@@ -1,0 +1,64 @@
+<h2>Assignment 1: Grade Converter [0%]</h2>
+
+<p>This assignment has zero weighting (it doesn't contribute to your unit mark). <br />
+You should however still submit it as it will be good practice to do so (both for you and the marking team).  </p>
+
+<p>Read all the instructions before attempting anything (there may be important details near the end !) <br />
+This is a relatively simple assignment, just to ease you into programming in Java. <br />
+The "hidden agenda" of this assignment is to thrash out any problems with the installation of java <br />
+(both in the lab and on your own computer)</p>
+
+<h3>Overview</h3>
+
+<p>The aim of this assignment is to create a program to convert a mark (between 0 and 100) <br />
+into a grade ("Fail", "Pass", "Merit", "Distinction"). <br />
+If you don't know the grade boundaries for your degree, maybe now is the time to look them up. <br />
+You will be given a template/skeleton project to help get you started. <br />
+You must add to the <em>GradeConverter</em> class and complete the following methods:
+<li> convertStringToMark: Reads a mark from a String and returns the mark as an int (0 to 100)
+<li> convertCharToInt: Converts a single character to an int - this will be used by convertStringToMark
+<li> convertMarkToGrade: Converts a numerical mark (e.g. 68) into a textual grade (e.g. "Merit")</p>
+
+<p>You may find it useful to take a look at the documentation for the Java
+<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> class</p>
+
+<h3>Conversion</h3>
+
+<p>Do <strong>NOT</strong> use existing libraries/methods to convert Strings to ints (that would make it too easy). <br />
+Instead, write your own function (convertCharToInt) that converts a single character into an <br />
+integer between 0 and 9 (or -1 if the character is not a numerical digit). <br />
+Don't use a bunch of IF statements for this - instead use a calculation based on
+<a href="http://www.asciitable.com/index/asciifull.gif">ascii values</a>.  </p>
+
+<h3>Running your Code</h3>
+
+<p>A Makefile is provided to help you: type <code>make</code> to compile your code and <code>make run</code> to run it. <br />
+The loop in the main method will repeatedly prompt the user for a mark <br />
+and will then use your code to convert it into a grade, before printing it out.   </p>
+
+<h3>Testing your Code</h3>
+
+<p>There is a separate test class (<em>GradeConverterTester</em>) that contains a range of different test cases. <br />
+Type <code>make test</code> to run the test cases against the current version of your code. <br />
+Extend and improve your code bit-by-bit in order to pass one test at a time <br />
+(don't try to pass them all in one go at the start !) <br />
+Your eventual aim is to pass as many tests as possible.  </p>
+
+<h3>Robustness</h3>
+
+<p>You should make your code robust (so that it does something sensible if an invalid input is given). <br />
+As much as possible, try to deal elegantly with unexpected input. <br />
+For example, if the user enters a % symbol at the end of their input, your code should still convert the mark. <br />
+There are many other weird inputs you might get from the user - try to anticipate these.  </p>
+
+<h3>Submission</h3>
+
+<p>This assignment is not assessed, however it will be good practice to submit it onto blackboard <br />
+(go to "Assessment, submission and feedback" and then "Other Formative and Draft Submissions").  </p>
+
+<p>It is <strong>essential</strong> that you ensure your code compiles and runs before you submit it <br />
+(otherwise we will not be able to run it to mark it !) <br />
+Just Submit your <em>GradeConverter</em> class (nothing else should be needed) <br />
+Scripts will be used to automatically test your code to make sure it operates correctly. <br />
+Don't change the name of the class or the signatures of any of the methods that already exist <br />
+(or we won't be able to test your code !).  </p>
