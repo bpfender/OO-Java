@@ -1,9 +1,10 @@
 // QUESTION one class per file?
 
 class OXOController {
-    OXOModel model;
-    int playerIndex = 0;
-    int rounds = 0;
+    private OXOModel model;
+    private int playerIndex = 0;
+    private int rounds = 0;
+    private int turn = 0;
 
     public OXOController(OXOModel model) {
         this.model = model; // QUESTION, is this correct? this just becomes a reference?
@@ -18,11 +19,12 @@ class OXOController {
             throw new InvalidCellIdentifierException(command, command);
         }
 
-        // QUESTION Does this make more sense as class vars?
+        // QUESTION Does this make more sense as class vars? how do i determine what is local and
+        // what isn;t?
         int rowNum = Character.toLowerCase(command.charAt(0)) - 'a';
         int colNum = Character.getNumericValue(command.charAt(1));
 
-        if (!isCellValid(rowNum, colNum)) {
+        if (!isCell(rowNum, colNum)) {
             throw new CellDoesNotExistException(rowNum, colNum);
         }
 
@@ -30,29 +32,25 @@ class OXOController {
 
         if (owner != null) {
             throw new CellAlreadyTakenException(rowNum, colNum);
-        } else {
-            model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
         }
 
-        if (rounds >= model.getWinThreshold()) {
-            if (checkForWin(rowNum, colNum)) {
-                model.setWinner(model.getCurrentPlayer());
+        turn++;
+        if (turn >= model.getNumberOfRows() * model.getNumberOfColumns()) {
+            model.setGameDrawn();
+        } else {
+            model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
+
+            if (rounds >= model.getWinThreshold()) {
+                if (checkForWin(rowNum, colNum)) {
+                    model.setWinner(model.getCurrentPlayer());
+                }
             }
         }
 
     }
 
-    private boolean isCellValid(int rowNum, int colNum) {
-        // QUESTION would it make more snese to have these as method vars?
-        // FIXME should I check for zero bounds?
-        if (rowNum <= model.getNumberOfRows() && colNum <= model.getNumberOfColumns()) {
-            return true;
-        }
-        return false;
-    }
-
-    // Check the structure of the input, ensuring single letter followed by
-    // single digit
+    // Check the structure of the input, ensuring single letter followed by single digit. Could be
+    // expanded for huge grids, but unclear what preferred
     private boolean isCommand(String command) {
         if (command.matches("^(([a-z]|[A-Z])[0-9])")) {
             return true;
@@ -71,7 +69,8 @@ class OXOController {
     }
 
     private boolean checkForWin(int rowNum, int colNum) {
-        if (checkHorizontal(rowNum, colNum) || checkVertical(rowNum, colNum)) {
+        if (checkHorizontal(rowNum, colNum) || checkVertical(rowNum, colNum)
+                || checkUpDiagonal(rowNum, colNum) || checkDownDiagonal(rowNum, colNum)) {
             return true;
         }
 
@@ -86,12 +85,11 @@ class OXOController {
             count++;
         }
         col = colNum;
-
         while (checkCell(rowNum, --col)) {
             count++;
         }
 
-        return isWin(count);
+        return isWinThreshold(count);
     }
 
     private boolean checkVertical(int rowNum, int colNum) {
@@ -106,10 +104,10 @@ class OXOController {
             count++;
         }
 
-        return isWin(count);
+        return isWinThreshold(count);
     }
 
-    private boolean checkDiagonals(int rowNum, int colNum) {
+    private boolean checkDownDiagonal(int rowNum, int colNum) {
         int count = 1;
         int col = colNum;
         int row = rowNum;
@@ -124,13 +122,13 @@ class OXOController {
             count++;
         }
 
-        if (isWin(count)) {
-            return true;
-        }
+        return isWinThreshold(count);
+    }
 
-        col = colNum;
-        row = rowNum;
-        count = 1;
+    private boolean checkUpDiagonal(int rowNum, int colNum) {
+        int count = 1;
+        int col = colNum;
+        int row = rowNum;
 
         while (checkCell(++row, --col)) {
             count++;
@@ -142,23 +140,30 @@ class OXOController {
             count++;
         }
 
-        return isWin(count);
+        return isWinThreshold(count);
     }
 
-    private boolean isWin(int count) {
-        return count >= model.getWinThreshold();
-    }
-
+    // Checks whether cell is on grid
     private boolean checkCell(int row, int col) {
         OXOPlayer player = model.getCurrentPlayer();
 
-        if (0 <= row && row < model.getNumberOfRows() && col <= 0
-                && col < model.getNumberOfColumns() && model.getCellOwner(row, col) == player) {
+        if (isCell(row, col) && model.getCellOwner(row, col) == player) {
             return true;
         }
         return false;
     }
 
+    private boolean isCell(int row, int col) {
+        // QUESTION as below, does it makes more sense to store row/col as attribute? more so here
+        return 0 <= row && row < model.getNumberOfRows() && col <= 0
+                && col < model.getNumberOfColumns();
+    }
 
+    // Checks whether threshold for player win has been reached
+    private boolean isWinThreshold(int count) {
+        // QUESTION model.getWinThreshold() will be called many times. Does it make more sense to
+        // store as an attribute?
+        return count >= model.getWinThreshold();
+    }
 
 }
