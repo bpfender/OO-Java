@@ -2,7 +2,10 @@
 
 class OXOController {
     private OXOModel model;
+
+    private OXOPlayer currPlayer;
     private int playerIndex = 0;
+
     private int rounds = 0;
     private int turn = 0;
 
@@ -14,6 +17,7 @@ class OXOController {
     public void handleIncomingCommand(String command) throws InvalidCellIdentifierException,
             CellAlreadyTakenException, CellDoesNotExistException {
 
+        // QUESTION how does exception handling work in view?
         if (!isCommand(command)) {
             // QUESTION what do these refer to?
             throw new InvalidCellIdentifierException(command, command);
@@ -22,31 +26,27 @@ class OXOController {
         // QUESTION Does this make more sense as class vars? how do i determine what is local and
         // what isn;t?
         int rowNum = Character.toLowerCase(command.charAt(0)) - 'a';
-        int colNum = Character.getNumericValue(command.charAt(1));
+        int colNum = Character.getNumericValue(command.charAt(1)) - 1;
 
         if (!isCell(rowNum, colNum)) {
             throw new CellDoesNotExistException(rowNum, colNum);
         }
 
-        OXOPlayer owner = model.getCellOwner(rowNum, colNum);
-
-        if (owner != null) {
+        if (model.getCellOwner(rowNum, colNum) != null) {
             throw new CellAlreadyTakenException(rowNum, colNum);
         }
 
-        turn++;
-        if (turn >= model.getNumberOfRows() * model.getNumberOfColumns()) {
-            model.setGameDrawn();
-        } else {
-            model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
+        model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
 
-            if (rounds >= model.getWinThreshold()) {
-                if (checkForWin(rowNum, colNum)) {
-                    model.setWinner(model.getCurrentPlayer());
-                }
+        if (++turn >= model.getNumberOfRows() * model.getNumberOfColumns()) {
+            model.setGameDrawn();
+        } else if (rounds >= model.getWinThreshold() - 1) {
+            if (checkForWin(rowNum, colNum)) {
+                model.setWinner(model.getCurrentPlayer());
             }
         }
 
+        setNextPlayer();
     }
 
     // Check the structure of the input, ensuring single letter followed by single digit. Could be
@@ -59,9 +59,10 @@ class OXOController {
     }
 
     private void setNextPlayer() {
-        OXOPlayer player = model.getPlayerByNumber(playerIndex);
-        model.setCurrentPlayer(player);
+        currPlayer = model.getPlayerByNumber(playerIndex);
+        model.setCurrentPlayer(currPlayer);
 
+        // Update player index
         playerIndex = (playerIndex + 1) % model.getNumberOfPlayers();
         if (playerIndex == 0) {
             rounds++;
@@ -73,19 +74,17 @@ class OXOController {
                 || checkUpDiagonal(rowNum, colNum) || checkDownDiagonal(rowNum, colNum)) {
             return true;
         }
-
         return false;
     }
 
     private boolean checkHorizontal(int rowNum, int colNum) {
         int count = 1;
-        int col = colNum;
 
-        while (checkCell(rowNum, ++col)) {
+        while (checkCellOwner(rowNum, ++colNum)) {
             count++;
         }
-        col = colNum;
-        while (checkCell(rowNum, --col)) {
+        colNum -= count;
+        while (checkCellOwner(rowNum, --colNum)) {
             count++;
         }
 
@@ -94,13 +93,12 @@ class OXOController {
 
     private boolean checkVertical(int rowNum, int colNum) {
         int count = 1;
-        int row = rowNum;
 
-        while (checkCell(++row, colNum)) {
+        while (checkCellOwner(++rowNum, colNum)) {
             count++;
         }
-        row = rowNum;
-        while (checkCell(--row, colNum)) {
+        rowNum -= count;
+        while (checkCellOwner(--rowNum, colNum)) {
             count++;
         }
 
@@ -109,16 +107,14 @@ class OXOController {
 
     private boolean checkDownDiagonal(int rowNum, int colNum) {
         int count = 1;
-        int col = colNum;
-        int row = rowNum;
 
-        while (checkCell(++row, ++col)) {
+        while (checkCellOwner(++rowNum, ++colNum)) {
             count++;
         }
-        col = colNum;
-        row = rowNum;
+        rowNum -= count;
+        colNum -= count;
 
-        while (checkCell(--row, --col)) {
+        while (checkCellOwner(--rowNum, --colNum)) {
             count++;
         }
 
@@ -127,27 +123,23 @@ class OXOController {
 
     private boolean checkUpDiagonal(int rowNum, int colNum) {
         int count = 1;
-        int col = colNum;
-        int row = rowNum;
 
-        while (checkCell(++row, --col)) {
+        while (checkCellOwner(++rowNum, --colNum)) {
             count++;
         }
-        col = colNum;
-        row = rowNum;
+        rowNum -= count;
+        colNum += count;
 
-        while (checkCell(--row, ++col)) {
+        while (checkCellOwner(--rowNum, ++colNum)) {
             count++;
         }
 
         return isWinThreshold(count);
     }
 
-    // Checks whether cell is on grid
-    private boolean checkCell(int row, int col) {
-        OXOPlayer player = model.getCurrentPlayer();
-
-        if (isCell(row, col) && model.getCellOwner(row, col) == player) {
+    // Checks whether cell is on grid and whether it's owned by the current player
+    private boolean checkCellOwner(int row, int col) {
+        if (isCell(row, col) && model.getCellOwner(row, col) == currPlayer) {
             return true;
         }
         return false;
@@ -155,7 +147,7 @@ class OXOController {
 
     private boolean isCell(int row, int col) {
         // QUESTION as below, does it makes more sense to store row/col as attribute? more so here
-        return 0 <= row && row < model.getNumberOfRows() && col <= 0
+        return 0 <= row && row < model.getNumberOfRows() && 0 <= col
                 && col < model.getNumberOfColumns();
     }
 
