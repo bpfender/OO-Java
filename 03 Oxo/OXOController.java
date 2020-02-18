@@ -1,42 +1,37 @@
-// QUESTION one class per file?
 
 class OXOController {
+    // QUESTION what's the balance between storing getter returns as local
+    // attributes and constantly calling the getter functions
     private OXOModel model;
 
-    private OXOPlayer currPlayer;
     private int playerIndex = 0;
 
     private int rounds = 0;
     private int turn = 0;
 
     public OXOController(OXOModel model) {
-        this.model = model; // QUESTION, is this correct? this just becomes a reference?
+        this.model = model;
         setNextPlayer();
     }
 
-    public void handleIncomingCommand(String command) throws InvalidCellIdentifierException,
-            CellAlreadyTakenException, CellDoesNotExistException {
+    public void handleIncomingCommand(String command)
+            throws InvalidCellIdentifierException, CellAlreadyTakenException, CellDoesNotExistException {
 
-        if (command.length() < 2) {
-            throw new InvalidCellIdentifierException("location must be 2 chars,", command);
-        }
-
-        // QUESTION how does exception handling work in view?
+        // Error checking on input could obviously be extended with more detailed
+        // checking and error messages, such as length of string etc. For the moment,
+        // this will do.
         if (!isCommand(command)) {
-            // QUESTION what do these refer to?
-            throw new InvalidCellIdentifierException("string must be number and letter", command);
+            throw new InvalidCellIdentifierException("ref. must be 1 letter followed by 1 number:", command);
         }
 
-        // QUESTION Does this make more sense as class vars? how do i determine what is
-        // local and
-        // what isn;t?
+        // QUESTION balance of attributes vs local variables?
+        // If command is valid (checked above) coordinates can be extracted.
         int rowNum = Character.toLowerCase(command.charAt(0)) - 'a';
         int colNum = Character.getNumericValue(command.charAt(1)) - 1;
 
         if (!isCell(rowNum, colNum)) {
             throw new CellDoesNotExistException(rowNum, colNum);
         }
-
         if (model.getCellOwner(rowNum, colNum) != null) {
             throw new CellAlreadyTakenException(rowNum, colNum);
         }
@@ -57,19 +52,16 @@ class OXOController {
     }
 
     // Check the structure of the input, ensuring single letter followed by single
-    // digit. Could be
-    // expanded for huge grids, but unclear what preferred
-    // QUESTION do you want this to work for 10,11,12 etc?
+    // digit. Accepts both capital and non-capital input.
     private boolean isCommand(String command) {
-        if (command.matches("^(([a-z]|[A-Z])[0-9])")) {
-            return true;
-        }
-        return false;
+        // Have stuck with single digit input, assuming limited grid sizes (A-I, 0-9)
+        // for purposes of simplicity. In any case, the provided code breaks,
+        // displaying ":" etc. instead of "10" at larger sizes.
+        return command.matches("^(([a-z]|[A-Z])[0-9])");
     }
 
     private void setNextPlayer() {
-        currPlayer = model.getPlayerByNumber(playerIndex);
-        model.setCurrentPlayer(currPlayer);
+        model.setCurrentPlayer(model.getPlayerByNumber(playerIndex));
 
         // Update player index
         playerIndex = (playerIndex + 1) % model.getNumberOfPlayers();
@@ -78,16 +70,19 @@ class OXOController {
         }
     }
 
+    // Checks horizontal, vertical, diagonal and anti-diagonal star around last
+    // placed move for a win condition
     private boolean checkForWin(int rowNum, int colNum) {
-        if (checkWinVector(rowNum, colNum, 1, 0) || checkWinVector(rowNum, colNum, 0, 1)
-                || checkWinVector(rowNum, colNum, 1, 1) || checkWinVector(rowNum, colNum, 1, -1)) {
-            return true;
-        }
-
-        return false;
+        return checkWinVector(rowNum, colNum, 1, 0) || checkWinVector(rowNum, colNum, 0, 1)
+                || checkWinVector(rowNum, colNum, 1, 1) || checkWinVector(rowNum, colNum, 1, -1);
     }
 
+    // Counts either side around last placed move for the number of connected cells.
+    // If the win threshold is reached, true is returned The dir_ variables
+    // determine which direction the search goes (horizontal, vertical, diagonal
+    // or anti-diagonal).
     private boolean checkWinVector(int rowNum, int colNum, int dir_x, int dir_y) {
+        // Current cell counts as 1 in the row
         int count = 1;
 
         int col = colNum + dir_x;
@@ -108,30 +103,16 @@ class OXOController {
             count++;
         }
 
-        return isWinThreshold(count);
+        return count >= model.getWinThreshold();
     }
 
     // Checks whether cell is on grid and whether it's owned by the current player
     private boolean checkCellOwner(int row, int col) {
-        if (isCell(row, col) && model.getCellOwner(row, col) == currPlayer) {
-            return true;
-        }
-        return false;
+        return isCell(row, col) && model.getCellOwner(row, col) == model.getCurrentPlayer();
     }
 
     private boolean isCell(int row, int col) {
-        // QUESTION as below, does it makes more sense to store row/col as attribute?
-        // more so here
-        return 0 <= row && row < model.getNumberOfRows() && 0 <= col
-                && col < model.getNumberOfColumns();
+        // QUESTION does it makes more sense to store row/col as attribute?
+        return (0 <= row && row < model.getNumberOfRows()) && (0 <= col && col < model.getNumberOfColumns());
     }
-
-    // Checks whether threshold for player win has been reached
-    private boolean isWinThreshold(int count) {
-        // QUESTION model.getWinThreshold() will be called many times. Does it make more
-        // sense to
-        // store as an attribute?
-        return count >= model.getWinThreshold();
-    }
-
 }

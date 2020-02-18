@@ -6,9 +6,5 @@ build:
 run: build
 	java --module-path $$PATH_TO_FX --add-modules javafx.controls OXOView
 
-test: build
-	javac TriangleTester.java
-	java -ea TriangleTester
-
 clean:
 	rm *.class
