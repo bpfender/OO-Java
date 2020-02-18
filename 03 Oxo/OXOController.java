@@ -1,7 +1,7 @@
 
 class OXOController {
     // QUESTION what's the balance between storing getter returns as local
-    // attributes and constantly calling the getter functions
+    // attributes and constantly calling the getter functions?
     private OXOModel model;
 
     private int playerIndex = 0;
@@ -36,15 +36,17 @@ class OXOController {
             throw new CellAlreadyTakenException(rowNum, colNum);
         }
 
+        turn++;
         model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
 
+        // Dont't check for win until you need to
         if (rounds >= model.getWinThreshold() - 1) {
             if (checkForWin(rowNum, colNum)) {
                 model.setWinner(model.getCurrentPlayer());
             }
         }
 
-        if (++turn >= model.getNumberOfRows() * model.getNumberOfColumns()) {
+        if (turn >= model.getNumberOfRows() * model.getNumberOfColumns()) {
             model.setGameDrawn();
         }
 
