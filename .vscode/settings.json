@@ -1,6 +1,0 @@
-{
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "/home/bpfender/projects/OO-Java/**/*.jar"
-    ]
-}

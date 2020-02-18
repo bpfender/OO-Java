@@ -36,6 +36,7 @@ class OXOController {
             throw new CellAlreadyTakenException(rowNum, colNum);
         }
 
+        // FIXME handling of win, no more input accepted
         turn++;
         model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
 
