@@ -1,12 +1,8 @@
 
 class OXOController {
-    // QUESTION what's the balance between storing getter returns as local
-    // attributes and constantly calling the getter functions?
     private OXOModel model;
 
     private int playerIndex = 0;
-
-    private int rounds = 0;
     private int turn = 0;
 
     public OXOController(OXOModel model) {
@@ -14,44 +10,46 @@ class OXOController {
         setNextPlayer();
     }
 
-    public void handleIncomingCommand(String command)
-            throws InvalidCellIdentifierException, CellAlreadyTakenException, CellDoesNotExistException {
+    public void handleIncomingCommand(String command) throws InvalidCellIdentifierException,
+            CellAlreadyTakenException, CellDoesNotExistException {
 
-        // Error checking on input could obviously be extended with more detailed
-        // checking and error messages, such as length of string etc. For the moment,
-        // this will do.
-        if (!isCommand(command)) {
-            throw new InvalidCellIdentifierException("ref. must be 1 letter followed by 1 number:", command);
-        }
+        if (!isGameOver()) {
+            // Error checking on input could obviously be extended with more detailed
+            // checking and error messages, such as length of string etc. For the moment,
+            // this will do.
+            if (!isCommand(command)) {
+                throw new InvalidCellIdentifierException("ref. must be letter followed by number:",
+                        command);
+            }
 
-        // QUESTION balance of attributes vs local variables?
-        // If command is valid (checked above) coordinates can be extracted.
-        int rowNum = Character.toLowerCase(command.charAt(0)) - 'a';
-        int colNum = Character.getNumericValue(command.charAt(1)) - 1;
+            // If command is valid (checked above) coordinates can be extracted.
+            int rowNum = Character.toLowerCase(command.charAt(0)) - 'a';
+            int colNum = Integer.parseInt(command.substring(1)) - 1;
 
-        if (!isCell(rowNum, colNum)) {
-            throw new CellDoesNotExistException(rowNum, colNum);
-        }
-        if (model.getCellOwner(rowNum, colNum) != null) {
-            throw new CellAlreadyTakenException(rowNum, colNum);
-        }
+            if (!isCell(rowNum, colNum)) {
+                throw new CellDoesNotExistException(rowNum, colNum);
+            }
+            if (model.getCellOwner(rowNum, colNum) != null) {
+                throw new CellAlreadyTakenException(rowNum, colNum);
+            }
 
-        // FIXME handling of win, no more input accepted
-        turn++;
-        model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
+            turn++;
+            model.setCellOwner(rowNum, colNum, model.getCurrentPlayer());
 
-        // Dont't check for win until you need to
-        if (rounds >= model.getWinThreshold() - 1) {
             if (checkForWin(rowNum, colNum)) {
                 model.setWinner(model.getCurrentPlayer());
             }
-        }
 
-        if (turn >= model.getNumberOfRows() * model.getNumberOfColumns()) {
-            model.setGameDrawn();
-        }
+            if (turn >= model.getNumberOfRows() * model.getNumberOfColumns()) {
+                model.setGameDrawn();
+            }
 
-        setNextPlayer();
+            setNextPlayer();
+        }
+    }
+
+    private boolean isGameOver() {
+        return model.isGameDrawn() || model.getWinner() != null;
     }
 
     // Check the structure of the input, ensuring single letter followed by single
@@ -60,7 +58,7 @@ class OXOController {
         // Have stuck with single digit input, assuming limited grid sizes (A-I, 0-9)
         // for purposes of simplicity. In any case, the provided code breaks,
         // displaying ":" etc. instead of "10" at larger sizes.
-        return command.matches("^(([a-z]|[A-Z])[0-9])");
+        return command.matches("^([a-z]|[A-Z])[0-9]+");
     }
 
     private void setNextPlayer() {
@@ -68,9 +66,6 @@ class OXOController {
 
         // Update player index
         playerIndex = (playerIndex + 1) % model.getNumberOfPlayers();
-        if (playerIndex == 0) {
-            rounds++;
-        }
     }
 
     // Checks horizontal, vertical, diagonal and anti-diagonal star around last
@@ -115,7 +110,7 @@ class OXOController {
     }
 
     private boolean isCell(int row, int col) {
-        // QUESTION does it makes more sense to store row/col as attribute?
-        return (0 <= row && row < model.getNumberOfRows()) && (0 <= col && col < model.getNumberOfColumns());
+        return (0 <= row && row < model.getNumberOfRows())
+                && (0 <= col && col < model.getNumberOfColumns());
     }
 }
