@@ -1,11 +1,10 @@
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
+import com.alexmerz.graphviz.objects.Edge;
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 
@@ -16,8 +15,29 @@ public class Builder {
     // FIXME try catch exception, other error handling
 
     public static void main(String[] args) {
+        World world = new World();
+
         ArrayList<Graph> graphs = parseFile(args[0]);
+
+        // Populate locations
         ArrayList<Graph> locations = getLocationsGraph(graphs);
+        for (Graph loc : locations) {
+            Location location = parseLocation(loc);
+            world.addLocation(location.getName(), location);
+        }
+
+        // Populate paths
+        ArrayList<Edge> paths = getPathsGraph(graphs);
+        for (Edge p : paths) {
+            String source = p.getSource().getNode().getId().getId();
+            String target = p.getTarget().getNode().getId().getId();
+
+            Location location = world.getLocation(source);
+            Location path = world.getLocation(target);
+
+            location.addEntity(path);
+        }
+
         System.out.printf("TEST %s\n\n", locations.get(0).getId());
         parseLocation(locations.get(0));
     }
@@ -45,21 +65,25 @@ public class Builder {
         return null;
     }
 
+    // FIXME basically the same functions below
     private static ArrayList<Graph> getLocationsGraph(ArrayList<Graph> graphs) {
         // FIXME handle null return and also orelse/null?
         return graphs.stream().filter(s -> "locations".equals(s.getId().getId())).findAny().orElse(null).getSubgraphs();
     }
 
-    private static void parseLocation(Graph location) {
-        Node nodesLoc = location.getNodes(false).get(0);
+    private static ArrayList<Edge> getPathsGraph(ArrayList<Graph> graphs) {
+        return graphs.stream().filter(s -> "paths".equals(s.getId().getId())).findAny().orElse(null).getEdges();
+    }
+
+    private static Location parseLocation(Graph locationGraph) {
+        Node nodesLoc = locationGraph.getNodes(false).get(0);
 
         String name = nodesLoc.getId().getId();
         String description = nodesLoc.getAttribute("description");
 
-        System.out.printf("Location name %s \n", name);
-        System.out.printf("Location descr %s \n", description);
+        Location location = new Location(name, description);
 
-        ArrayList<Graph> entities = location.getSubgraphs();
+        ArrayList<Graph> entities = locationGraph.getSubgraphs();
 
         for (Graph g : entities) {
             String entName = g.getId().getId();
@@ -68,19 +92,18 @@ public class Builder {
                 String nodName = n.getId().getId();
                 String nodDescr = n.getAttribute("description");
 
-                System.out.printf("%s \n", entName);
-                System.out.printf("Node name %s \n", nodName);
-                System.out.printf("Node descr %s \n", nodDescr);
-
                 switch (entName) {
                     case "artefacts":
-                        System.out.printf("art\n", entName);
+                        Artefact artefact = new Artefact(nodName, nodDescr);
+                        location.addEntity(artefact);
                         break;
                     case "furniture":
-                        System.out.printf("furn\n", entName);
+                        Furniture furniture = new Furniture(nodName, nodDescr);
+                        location.addEntity(furniture);
                         break;
                     case "character":
-                        System.out.printf("char\n", entName);
+                        Character character = new Character(nodName, nodDescr);
+                        location.addEntity(character);
                         break;
                     default:
                         break;
@@ -88,10 +111,7 @@ public class Builder {
             }
         }
 
-        // List<Character> characters = new ArrayList<Character>();
-        // List<Artefact> artefacts = new ArrayList<Artefact>();
-        // List<Furniture> furniture = new ArrayList<Furniture>();
-
+        return location;
     }
 
 }
