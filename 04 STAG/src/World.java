@@ -25,4 +25,12 @@ public class World {
     public Action getAction(String name) {
         return actions.get(name);
     }
+
+    public void addPlayer(String name, Player player) {
+        players.put(name, player);
+    }
+
+    public Player getPlayer(String name) {
+        return players.get(name);
+    }
 }
