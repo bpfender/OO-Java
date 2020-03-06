@@ -1,12 +1,32 @@
-import java.util.List;
+import org.json.simple.*;
 
 /**
  * Actions
  */
-public abstract class Action {
-    List<String> triggers;
-    List<String> subjects;
-    List<String> consumed;
-    List<String> produced;
-    List<String> narration;
+
+// FIXME maybe make these final
+// FIXME don't like that this is structured as a JSONArray at the moment
+public class Action {
+    JSONArray triggers = new JSONArray();
+    JSONArray subjects = new JSONArray();
+    JSONArray consumed = new JSONArray();
+    JSONArray produced = new JSONArray();
+    String narration;
+
+    public Action(JSONArray triggers, JSONArray subjects, JSONArray consumed, JSONArray produced, String narration) {
+        this.triggers = triggers;
+        this.subjects = subjects;
+        this.consumed = consumed;
+        this.produced = produced;
+        this.narration = narration;
+    }
+
+    public JSONArray getTriggers() {
+        return triggers;
+    }
+
+    public void setTriggers(JSONArray triggers) {
+        this.triggers = triggers;
+    }
+
 }

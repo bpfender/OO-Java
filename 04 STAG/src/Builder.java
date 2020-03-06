@@ -1,12 +1,18 @@
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Edge;
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 /**
  * World
@@ -40,6 +46,16 @@ public class Builder {
 
         System.out.printf("TEST %s\n\n", locations.get(0).getId());
         parseLocation(locations.get(0));
+
+        JSONArray actions = parseActionsFile(args[1]);
+
+        for (Object obj : actions) {
+            Action action = getActions((JSONObject) obj);
+            JSONArray triggers = action.getTriggers();
+            for (Object trig : triggers) {
+                world.addAction((String) trig, action);
+            }
+        }
     }
 
     private static ArrayList<Graph> parseFile(String entities) {
@@ -112,6 +128,41 @@ public class Builder {
         }
 
         return location;
+    }
+
+    private static JSONArray parseActionsFile(String actions) {
+        try {
+            JSONParser parser = new JSONParser();
+            FileReader reader = new FileReader(actions);
+            JSONObject object = (JSONObject) parser.parse(reader);
+            JSONArray array = (JSONArray) object.get("actions");
+            return array;
+
+        } catch (FileNotFoundException fnfe) {
+            // TODO: handle exception
+        } catch (IOException io) {
+
+        } catch (org.json.simple.parser.ParseException pe) {
+
+        }
+        return null;
+        // FIXME error handling!!
+
+    }
+
+    // TODO check that zero length arrays are handled properly
+    private static Action getActions(JSONObject object) {
+        JSONArray triggers = (JSONArray) object.get("triggers");
+        JSONArray subjects = (JSONArray) object.get("subjects");
+        JSONArray consumed = (JSONArray) object.get("consumed");
+        JSONArray produced = (JSONArray) object.get("produced");
+        String narration = (String) object.get("narration");
+
+        for (Object s : triggers) {
+            System.out.printf("%s ", (String) s);
+        }
+
+        return new Action(triggers, subjects, consumed, produced, narration);
     }
 
 }
