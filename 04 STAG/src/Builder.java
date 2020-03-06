@@ -2,7 +2,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
@@ -20,7 +19,7 @@ import org.json.simple.parser.JSONParser;
 public class Builder {
     // FIXME try catch exception, other error handling
 
-    public static void main(String[] args) {
+    public World buildWorld(String args[]) {
         World world = new World();
 
         ArrayList<Graph> graphs = parseFile(args[0]);
@@ -56,9 +55,11 @@ public class Builder {
                 world.addAction((String) trig, action);
             }
         }
+
+        return world;
     }
 
-    private static ArrayList<Graph> parseFile(String entities) {
+    private ArrayList<Graph> parseFile(String entities) {
         try {
             Parser parser = new Parser();
             FileReader reader = new FileReader(entities);
@@ -82,16 +83,16 @@ public class Builder {
     }
 
     // FIXME basically the same functions below
-    private static ArrayList<Graph> getLocationsGraph(ArrayList<Graph> graphs) {
+    private ArrayList<Graph> getLocationsGraph(ArrayList<Graph> graphs) {
         // FIXME handle null return and also orelse/null?
         return graphs.stream().filter(s -> "locations".equals(s.getId().getId())).findAny().orElse(null).getSubgraphs();
     }
 
-    private static ArrayList<Edge> getPathsGraph(ArrayList<Graph> graphs) {
+    private ArrayList<Edge> getPathsGraph(ArrayList<Graph> graphs) {
         return graphs.stream().filter(s -> "paths".equals(s.getId().getId())).findAny().orElse(null).getEdges();
     }
 
-    private static Location parseLocation(Graph locationGraph) {
+    private Location parseLocation(Graph locationGraph) {
         Node nodesLoc = locationGraph.getNodes(false).get(0);
 
         String name = nodesLoc.getId().getId();
@@ -130,7 +131,7 @@ public class Builder {
         return location;
     }
 
-    private static JSONArray parseActionsFile(String actions) {
+    private JSONArray parseActionsFile(String actions) {
         try {
             JSONParser parser = new JSONParser();
             FileReader reader = new FileReader(actions);
@@ -151,7 +152,7 @@ public class Builder {
     }
 
     // TODO check that zero length arrays are handled properly
-    private static Action getActions(JSONObject object) {
+    private Action getActions(JSONObject object) {
         JSONArray triggers = (JSONArray) object.get("triggers");
         JSONArray subjects = (JSONArray) object.get("subjects");
         JSONArray consumed = (JSONArray) object.get("consumed");

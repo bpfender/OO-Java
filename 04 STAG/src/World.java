@@ -8,6 +8,7 @@ import java.util.HashMap;
 public class World {
     HashMap<String, Location> locations = new HashMap<String, Location>();
     HashMap<String, Action> actions = new HashMap<String, Action>();
+    HashMap<String, Player> players = new HashMap<>();
 
     public void addLocation(String name, Location location) {
         locations.put(name, location);

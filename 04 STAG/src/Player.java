@@ -9,4 +9,5 @@ public class Player extends Character {
     }
 
     List<Artefact> inventory;
+    Location currentLocations;
 }
