@@ -1,13 +1,18 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 class StagServer {
+    static World world;
+
     public static void main(String args[]) {
         if (args.length != 2)
             System.out.println("Usage: java StagServer <entity-file> <action-file>");
-        else
+        else {
+            Builder builder = new Builder();
+            world = builder.buildWorld(args);
+
             new StagServer(args[0], args[1], 8888);
+        }
     }
 
     public StagServer(String entityFilename, String actionFilename, int portNumber) {
@@ -38,6 +43,10 @@ class StagServer {
 
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException {
         String line = in.readLine();
+
+        // QUESTION is this bad practice?
+        CommandHandler.processCommand(world, line);
+
         out.write("You said... " + line + "\n");
     }
 }
