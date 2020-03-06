@@ -7,7 +7,7 @@
             "consumed": ["key"],
             "produced": ["cellar"],
             "narration": "You unlock the door and see steps leading down into a cellar"
-        }
+        },
 
         {
             "triggers": ["chop", "cut", "cutdown"],
@@ -15,7 +15,7 @@
             "consumed": ["tree"],
             "produced": ["log"],
             "narration": "You cut down the tree with the axe"
-        }
+        },
 
         {
             "triggers": ["drink"],
@@ -23,7 +23,7 @@
             "consumed": ["potion"],
             "produced": ["health"],
             "narration": "You drink the potion and your health improves"
-        }
+        },
 
         {
             "triggers": ["fight", "hit", "punch", "kick", "slap", "attack", "kill"],
