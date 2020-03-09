@@ -43,9 +43,9 @@ class StagServer {
 
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException {
         String line = in.readLine();
-
+        CommandHandler handler = new CommandHandler();
         // QUESTION is this bad practice?
-        CommandHandler.processCommand(world, line);
+        handler.processInput(world, line);
 
         out.write("You said... " + line + "\n");
     }

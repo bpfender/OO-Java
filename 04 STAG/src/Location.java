@@ -30,4 +30,25 @@ public class Location extends Entity {
         }
     }
 
+    // TODO needs to be extended
+    public void describeLocation() {
+        // QUESTION this.getName() seems a bit unecesarry?
+        System.out.printf("This is the %s\n", this.getName());
+    }
+
+    public Entity removeEntity(String name) {
+        Entity entity;
+
+        // FIXME super horrible at the moment
+        if ((entity = paths.get(name)) != null) {
+            return entity;
+        } else if ((entity = artefacts.get(name)) != null) {
+            return entity;
+        } else if ((entity = furniture.get(name)) != null) {
+            return entity;
+        } else {
+            return null;
+        }
+    }
+
 }
