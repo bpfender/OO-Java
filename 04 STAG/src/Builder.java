@@ -16,6 +16,8 @@ import org.json.simple.parser.JSONParser;
 /**
  * World
  */
+/// TODO make sure everything is lowercased
+
 public class Builder {
     // FIXME try catch exception, other error handling
 
@@ -46,11 +48,13 @@ public class Builder {
         System.out.printf("TEST %s\n\n", locations.get(0).getId());
         parseLocation(locations.get(0));
 
+        // Populate actions
         JSONArray actions = parseActionsFile(args[1]);
 
         for (Object obj : actions) {
             Action action = getActions((JSONObject) obj);
             JSONArray triggers = action.getTriggers();
+            // QUESTION is this the most efficient way of doing this?
             for (Object trig : triggers) {
                 world.addAction((String) trig, action);
             }
