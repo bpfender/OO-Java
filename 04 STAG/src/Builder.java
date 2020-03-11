@@ -25,29 +25,19 @@ public class Builder {
     public World buildWorld(String args[]) {
         World world = new World();
 
-        ArrayList<Graph> graphs = loadEntitiesFile(args[0]);
+        ArrayList<Graph> layoutGraph = loadEntitiesFile(args[0]);
 
-        // Populate locations
-        ArrayList<Graph> locations = getLocationsGraph(graphs);
-        for (Graph loc : locations) {
-            Location location = parseLocation(loc);
-            world.addLocation(location.getName(), location);
+        // QUESTION graceful handling of program termination?
+        if (layoutGraph == null) {
+            System.exit(1);
         }
 
-        // Populate paths
-        ArrayList<Edge> paths = getPathsGraph(graphs);
-        for (Edge p : paths) {
-            String source = p.getSource().getNode().getId().getId();
-            String target = p.getTarget().getNode().getId().getId();
-
-            Location location = world.getLocation(source);
-            Location path = world.getLocation(target);
-
-            location.addEntity(path);
+        try {
+            processEntities(world, layoutGraph);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e);
+            System.exit(1);
         }
-
-        System.out.printf("TEST %s\n\n", locations.get(0).getId());
-        parseLocation(locations.get(0));
 
         // Populate actions
         JSONArray actions = parseActionsFile(args[1]);
@@ -66,7 +56,7 @@ public class Builder {
 
     // TODO add filename extension checking?
     private ArrayList<Graph> loadEntitiesFile(String filename) {
-        // QUESTION is this ok?
+        // QUESTION is this ok throwing my own exceptions?
         try {
             if (!filename.matches(".+(.dot)$")) {
                 throw new FileNotFoundException("Invalid file extension");
@@ -81,9 +71,9 @@ public class Builder {
             Parser parser = new Parser();
 
             parser.parse(reader);
-            ArrayList<Graph> entitiesGraph = parser.getGraphs();
+            ArrayList<Graph> layoutGraph = parser.getGraphs();
 
-            return entitiesGraph;
+            return layoutGraph;
 
         } catch (FileNotFoundException | ParseException e) {
             System.err.println(e);
@@ -94,22 +84,23 @@ public class Builder {
         return null;
     }
 
-    private void processEntities(World world, ArrayList<Graph> entitiesGraph) throws IllegalArgumentException {
+    private void processEntities(World world, ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
         // QUESTION why calling getId() twice?
-        if (entitiesGraph.get(0).getId().getId().equals("layout")) {
+        if (layoutGraph.get(0).getId().getId().equals("layout")) {
             throw new IllegalArgumentException("Expected 'layout' graph in file");
         }
 
-        ArrayList<Graph> layoutGraph = entitiesGraph.get(0).getSubgraphs();
-        ArrayList<Graph> locationsGraph = getLocationsGraph(layoutGraph);
-        ArrayList<Edge> pathsGraph = getPathsGraph(layoutGraph);
+        ArrayList<Graph> entities = layoutGraph.get(0).getSubgraphs();
+
+        ArrayList<Graph> locationsGraph = getLocationsGraph(entities);
+        ArrayList<Edge> pathsGraph = getPathsGraph(entities);
 
         if (locationsGraph == null || pathsGraph == null) {
             throw new IllegalArgumentException("Expected a locations and paths graph in file");
         }
 
         for (Graph l : locationsGraph) {
-            Location location = parseLocation(l);
+            Location location = processLocationGraph(l);
             world.addLocation(location.getName(), location);
         }
 
@@ -127,7 +118,6 @@ public class Builder {
 
             location.addEntity(path);
         }
-
     }
 
     // FIXME basically the same functions below, generics possible?
@@ -139,38 +129,39 @@ public class Builder {
         return graphs.stream().filter(s -> "paths".equals(s.getId().getId())).findAny().orElse(null).getEdges();
     }
 
-    private Location parseLocation(Graph locationGraph) {
-        Node nodesLoc = locationGraph.getNodes(false).get(0);
+    private Location processLocationGraph(Graph locationGraph) throws IllegalArgumentException {
+        Node locationNode = locationGraph.getNodes(false).get(0);
 
-        String name = nodesLoc.getId().getId();
-        String description = nodesLoc.getAttribute("description");
+        String name = locationNode.getId().getId();
+        String description = locationNode.getAttribute("description");
 
         Location location = new Location(name, description);
 
         ArrayList<Graph> entities = locationGraph.getSubgraphs();
 
         for (Graph g : entities) {
-            String entName = g.getId().getId();
-            ArrayList<Node> nodesEnt = g.getNodes(false);
-            for (Node n : nodesEnt) {
-                String nodName = n.getId().getId();
-                String nodDescr = n.getAttribute("description");
+            String entityName = g.getId().getId();
+            ArrayList<Node> entityNodes = g.getNodes(false);
+            for (Node n : entityNodes) {
+                String nodeName = n.getId().getId();
+                String nodeDescription = n.getAttribute("description");
 
-                switch (entName) {
+                // What if an entity gets added to the game?
+                switch (entityName) {
                     case "artefacts":
-                        Artefact artefact = new Artefact(nodName, nodDescr);
+                        Artefact artefact = new Artefact(nodeName, nodeDescription);
                         location.addEntity(artefact);
                         break;
                     case "furniture":
-                        Furniture furniture = new Furniture(nodName, nodDescr);
+                        Furniture furniture = new Furniture(nodeName, nodeDescription);
                         location.addEntity(furniture);
                         break;
                     case "character":
-                        Character character = new Character(nodName, nodDescr);
+                        Character character = new Character(nodeName, nodeDescription);
                         location.addEntity(character);
                         break;
                     default:
-                        break;
+                        throw new IllegalArgumentException("Invalid entity in .dot file");
                 }
             }
         }
