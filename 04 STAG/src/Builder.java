@@ -19,12 +19,13 @@ import org.json.simple.parser.JSONParser;
 /// TODO make sure everything is lowercased
 
 public class Builder {
+    // TODO need to catch first location
     // FIXME try catch exception, other error handling
 
     public World buildWorld(String args[]) {
         World world = new World();
 
-        ArrayList<Graph> graphs = parseFile(args[0]);
+        ArrayList<Graph> graphs = loadEntitiesFile(args[0]);
 
         // Populate locations
         ArrayList<Graph> locations = getLocationsGraph(graphs);
@@ -63,24 +64,38 @@ public class Builder {
         return world;
     }
 
-    private ArrayList<Graph> parseFile(String entities) {
+    // TODO add filename extension checking?
+    private ArrayList<Graph> loadEntitiesFile(String filename) {
+        // QUESTION is this ok?
         try {
-            Parser parser = new Parser();
-            FileReader reader = new FileReader(entities);
-            parser.parse(reader);
-            ArrayList<Graph> graphs = parser.getGraphs();
-
-            // QUESTION why am i calling getId twice?
-            if (graphs.get(0).getId().getId().equals("layout")) {
-                return graphs.get(0).getSubgraphs();
-            } else {
-                System.out.println("An error occurred: Not a valid layout file\n");
+            if (!filename.matches(".+(.dot)$")) {
+                throw new FileNotFoundException("Invalid file extension");
             }
+        } catch (FileNotFoundException e) {
+            System.err.println(e);
+            return null;
+        }
 
-        } catch (FileNotFoundException fnfe) {
-            System.out.println(fnfe);
-        } catch (ParseException pe) {
-            System.out.println(pe);
+        // Done like this so it auto closes
+        try (FileReader reader = new FileReader(filename)) {
+            Parser parser = new Parser();
+
+            parser.parse(reader);
+            ArrayList<Graph> entitiesGraph = parser.getGraphs();
+
+            // FIXME make sure that readers are closed properly
+            return entitiesGraph;
+            // QUESTION why am i calling getId twice?
+            /*
+             * if (graphs.get(0).getId().getId().equals("layout")) { return
+             * graphs.get(0).getSubgraphs(); } else {
+             * System.out.println("An error occurred: Not a valid layout file\n"); }
+             */
+
+        } catch (FileNotFoundException | ParseException e) {
+            System.err.println(e);
+        } catch (IOException io) {
+            // QUESTION what to do here?
         }
         /* FIXME handling of error, what do i do? */
         return null;
