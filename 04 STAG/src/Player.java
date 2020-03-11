@@ -9,8 +9,10 @@ public class Player extends Character {
     HashMap<String, Artefact> inventory = new HashMap<>();
     Location currentLocation;
 
-    public Player(String name, String description) {
+    public Player(String name, String description, Location start) {
         super(name, description);
+        this.health = 3; // QUESTION does this need to be explicit?
+        this.currentLocation = start;
     }
 
     public void listInventory() {
@@ -41,5 +43,4 @@ public class Player extends Character {
     public void setHealth(int health) {
         this.health = health;
     }
-
 }

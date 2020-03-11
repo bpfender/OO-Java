@@ -8,6 +8,7 @@ class StagServer {
         if (args.length != 2)
             System.out.println("Usage: java StagServer <entity-file> <action-file>");
         else {
+
             Builder builder = new Builder();
             world = builder.buildWorld(args);
 

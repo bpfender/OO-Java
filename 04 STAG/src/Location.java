@@ -41,10 +41,13 @@ public class Location extends Entity {
 
         // FIXME super horrible at the moment
         if ((entity = paths.get(name)) != null) {
+            paths.remove(name);
             return entity;
         } else if ((entity = artefacts.get(name)) != null) {
+            artefacts.remove(name);
             return entity;
         } else if ((entity = furniture.get(name)) != null) {
+            furniture.remove(name);
             return entity;
         } else {
             return null;

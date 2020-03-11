@@ -25,8 +25,20 @@ public class Action {
         return triggers;
     }
 
-    public void setTriggers(JSONArray triggers) {
-        this.triggers = triggers;
+    public JSONArray getSubject() {
+        return subjects;
+    }
+
+    public JSONArray getConsumed() {
+        return consumed;
+    }
+
+    public JSONArray getProduced() {
+        return produced;
+    }
+
+    public String getNarration() {
+        return narration;
     }
 
 }

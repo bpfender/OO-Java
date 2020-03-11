@@ -83,14 +83,7 @@ public class Builder {
             parser.parse(reader);
             ArrayList<Graph> entitiesGraph = parser.getGraphs();
 
-            // FIXME make sure that readers are closed properly
             return entitiesGraph;
-            // QUESTION why am i calling getId twice?
-            /*
-             * if (graphs.get(0).getId().getId().equals("layout")) { return
-             * graphs.get(0).getSubgraphs(); } else {
-             * System.out.println("An error occurred: Not a valid layout file\n"); }
-             */
 
         } catch (FileNotFoundException | ParseException e) {
             System.err.println(e);
@@ -101,9 +94,44 @@ public class Builder {
         return null;
     }
 
-    // FIXME basically the same functions below
+    private void processEntities(World world, ArrayList<Graph> entitiesGraph) throws IllegalArgumentException {
+        // QUESTION why calling getId() twice?
+        if (entitiesGraph.get(0).getId().getId().equals("layout")) {
+            throw new IllegalArgumentException("Expected 'layout' graph in file");
+        }
+
+        ArrayList<Graph> layoutGraph = entitiesGraph.get(0).getSubgraphs();
+        ArrayList<Graph> locationsGraph = getLocationsGraph(layoutGraph);
+        ArrayList<Edge> pathsGraph = getPathsGraph(layoutGraph);
+
+        if (locationsGraph == null || pathsGraph == null) {
+            throw new IllegalArgumentException("Expected a locations and paths graph in file");
+        }
+
+        for (Graph l : locationsGraph) {
+            Location location = parseLocation(l);
+            world.addLocation(location.getName(), location);
+        }
+
+        for (Edge p : pathsGraph) {
+            // TODO error handling of edges?
+            String source = p.getSource().getNode().getId().getId();
+            String target = p.getTarget().getNode().getId().getId();
+
+            Location location = world.getLocation(source);
+            Location path = world.getLocation(target);
+
+            if (location == null || path == null) {
+                throw new IllegalArgumentException("Path to non-existent location");
+            }
+
+            location.addEntity(path);
+        }
+
+    }
+
+    // FIXME basically the same functions below, generics possible?
     private ArrayList<Graph> getLocationsGraph(ArrayList<Graph> graphs) {
-        // FIXME handle null return and also orelse/null?
         return graphs.stream().filter(s -> "locations".equals(s.getId().getId())).findAny().orElse(null).getSubgraphs();
     }
 
