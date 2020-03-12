@@ -21,31 +21,29 @@ public class CommandHandler {
         processCommandString(world, command);
     }
 
-    // FIXME horribly bosic way of parsing commands. Some more sophistication please
-    // TODO this assumed action verb is the first part of the string, only handles
-    // one item at the moment.
     private void processCommandString(World world, String command) {
         String split[] = command.split(" ");
-        Entity item;
+
+        CommandStrategy strategy;
 
         if (command.contains("inventory") || command.contains("inv")) {
-            player.listInventory();
+            strategy = new InventoryStategy();
         } else if (command.contains("get")) {
-            item = player.getLocation().removeEntity(split[1]);
-
+            strategy = new GetStrategy();
         } else if (command.contains("drop")) {
-
+            strategy = new DropStrategy();
         } else if (command.contains("goto")) {
-
+            strategy = new GotoStrategy();
         } else if (command.contains("look")) {
-            player.getLocation().describeLocation();
+            strategy = new LookStrategy();
         } else if (command.contains("health")) {
-            System.out.printf("Health: %s\n", player.getHealth());
-        } else if (world.getAction(split[0]) != null) {
-
+            strategy = new HealthStrategy();
         } else {
-            System.out.println("Error in command input");
+            strategy = new TriggerStrategy();
         }
+
+        String string = strategy.process();
+        System.out.printf("%s\n", string);
     }
 
     private String getSubject(String command) {
