@@ -26,29 +26,19 @@ public class Builder {
         World world = new World();
 
         ArrayList<Graph> layoutGraph = loadEntitiesFile(args[0]);
+        JSONObject actionJSON = loadActionsFile(args[1]);
 
         // QUESTION graceful handling of program termination?
-        if (layoutGraph == null) {
+        if (layoutGraph == null || actionJSON == null) {
             System.exit(1);
         }
 
         try {
             processEntities(world, layoutGraph);
+            processActions(world, actionJSON);
         } catch (IllegalArgumentException e) {
             System.err.println(e);
             System.exit(1);
-        }
-
-        // Populate actions
-        JSONArray actions = parseActionsFile(args[1]);
-
-        for (Object obj : actions) {
-            Action action = getActions((JSONObject) obj);
-            JSONArray triggers = action.getTriggers();
-            // QUESTION is this the most efficient way of doing this?
-            for (Object trig : triggers) {
-                world.addAction((String) trig, action);
-            }
         }
 
         return world;
@@ -59,7 +49,7 @@ public class Builder {
         // QUESTION is this ok throwing my own exceptions?
         try {
             if (!filename.matches(".+(.dot)$")) {
-                throw new FileNotFoundException("Invalid file extension");
+                throw new FileNotFoundException(filename + ": Invalid file extension. Expected .dot");
             }
         } catch (FileNotFoundException e) {
             System.err.println(e);
@@ -86,7 +76,7 @@ public class Builder {
 
     private void processEntities(World world, ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
         // QUESTION why calling getId() twice?
-        if (layoutGraph.get(0).getId().getId().equals("layout")) {
+        if (!layoutGraph.get(0).getId().getId().equals("layout")) {
             throw new IllegalArgumentException("Expected 'layout' graph in file");
         }
 
@@ -156,7 +146,7 @@ public class Builder {
                         Furniture furniture = new Furniture(nodeName, nodeDescription);
                         location.addEntity(furniture);
                         break;
-                    case "character":
+                    case "characters":
                         Character character = new Character(nodeName, nodeDescription);
                         location.addEntity(character);
                         break;
@@ -169,39 +159,70 @@ public class Builder {
         return location;
     }
 
-    private JSONArray parseActionsFile(String actions) {
+    private JSONObject loadActionsFile(String filename) {
         try {
+            if (!filename.matches(".+(.json)$")) {
+                throw new FileNotFoundException(filename + ": Invalid file extension. Expected .json");
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println(e);
+            return null;
+        }
+
+        try (FileReader reader = new FileReader(filename)) {
             JSONParser parser = new JSONParser();
-            FileReader reader = new FileReader(actions);
-            JSONObject object = (JSONObject) parser.parse(reader);
-            JSONArray array = (JSONArray) object.get("actions");
-            return array;
 
-        } catch (FileNotFoundException fnfe) {
-            // TODO: handle exception
-        } catch (IOException io) {
+            return (JSONObject) parser.parse(reader);
 
-        } catch (org.json.simple.parser.ParseException pe) {
+        } catch (FileNotFoundException | org.json.simple.parser.ParseException e) {
+            System.err.println(e);
+        } catch (IOException e) {
 
         }
         return null;
-        // FIXME error handling!!
+    }
+
+    private void processActions(World world, JSONObject actionJSON) throws IllegalArgumentException {
+        JSONArray actionsList = (JSONArray) actionJSON.get("actions");
+        if (actionsList == null) {
+            throw new IllegalArgumentException("Could not find 'actions' object in JSON");
+        }
+
+        for (Object a : actionsList) {
+            Action action = buildAction((JSONObject) a);
+            ArrayList<String> triggers = action.getTriggers();
+
+            // Add one entry per triger to world.
+            for (String t : triggers) {
+                world.addAction(t, action);
+            }
+        }
 
     }
 
-    // TODO check that zero length arrays are handled properly
-    private Action getActions(JSONObject object) {
-        JSONArray triggers = (JSONArray) object.get("triggers");
-        JSONArray subjects = (JSONArray) object.get("subjects");
-        JSONArray consumed = (JSONArray) object.get("consumed");
-        JSONArray produced = (JSONArray) object.get("produced");
+    // TODO check that zero length arrays are handled properly. Error handling here?
+    private Action buildAction(JSONObject object) {
+        ArrayList<String> triggers = convertToStringArray((JSONArray) object.get("triggers"));
+        ArrayList<String> subjects = convertToStringArray((JSONArray) object.get("subjects"));
+        ArrayList<String> consumed = convertToStringArray((JSONArray) object.get("consumed"));
+        ArrayList<String> produced = convertToStringArray((JSONArray) object.get("produced"));
         String narration = (String) object.get("narration");
 
-        for (Object s : triggers) {
-            System.out.printf("%s ", (String) s);
+        for (String s : produced) {
+            System.out.printf("%s\n", s);
         }
 
         return new Action(triggers, subjects, consumed, produced, narration);
+    }
+
+    // QUESTION could this be done as a stream?
+    private ArrayList<String> convertToStringArray(JSONArray jsonArray) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        // TODO how does this handle empties?
+        for (Object s : jsonArray) {
+            arrayList.add((String) s);
+        }
+        return arrayList;
     }
 
 }
