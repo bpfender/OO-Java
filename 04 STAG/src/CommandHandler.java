@@ -13,6 +13,7 @@ public class CommandHandler {
         command = split[1];
 
         // FIXME what if the player doesn't exist?
+
         if ((player = world.getPlayer(name)) == null) {
             player = new Player(name, "An adventurer", world.getStart());
             world.addPlayer(name, player);
@@ -21,23 +22,26 @@ public class CommandHandler {
         processCommandString(world, command);
     }
 
+    // QUESTION how does it handle multiple whitespace?
+
+    // TODO variable renaming
     private void processCommandString(World world, String command) {
         String split[] = command.split(" ");
 
         CommandStrategy strategy;
 
         if (command.contains("inventory") || command.contains("inv")) {
-            strategy = new InventoryStategy();
+            strategy = new InventoryStrategy(player);
         } else if (command.contains("get")) {
-            strategy = new GetStrategy();
+            strategy = new GetStrategy(player, split);
         } else if (command.contains("drop")) {
-            strategy = new DropStrategy();
+            strategy = new DropStrategy(player, split);
         } else if (command.contains("goto")) {
-            strategy = new GotoStrategy();
+            strategy = new GotoStrategy(player, split);
         } else if (command.contains("look")) {
-            strategy = new LookStrategy();
+            strategy = new LookStrategy(player.getLocation());
         } else if (command.contains("health")) {
-            strategy = new HealthStrategy();
+            strategy = new HealthStrategy(player);
         } else {
             strategy = new TriggerStrategy();
         }
@@ -46,13 +50,4 @@ public class CommandHandler {
         System.out.printf("%s\n", string);
     }
 
-    private String getSubject(String command) {
-        String split[] = command.split(" ");
-        for (String word : split) {
-
-        }
-        return "SAMPLE";
-    }
-
-    // QUESTION command semantics?
 }

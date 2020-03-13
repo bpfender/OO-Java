@@ -9,6 +9,8 @@ public class GotoStrategy implements CommandStrategy {
 
     @Override
     public String process() {
+        System.out.println(command.length);
+
         if (command.length == 1) {
             return "You must specify a location to go to\n";
         }
