@@ -2,8 +2,8 @@
  * Furniture
  */
 public class Furniture extends Entity {
-    public Furniture(String name, String description) {
-        super(name, description);
+    public Furniture(String id, String description) {
+        super(id, description);
     }
 
 }
