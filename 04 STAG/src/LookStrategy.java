@@ -10,10 +10,10 @@ public class LookStrategy implements CommandStrategy {
     @Override
     public String process() {
         String locationDescription = new String("TEST");
-        ArrayList<String> furniture = location.getFurnitureList();
-        ArrayList<String> artefacts = location.getArtefactList();
-        ArrayList<String> characters = location.getCharacterList();
-        ArrayList<String> paths = location.getPathList();
+        ArrayList<String> furniture = location.getFurnitureMap().listEntities();
+        ArrayList<String> artefacts = location.getArtefactMap().listEntities();
+        ArrayList<String> characters = location.getCharacterMap().listEntities();
+        ArrayList<String> paths = location.getPathMap().listEntities();
 
         System.out.println(furniture.size());
         System.out.println(artefacts);
@@ -26,7 +26,8 @@ public class LookStrategy implements CommandStrategy {
             locationDescription = locationDescription.concat("You see around you a...\n");
 
             for (String item : furniture) {
-                locationDescription = locationDescription.concat(location.getEntityDescription(item) + "\n");
+                locationDescription = locationDescription
+                        .concat(location.getFurnitureMap().getEntity(item).getDescription() + "\n");
             }
         }
 
@@ -36,17 +37,21 @@ public class LookStrategy implements CommandStrategy {
         } else if (artefacts.size() > 1) {
             locationDescription = locationDescription.concat("Some items, including a ");
             for (String item : artefacts) {
-                locationDescription.concat(item + ", ");
+                locationDescription = locationDescription.concat(item + ", ");
             }
             locationDescription = locationDescription.concat("are strewn around\n");
         }
 
-        if (characters.size() != 0) {
+        if (characters.size() > 1) {
             locationDescription = locationDescription.concat("Some curious faces peer at you. You spot\n");
             for (String item : characters) {
-                locationDescription = locationDescription.concat(location.getEntityDescription(item) + "\n");
+                locationDescription = locationDescription
+                        .concat(location.getCharacterMap().getEntity(item).getDescription() + "\n");
             }
         }
+
+        // TODO need to add look at players "Some othe adventurers are travelling
+        // through the world"
 
         if (paths.size() == 0) {
             locationDescription = locationDescription

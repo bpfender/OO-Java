@@ -1,46 +1,33 @@
-import java.util.HashMap;
-
 /**
  * Player
  */
 public class Player extends Character {
-    int health = 3;
+    private EntityMap<Artefact> inventoryMap = new EntityMap<>();
+    private Location currentLocation;
+    private int health = 3;
 
-    HashMap<String, Artefact> inventory = new HashMap<>();
-    Location currentLocation;
-
-    public Player(String name, String description, Location start) {
-        super(name, description);
-        this.health = 3; // QUESTION does this need to be explicit?
+    public Player(String id, String description, Location start) {
+        super(id, description);
         this.currentLocation = start;
     }
 
-    public void listInventory() {
-        // FIXME seems like i'm duplicating stuff with the hashset
-        inventory.keySet().stream().forEach(s -> System.out.printf("%: %\n", s, inventory.get(s)));
+    public EntityMap<Artefact> getInventoryMap() {
+        return inventoryMap;
     }
 
-    public void dropItem(String name) {
-
-    }
-
-    public void addItem(Artefact artefact) {
-        inventory.put(artefact.getName(), artefact);
-    }
-
-    public void setLocation(Location location) {
-        this.currentLocation = location;
+    public void setLocation(Location newLocation) {
+        this.currentLocation = newLocation;
     }
 
     public Location getLocation() {
         return currentLocation;
     }
 
-    public int getHealth() {
-        return health;
-    }
-
     public void setHealth(int health) {
         this.health = health;
+    }
+
+    public int getHealth() {
+        return health;
     }
 }

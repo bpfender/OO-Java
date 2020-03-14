@@ -2,16 +2,17 @@
  * Entity
  */
 public abstract class Entity {
-    private final String name;
+    private final String id;
     private final String description;
 
-    public Entity(String name, String description) {
-        this.name = name;
+    public Entity(String id, String description) {
+        this.id = id;
         this.description = description;
     }
 
+    // TODO this needs to be renamed
     public String getName() {
-        return name;
+        return id;
     }
 
     public String getDescription() {

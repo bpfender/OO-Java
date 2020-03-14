@@ -19,14 +19,15 @@ public class GotoStrategy implements CommandStrategy {
         }
 
         Location currentLocation = player.getLocation();
-        Location newLocation = currentLocation.getPath(command[1]);
+        Location newLocation = currentLocation.getPathMap().getEntity(command[1].strip());
+        System.out.println(command[1]);
 
         if (newLocation == null) {
             return "Invalid path specified\n";
         } else {
             player.setLocation(newLocation);
             newLocation.addEntity(player);
-            currentLocation.removeEntity(player.getName());
+            currentLocation.getPlayerMap().removeEntity(player.getName());
             return "You follow the path to the " + command[1];
         }
     }

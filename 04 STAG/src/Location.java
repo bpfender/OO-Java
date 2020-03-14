@@ -1,57 +1,55 @@
-import java.util.*;
-
 /**
  * Locations
  */
 public class Location extends Entity {
+    private EntityMap<Location> pathMap = new EntityMap<>();
+    private EntityMap<Character> characterMap = new EntityMap<>();
+    private EntityMap<Artefact> artefactMap = new EntityMap<>();
+    private EntityMap<Furniture> furnitureMap = new EntityMap<>();
+    private EntityMap<Player> playerMap = new EntityMap<>();
+
     public Location(String name, String description) {
         super(name, description);
     }
 
-    Map<String, Location> paths = new HashMap<>();
-    Map<String, Character> characters = new HashMap<>();
-    Map<String, Artefact> artefacts = new HashMap<>();
-    Map<String, Furniture> furniture = new HashMap<>();
-    Map<String, Player> players = new HashMap<>();
-
-    // FIXME this is super horrible
-    public <T extends Entity> void addEntity(T entity) {
-
-        if (entity instanceof Location) {
-            paths.put(entity.getName(), (Location) entity);
-        } else if (entity instanceof Character) {
-            characters.put(entity.getName(), (Character) entity);
-        } else if (entity instanceof Artefact) {
-            artefacts.put(entity.getName(), (Artefact) entity);
-        } else if (entity instanceof Furniture) {
-            furniture.put(entity.getName(), (Furniture) entity);
-        } else if (entity instanceof Player) {
-            players.put(entity.getName(), (Player) entity);
-        }
+    public void addEntity(Location entity) {
+        pathMap.addEntity(entity);
     }
 
-    // TODO needs to be extended
-    public void describeLocation() {
-        // QUESTION this.getName() seems a bit unecesarry?
-        System.out.printf("This is the %s\n", this.getName());
+    public void addEntity(Character entity) {
+        characterMap.addEntity(entity);
     }
 
-    public Entity removeEntity(String name) {
-        Entity entity;
+    public void addEntity(Artefact entity) {
+        artefactMap.addEntity(entity);
+    }
 
-        // FIXME super horrible at the moment
-        if ((entity = paths.get(name)) != null) {
-            paths.remove(name);
-            return entity;
-        } else if ((entity = artefacts.get(name)) != null) {
-            artefacts.remove(name);
-            return entity;
-        } else if ((entity = furniture.get(name)) != null) {
-            furniture.remove(name);
-            return entity;
-        } else {
-            return null;
-        }
+    public void addEntity(Furniture entity) {
+        furnitureMap.addEntity(entity);
+    }
+
+    public void addEntity(Player entity) {
+        playerMap.addEntity(entity);
+    }
+
+    public EntityMap<Location> getPathMap() {
+        return pathMap;
+    }
+
+    public EntityMap<Character> getCharacterMap() {
+        return characterMap;
+    }
+
+    public EntityMap<Artefact> getArtefactMap() {
+        return artefactMap;
+    }
+
+    public EntityMap<Furniture> getFurnitureMap() {
+        return furnitureMap;
+    }
+
+    public EntityMap<Player> getPlayerMap() {
+        return playerMap;
     }
 
 }
