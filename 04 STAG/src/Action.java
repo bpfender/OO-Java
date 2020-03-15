@@ -1,19 +1,17 @@
-import org.json.simple.*;
+import java.util.ArrayList;
 
 /**
  * Actions
  */
-
-// FIXME maybe make these final
-// FIXME don't like that this is structured as a JSONArray at the moment
 public class Action {
-    JSONArray triggers = new JSONArray();
-    JSONArray subjects = new JSONArray();
-    JSONArray consumed = new JSONArray();
-    JSONArray produced = new JSONArray();
-    String narration;
+    private final ArrayList<String> triggers;
+    private final ArrayList<String> subjects;
+    private final ArrayList<String> consumed;
+    private final ArrayList<String> produced;
+    private final String narration;
 
-    public Action(JSONArray triggers, JSONArray subjects, JSONArray consumed, JSONArray produced, String narration) {
+    public Action(ArrayList<String> triggers, ArrayList<String> subjects, ArrayList<String> consumed,
+            ArrayList<String> produced, String narration) {
         this.triggers = triggers;
         this.subjects = subjects;
         this.consumed = consumed;
@@ -21,24 +19,23 @@ public class Action {
         this.narration = narration;
     }
 
-    public JSONArray getTriggers() {
+    public ArrayList<String> getTriggers() {
         return triggers;
     }
 
-    public JSONArray getSubject() {
+    public ArrayList<String> getSubjects() {
         return subjects;
     }
 
-    public JSONArray getConsumed() {
+    public ArrayList<String> getConsumed() {
         return consumed;
     }
 
-    public JSONArray getProduced() {
+    public ArrayList<String> getProduced() {
         return produced;
     }
 
     public String getNarration() {
         return narration;
     }
-
 }

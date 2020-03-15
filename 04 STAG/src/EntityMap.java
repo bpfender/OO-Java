@@ -15,8 +15,8 @@ public class EntityMap<T extends Entity> {
         return map.get(id);
     }
 
-    public void removeEntity(String id) {
-        map.remove(id);
+    public T removeEntity(String id) {
+        return map.remove(id);
     }
 
     public ArrayList<String> listEntities() {
@@ -24,8 +24,9 @@ public class EntityMap<T extends Entity> {
     }
 
     // FIXME might not actually be needed
-    /*
-     * public boolean containsEntity(String id) { return map.containsKey(id); }
-     */
+
+    public boolean containsEntity(String id) {
+        return map.containsKey(id);
+    }
 
 }

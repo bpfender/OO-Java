@@ -16,14 +16,14 @@ public class GetStrategy implements CommandStrategy {
         String getString = new String();
 
         for (int i = 1; i < command.length; i++) {
-            Artefact item = location.getArtefactMap().getEntity(command[i]);
-            if (item == null) {
+            if (!location.getArtefactMap().containsEntity(command[i])) {
                 // TODO error handling for furniture
                 getString = getString.concat(command[i] + "is not a valid item\n");
             } else {
-                getString = getString.concat("Picked up " + item.getDescription());
-                location.getArtefactMap().removeEntity(command[i]);
+                Artefact item = location.getArtefactMap().removeEntity(command[i]);
                 player.getInventoryMap().addEntity(item);
+
+                getString = getString.concat("Picked up " + item.getDescription());
             }
         }
         return getString;

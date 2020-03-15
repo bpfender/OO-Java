@@ -22,8 +22,8 @@ public class Builder {
     // TODO need to catch first location
     // FIXME try catch exception, other error handling
 
-    public World buildWorld(String args[]) {
-        World world = new World();
+    public Game buildWorld(String args[]) {
+        Game game = new Game();
 
         ArrayList<Graph> layoutGraph = loadEntitiesFile(args[0]);
         JSONObject actionJSON = loadActionsFile(args[1]);
@@ -34,14 +34,14 @@ public class Builder {
         }
 
         try {
-            processEntities(world, layoutGraph);
-            processActions(world, actionJSON);
+            processEntities(game, layoutGraph);
+            processActions(game, actionJSON);
         } catch (IllegalArgumentException e) {
             System.err.println(e);
             System.exit(1);
         }
 
-        return world;
+        return game;
     }
 
     // TODO add filename extension checking?
@@ -74,7 +74,7 @@ public class Builder {
         return null;
     }
 
-    private void processEntities(World world, ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
+    private void processEntities(Game game, ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
         // QUESTION why calling getId() twice?
         if (!layoutGraph.get(0).getId().getId().equals("layout")) {
             throw new IllegalArgumentException("Expected 'layout' graph in file");
@@ -91,7 +91,10 @@ public class Builder {
 
         for (Graph l : locationsGraph) {
             Location location = processLocationGraph(l);
-            world.addLocation(location.getName(), location);
+            game.getLocationMap().addEntity(location);
+            if (game.getStartLocation() == null) {
+                game.setStartLocation(location);
+            }
         }
 
         for (Edge p : pathsGraph) {
@@ -99,8 +102,8 @@ public class Builder {
             String source = p.getSource().getNode().getId().getId();
             String target = p.getTarget().getNode().getId().getId();
 
-            Location location = world.getLocation(source);
-            Location path = world.getLocation(target);
+            Location location = game.getLocationMap().getEntity(source);
+            Location path = game.getLocationMap().getEntity(target);
 
             if (location == null || path == null) {
                 throw new IllegalArgumentException("Path to non-existent location");
@@ -182,7 +185,7 @@ public class Builder {
         return null;
     }
 
-    private void processActions(World world, JSONObject actionJSON) throws IllegalArgumentException {
+    private void processActions(Game game, JSONObject actionJSON) throws IllegalArgumentException {
         JSONArray actionsList = (JSONArray) actionJSON.get("actions");
         if (actionsList == null) {
             throw new IllegalArgumentException("Could not find 'actions' object in JSON");
@@ -194,7 +197,7 @@ public class Builder {
 
             // Add one entry per triger to world.
             for (String t : triggers) {
-                world.addAction(t, action);
+                game.addAction(t, action);
             }
         }
 

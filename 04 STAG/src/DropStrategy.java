@@ -13,14 +13,13 @@ public class DropStrategy implements CommandStrategy {
         Location location = player.getLocation();
 
         for (int i = 1; i < command.length; i++) {
-            Artefact item = player.getInventoryMap().getEntity(command[i]);
-
-            if (item == null) {
+            if (!player.getInventoryMap().containsEntity(command[i])) {
                 dropDescription = dropDescription.concat("Do not have " + command[i] + " in inventory\n");
             } else {
-                dropDescription = dropDescription.concat("Dropped " + item.getDescription() + "\n");
-                player.getInventoryMap().removeEntity(command[i]);
+                Artefact item = player.getInventoryMap().removeEntity(command[i]);
                 location.addEntity(item);
+
+                dropDescription = dropDescription.concat("Dropped " + item.getDescription() + "\n");
             }
         }
 
