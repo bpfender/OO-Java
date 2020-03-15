@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 
 class StagServer {
-    static World world;
+    static Game game;
 
     public static void main(String args[]) {
         if (args.length != 2)
@@ -10,7 +10,7 @@ class StagServer {
         else {
 
             Builder builder = new Builder();
-            world = builder.buildWorld(args);
+            game = builder.buildWorld(args);
 
             new StagServer(args[0], args[1], 8888);
         }
@@ -44,10 +44,11 @@ class StagServer {
 
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException {
         String line = in.readLine();
-        CommandHandler handler = new CommandHandler();
+        Controller controller = new Controller();
         // QUESTION is this bad practice?
-        handler.processInput(world, line);
+        controller.processInput(game, line);
 
         out.write("You said... " + line + "\n");
+        // flush?
     }
 }

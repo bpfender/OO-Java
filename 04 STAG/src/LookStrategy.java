@@ -42,7 +42,7 @@ public class LookStrategy implements CommandStrategy {
             locationDescription = locationDescription.concat("are strewn around\n");
         }
 
-        if (characters.size() > 1) {
+        if (characters.size() >= 1) {
             locationDescription = locationDescription.concat("Some curious faces peer at you. You spot\n");
             for (String item : characters) {
                 locationDescription = locationDescription
