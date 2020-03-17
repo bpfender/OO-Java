@@ -8,15 +8,14 @@ class StagServer {
         if (args.length != 2)
             System.out.println("Usage: java StagServer <entity-file> <action-file>");
         else {
-
-            Builder builder = new Builder();
-            game = builder.buildWorld(args);
-
             new StagServer(args[0], args[1], 8888);
         }
     }
 
     public StagServer(String entityFilename, String actionFilename, int portNumber) {
+        Builder builder = new Builder(entityFilename, actionFilename);
+        game = builder.buildWorld();
+
         try {
             ServerSocket ss = new ServerSocket(portNumber);
             System.out.println("Server Listening");
@@ -44,11 +43,8 @@ class StagServer {
 
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException {
         String line = in.readLine();
-        Controller controller = new Controller();
-        // QUESTION is this bad practice?
-        controller.processInput(game, line);
 
-        out.write("You said... " + line + "\n");
-        // flush?
+        Controller controller = new Controller(game, line);
+        out.write(controller.processLine());
     }
 }

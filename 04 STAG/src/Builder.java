@@ -16,19 +16,22 @@ import org.json.simple.parser.JSONParser;
 /**
  * World
  */
-/// TODO make sure everything is lowercased
-
 public class Builder {
-    // TODO need to catch first location
-    // FIXME try catch exception, other error handling
+    private final String entityFilename;
+    private final String actionFilename;
 
-    public Game buildWorld(String args[]) {
+    public Builder(String entityFilename, String actionFilename) {
+        this.entityFilename = entityFilename;
+        this.actionFilename = actionFilename;
+    }
+
+    public Game buildWorld() {
         Game game = new Game();
 
-        ArrayList<Graph> layoutGraph = loadEntitiesFile(args[0]);
-        JSONObject actionJSON = loadActionsFile(args[1]);
+        final ArrayList<Graph> layoutGraph = loadEntitiesFile();
+        final JSONObject actionJSON = loadActionsFile();
 
-        // QUESTION graceful handling of program termination?
+        // TODO exception handling in server?
         if (layoutGraph == null || actionJSON == null) {
             System.exit(1);
         }
@@ -44,12 +47,10 @@ public class Builder {
         return game;
     }
 
-    // TODO add filename extension checking?
-    private ArrayList<Graph> loadEntitiesFile(String filename) {
-        // QUESTION is this ok throwing my own exceptions?
+    private ArrayList<Graph> loadEntitiesFile() {
         try {
-            if (!filename.matches(".+(.dot)$")) {
-                throw new FileNotFoundException(filename + ": Invalid file extension. Expected .dot");
+            if (!entityFilename.matches(".+(.dot)$")) {
+                throw new FileNotFoundException(entityFilename + ": Invalid file extension. Expected .dot\n");
             }
         } catch (FileNotFoundException e) {
             System.err.println(e);
@@ -57,7 +58,7 @@ public class Builder {
         }
 
         // Done like this so it auto closes
-        try (FileReader reader = new FileReader(filename)) {
+        try (FileReader reader = new FileReader(entityFilename)) {
             Parser parser = new Parser();
 
             parser.parse(reader);
@@ -67,29 +68,27 @@ public class Builder {
 
         } catch (FileNotFoundException | ParseException e) {
             System.err.println(e);
-        } catch (IOException io) {
-            // QUESTION what to do here?
+        } catch (IOException ignore) {
         }
-        /* FIXME handling of error, what do i do? */
+
         return null;
     }
 
     private void processEntities(Game game, ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
-        // QUESTION why calling getId() twice?
         if (!layoutGraph.get(0).getId().getId().equals("layout")) {
-            throw new IllegalArgumentException("Expected 'layout' graph in file");
+            throw new IllegalArgumentException("Expected 'layout' graph in file\n");
         }
 
         ArrayList<Graph> entities = layoutGraph.get(0).getSubgraphs();
 
-        ArrayList<Graph> locationsGraph = getLocationsGraph(entities);
-        ArrayList<Edge> pathsGraph = getPathsGraph(entities);
+        ArrayList<Graph> locationsGraphArray = getGraphByName(entities, "locations").getSubgraphs();
+        ArrayList<Edge> pathsEdgesArray = getGraphByName(entities, "paths").getEdges();
 
-        if (locationsGraph == null || pathsGraph == null) {
-            throw new IllegalArgumentException("Expected a locations and paths graph in file");
+        if (locationsGraphArray == null || pathsEdgesArray == null) {
+            throw new IllegalArgumentException("Expected a locations and paths graph in file\n");
         }
 
-        for (Graph l : locationsGraph) {
+        for (Graph l : locationsGraphArray) {
             Location location = processLocationGraph(l);
             game.getLocationMap().addEntity(location);
             if (game.getStartLocation() == null) {
@@ -97,8 +96,7 @@ public class Builder {
             }
         }
 
-        for (Edge p : pathsGraph) {
-            // TODO error handling of edges?
+        for (Edge p : pathsEdgesArray) {
             String source = p.getSource().getNode().getId().getId();
             String target = p.getTarget().getNode().getId().getId();
 
@@ -106,20 +104,11 @@ public class Builder {
             Location path = game.getLocationMap().getEntity(target);
 
             if (location == null || path == null) {
-                throw new IllegalArgumentException("Path to non-existent location");
+                throw new IllegalArgumentException("Path to non-existent location specified\n");
             }
 
             location.addEntity(path);
         }
-    }
-
-    // FIXME basically the same functions below, generics possible?
-    private ArrayList<Graph> getLocationsGraph(ArrayList<Graph> graphs) {
-        return graphs.stream().filter(s -> "locations".equals(s.getId().getId())).findAny().orElse(null).getSubgraphs();
-    }
-
-    private ArrayList<Edge> getPathsGraph(ArrayList<Graph> graphs) {
-        return graphs.stream().filter(s -> "paths".equals(s.getId().getId())).findAny().orElse(null).getEdges();
     }
 
     private Location processLocationGraph(Graph locationGraph) throws IllegalArgumentException {
@@ -142,19 +131,16 @@ public class Builder {
                 // What if an entity gets added to the game?
                 switch (entityName) {
                     case "artefacts":
-                        Artefact artefact = new Artefact(nodeName, nodeDescription);
-                        location.addEntity(artefact);
+                        location.addEntity(new Artefact(nodeName, nodeDescription));
                         break;
                     case "furniture":
-                        Furniture furniture = new Furniture(nodeName, nodeDescription);
-                        location.addEntity(furniture);
+                        location.addEntity(new Furniture(nodeName, nodeDescription));
                         break;
                     case "characters":
-                        Character character = new Character(nodeName, nodeDescription);
-                        location.addEntity(character);
+                        location.addEntity(new Character(nodeName, nodeDescription));
                         break;
                     default:
-                        throw new IllegalArgumentException("Invalid entity in .dot file");
+                        throw new IllegalArgumentException("Invalid entity in .dot file\n");
                 }
             }
         }
@@ -162,17 +148,21 @@ public class Builder {
         return location;
     }
 
-    private JSONObject loadActionsFile(String filename) {
+    private Graph getGraphByName(ArrayList<Graph> graphs, String name) {
+        return graphs.stream().filter(s -> name.equals(s.getId().getId())).findAny().orElse(null);
+    }
+
+    private JSONObject loadActionsFile() {
         try {
-            if (!filename.matches(".+(.json)$")) {
-                throw new FileNotFoundException(filename + ": Invalid file extension. Expected .json");
+            if (!actionFilename.matches(".+(.json)$")) {
+                throw new FileNotFoundException(actionFilename + ": Invalid file extension. Expected .json\n");
             }
         } catch (FileNotFoundException e) {
             System.err.println(e);
             return null;
         }
 
-        try (FileReader reader = new FileReader(filename)) {
+        try (FileReader reader = new FileReader(actionFilename)) {
             JSONParser parser = new JSONParser();
 
             return (JSONObject) parser.parse(reader);
@@ -188,7 +178,7 @@ public class Builder {
     private void processActions(Game game, JSONObject actionJSON) throws IllegalArgumentException {
         JSONArray actionsList = (JSONArray) actionJSON.get("actions");
         if (actionsList == null) {
-            throw new IllegalArgumentException("Could not find 'actions' object in JSON");
+            throw new IllegalArgumentException("Could not find 'actions' object in JSON\n");
         }
 
         for (Object a : actionsList) {
@@ -203,7 +193,6 @@ public class Builder {
 
     }
 
-    // TODO check that zero length arrays are handled properly. Error handling here?
     private Action buildAction(JSONObject object) {
         ArrayList<String> triggers = convertToStringArray((JSONArray) object.get("triggers"));
         ArrayList<String> subjects = convertToStringArray((JSONArray) object.get("subjects"));
@@ -211,21 +200,16 @@ public class Builder {
         ArrayList<String> produced = convertToStringArray((JSONArray) object.get("produced"));
         String narration = (String) object.get("narration");
 
-        for (String s : produced) {
-            System.out.printf("%s\n", s);
-        }
-
         return new Action(triggers, subjects, consumed, produced, narration);
     }
 
-    // QUESTION could this be done as a stream?
+    // Could this be done as a stream?
     private ArrayList<String> convertToStringArray(JSONArray jsonArray) {
         ArrayList<String> arrayList = new ArrayList<>();
-        // TODO how does this handle empties?
+
         for (Object s : jsonArray) {
             arrayList.add((String) s);
         }
         return arrayList;
     }
-
 }
