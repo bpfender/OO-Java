@@ -2,11 +2,8 @@
  * CommandHandler
  */
 public class Controller {
-    Game game;
-    Player player;
-
-    String playerId;
-    String[] commandList;
+    private Game game;
+    private Player player;
 
     public Controller(Game game) {
         this.game = game;
@@ -14,10 +11,10 @@ public class Controller {
 
     public String processLine(String line) {
         String input = line.toLowerCase().trim(); // Trim any leading or trailing whitespace and lowercase input
-        String split[] = input.split("(\\s+):(\\s+)"); // Split on first colon and any surroumding whitespace
+        String split[] = input.split("(\\s*+):(\\s*+)"); // Split on first colon and any surroumding whitespace
 
-        this.playerId = split[0];
-        this.commandList = split[1].split("\\s+"); // Split command string on whitespace
+        final String playerId = split[0];
+        final String[] commandList = split[1].split("\\s+"); // Split command string on whitespace
 
         if ((player = game.getPlayerMap().getEntity(playerId)) == null) {
             player = new Player(playerId, "An intrepid adventurer", game.getStartLocation());
@@ -27,7 +24,6 @@ public class Controller {
         return processCommandString(game, commandList);
     }
 
-    // TODO variable renaming
     private String processCommandString(Game game, String[] commandList) {
         CommandStrategy strategy;
 
@@ -44,7 +40,7 @@ public class Controller {
         } else if (commandList[0].equals("goto")) {
             strategy = new GotoStrategy(player, commandList);
         } else if (commandList[0].equals("look")) {
-            strategy = new LookStrategy(player.getLocation());
+            strategy = new LookStrategy(player);
         } else if (commandList[0].equals("health")) {
             strategy = new HealthStrategy(player);
         } else {
