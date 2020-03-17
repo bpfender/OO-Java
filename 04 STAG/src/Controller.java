@@ -2,11 +2,20 @@
  * CommandHandler
  */
 public class Controller {
+    Game game;
+    String line;
+
     String id;
     String command;
+
     Player player;
 
-    public void processInput(Game game, String line) {
+    public Controller(Game game, String line) {
+        this.game = game;
+        this.line = line;
+    }
+
+    public String processLine() {
 
         String split[] = line.toLowerCase().split(":");
         id = split[0];
