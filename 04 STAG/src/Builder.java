@@ -89,7 +89,7 @@ public class Builder {
         }
 
         for (Graph l : locationsGraphArray) {
-            Location location = processLocationGraph(l);
+            Location location = buildLocation(l);
             game.getLocationMap().addEntity(location);
             if (game.getStartLocation() == null) {
                 game.setStartLocation(location);
@@ -111,13 +111,13 @@ public class Builder {
         }
     }
 
-    private Location processLocationGraph(Graph locationGraph) throws IllegalArgumentException {
+    private Location buildLocation(Graph locationGraph) throws IllegalArgumentException {
         Node locationNode = locationGraph.getNodes(false).get(0);
 
-        String name = locationNode.getId().getId();
+        String id = locationNode.getId().getId();
         String description = locationNode.getAttribute("description");
 
-        Location location = new Location(name, description);
+        Location location = new Location(id, description);
 
         ArrayList<Graph> entities = locationGraph.getSubgraphs();
 
@@ -125,19 +125,19 @@ public class Builder {
             String entityName = g.getId().getId();
             ArrayList<Node> entityNodes = g.getNodes(false);
             for (Node n : entityNodes) {
-                String nodeName = n.getId().getId();
+                String nodeId = n.getId().getId();
                 String nodeDescription = n.getAttribute("description");
 
-                // What if an entity gets added to the game?
+                // What if an entity gets added to the game? Should this code be somewhere else?
                 switch (entityName) {
                     case "artefacts":
-                        location.addEntity(new Artefact(nodeName, nodeDescription));
+                        location.addEntity(new Artefact(nodeId, nodeDescription));
                         break;
                     case "furniture":
-                        location.addEntity(new Furniture(nodeName, nodeDescription));
+                        location.addEntity(new Furniture(nodeId, nodeDescription));
                         break;
                     case "characters":
-                        location.addEntity(new Character(nodeName, nodeDescription));
+                        location.addEntity(new Character(nodeId, nodeDescription));
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid entity in .dot file\n");
