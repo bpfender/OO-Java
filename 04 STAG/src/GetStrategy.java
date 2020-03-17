@@ -2,32 +2,36 @@
  * GetStrategy
  */
 public class GetStrategy implements CommandStrategy {
-    Player player;
-    String[] command;
+    final Player player;
+    final String[] commandList;
 
-    public GetStrategy(Player player, String[] command) {
+    public GetStrategy(Player player, String[] commandList) {
         this.player = player;
-        this.command = command;
+        this.commandList = commandList;
     }
 
     @Override
     public String process() {
         Location location = player.getLocation();
-        String getString = new String();
+        String output = new String();
 
-        for (int i = 1; i < command.length; i++) {
-            if (!location.getArtefactMap().containsEntity(command[i])) {
-                // TODO error handling for furniture
-                getString = getString.concat(command[i] + "is not a valid item\n");
+        for (int i = 1; i < commandList.length; i++) {
+            String itemName = commandList[i];
+
+            if (location.getCharacterMap().containsEntity(itemName)
+                    || location.getFurnitureMap().containsEntity(itemName)) {
+                output += "Cannot pick up" + itemName + "\n";
+            } else if (!location.getArtefactMap().containsEntity(itemName)) {
+                output += itemName + "is not a valid item\n";
             } else {
-                Artefact item = location.getArtefactMap().removeEntity(command[i]);
+                Artefact item = location.getArtefactMap().removeEntity(itemName);
                 player.getInventoryMap().addEntity(item);
 
-                getString = getString.concat("Picked up " + item.getDescription());
+                output += "Picked up " + itemName + "\n";
             }
         }
-        return getString;
 
+        return output + "\n";
     }
 
 }

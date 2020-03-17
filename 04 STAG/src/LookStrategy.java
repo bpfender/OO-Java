@@ -1,74 +1,81 @@
-import java.util.ArrayList;
-
 public class LookStrategy implements CommandStrategy {
-    Location location;
+    final Location location;
+    final Player player;
 
-    public LookStrategy(Location location) {
-        this.location = location;
+    public LookStrategy(Player player) {
+        this.location = player.getLocation();
+        this.player = player;
     }
 
     @Override
     public String process() {
-        String locationDescription = new String("TEST");
-        ArrayList<String> furniture = location.getFurnitureMap().listEntities();
-        ArrayList<String> artefacts = location.getArtefactMap().listEntities();
-        ArrayList<String> characters = location.getCharacterMap().listEntities();
-        ArrayList<String> paths = location.getPathMap().listEntities();
+        String output = new String();
 
-        System.out.println(furniture.size());
-        System.out.println(artefacts);
-        System.out.println(characters);
-        System.out.println(paths);
+        EntityMap<Furniture> furnitureMap = location.getFurnitureMap();
+        EntityMap<Artefact> artefactMap = location.getArtefactMap();
+        EntityMap<Character> characterMap = location.getCharacterMap();
+        EntityMap<Location> pathMap = location.getPathMap();
+        EntityMap<Player> playerMap = location.getPlayerMap();
 
-        locationDescription = locationDescription.concat(location.getDescription() + "\n");
+        output += location.getDescription() + "\n";
 
-        if (furniture.size() != 0) {
-            locationDescription = locationDescription.concat("You see around you a...\n");
+        if (furnitureMap.getSize() > 0) {
+            output += "You look around and see...\n";
 
-            for (String item : furniture) {
-                locationDescription = locationDescription
-                        .concat(location.getFurnitureMap().getEntity(item).getDescription() + "\n");
+            for (String item : furnitureMap.listEntities()) {
+                output += location.getFurnitureMap().getEntity(item).getDescription();
             }
         }
 
-        if (artefacts.size() == 1) {
-            locationDescription = locationDescription
-                    .concat("There's a " + artefacts.get(0) + " lying on the ground.\n");
-        } else if (artefacts.size() > 1) {
-            locationDescription = locationDescription.concat("Some items, including a ");
-            for (String item : artefacts) {
-                locationDescription = locationDescription.concat(item + ", ");
+        if (artefactMap.getSize() == 1) {
+            output += "\nThere's a " + artefactMap.listEntities().get(0) + " lying on the ground.\n";
+        } else if (artefactMap.getSize() > 1) {
+            output += "Several items, including a ";
+            for (String item : artefactMap.listEntities()) {
+                output += item + " and ";
             }
-            locationDescription = locationDescription.concat("are strewn around\n");
+            output = output.replaceAll("(and )$", "");
+
+            output += "are strewn around\n";
         }
 
-        if (characters.size() >= 1) {
-            locationDescription = locationDescription.concat("Some curious faces peer at you. You spot\n");
-            for (String item : characters) {
-                locationDescription = locationDescription
-                        .concat(location.getCharacterMap().getEntity(item).getDescription() + "\n");
+        if (characterMap.getSize() > 0) {
+            output += "\nSome curious faces are peering at you. You spot...\n";
+            for (String item : characterMap.listEntities()) {
+                output += characterMap.getEntity(item).getDescription() + "\n";
             }
         }
 
-        // TODO need to add look at players "Some othe adventurers are travelling
-        // through the world"
+        if (playerMap.getSize() > 1) {
+            output += "\nYou see some other intrepid adventurers travelling the world. They are called ";
+            for (String name : playerMap.listEntities()) {
+                if (!name.equals(player.getName())) {
+                    output += name + " and ";
+                }
+            }
+            output = output.replaceAll("(and )$", "");
+            output += ".\n";
 
-        if (paths.size() == 0) {
-            locationDescription = locationDescription
-                    .concat("Unfortunately you can't see any paths leading away. You are stuck here forever...");
-        } else if (paths.size() == 1) {
-            locationDescription = locationDescription.concat("You see a path going to the " + paths.get(0) + ".\n");
+        }
+
+        if (pathMap.getSize() == 0) {
+            output += "\nUnfortunately you can't see any paths leading away. You are stuck here forever...\n";
+        } else if (pathMap.getSize() == 1) {
+            output += "\nYou see a path going to the " + pathMap.listEntities().get(0) + ".\n";
         } else {
-            locationDescription = locationDescription.concat("You see a number of paths, going to a");
+            output += "You see a number of paths, going to the ";
 
-            for (String item : paths) {
-                locationDescription = locationDescription.concat(item + ", or a ");
+            for (String item : pathMap.listEntities()) {
+                output = output.concat(item + " , or a ");
             }
-            locationDescription = locationDescription.concat("leading away.\n");
+            output = output.replaceAll("(, or a )$", "");
+            output += ".\n";
+
+            output += "leading away.\n";
 
         }
 
-        return locationDescription;
+        return output + "\n";
     }
 
 }

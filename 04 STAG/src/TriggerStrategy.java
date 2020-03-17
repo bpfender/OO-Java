@@ -2,10 +2,10 @@
  * TriggerStrategy
  */
 public class TriggerStrategy implements CommandStrategy {
-    Player player;
-    Location location;
-    Game game;
-    String[] command;
+    final Player player;
+    final Location location;
+    final Game game;
+    final String[] command;
 
     public TriggerStrategy(Player player, Game game, String[] command) {
         this.player = player;

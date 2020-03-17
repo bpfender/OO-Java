@@ -2,7 +2,7 @@
  * HealthStrategy
  */
 public class HealthStrategy implements CommandStrategy {
-    Player player;
+    final Player player;
 
     public HealthStrategy(Player player) {
         this.player = player;
@@ -10,7 +10,7 @@ public class HealthStrategy implements CommandStrategy {
 
     @Override
     public String process() {
-        return new String("You have " + player.getHealth() + "left.\n");
+        return new String("You have " + player.getHealth() + " HP left.\n");
     }
 
 }

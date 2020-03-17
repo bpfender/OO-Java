@@ -1,34 +1,33 @@
 public class GotoStrategy implements CommandStrategy {
-    Player player;
-    String[] command;
+    final Player player;
+    final String[] commandList;
 
-    public GotoStrategy(Player player, String[] command) {
+    public GotoStrategy(Player player, String[] commandList) {
         this.player = player;
-        this.command = command;
+        this.commandList = commandList;
     }
 
     @Override
     public String process() {
-        System.out.println(command.length);
-
-        if (command.length == 1) {
-            return "You must specify a location to go to\n";
+        if (commandList.length == 1) {
+            return "You must specify a location to go to\n\n";
         }
-        if (command.length > 2) {
-            return "You cannot go to multiple locations\n";
+        if (commandList.length > 2) {
+            return "You cannot go to multiple locations\n\n";
         }
 
+        String locationName = commandList[1];
         Location currentLocation = player.getLocation();
-        Location newLocation = currentLocation.getPathMap().getEntity(command[1].strip());
-        System.out.println(command[1]);
+        Location newLocation = currentLocation.getPathMap().getEntity(locationName);
 
         if (newLocation == null) {
-            return "Invalid path specified\n";
+            return "There's no path leading to" + locationName + "\n\n";
         } else {
             player.setLocation(newLocation);
             newLocation.addEntity(player);
             currentLocation.getPlayerMap().removeEntity(player.getName());
-            return "You follow the path to the " + command[1];
+
+            return "You follow the path to the " + locationName + "\n\n" + new LookStrategy(player).process();
         }
     }
 
