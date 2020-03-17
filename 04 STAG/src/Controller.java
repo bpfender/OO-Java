@@ -3,64 +3,55 @@
  */
 public class Controller {
     Game game;
-    String line;
-
-    String id;
-    String command;
-
     Player player;
 
-    public Controller(Game game, String line) {
+    String playerId;
+    String[] commandList;
+
+    public Controller(Game game) {
         this.game = game;
-        this.line = line;
     }
 
-    public String processLine() {
+    public String processLine(String line) {
+        String input = line.toLowerCase().trim(); // Trim any leading or trailing whitespace and lowercase input
+        String split[] = input.split("(\\s+):(\\s+)"); // Split on first colon and any surroumding whitespace
 
-        String split[] = line.toLowerCase().split(":");
-        id = split[0];
-        command = split[1];
+        this.playerId = split[0];
+        this.commandList = split[1].split("\\s+"); // Split command string on whitespace
 
-        // FIXME what if the player doesn't exist?
-
-        if ((player = game.getPlayerMap().getEntity(id)) == null) {
-            player = new Player(id, "An adventurer", game.getStartLocation());
+        if ((player = game.getPlayerMap().getEntity(playerId)) == null) {
+            player = new Player(playerId, "An intrepid adventurer", game.getStartLocation());
             game.getPlayerMap().addEntity(player);
         }
 
-        processCommandString(game, command);
+        return processCommandString(game, commandList);
     }
 
     // TODO variable renaming
-    private void processCommandString(Game game, String command) {
-        // QUESTION how does it handle multiple whitespace?
-        // TODO slightly nicer string handling please
-        String split[] = command.trim().split("\\s+");
-
+    private String processCommandString(Game game, String[] commandList) {
         CommandStrategy strategy;
 
-        for (String s : split) {
+        for (String s : commandList) {
             System.out.printf("%s\n", s);
         }
 
-        if (command.contains("inventory") || command.contains("inv")) {
+        if (commandList[0].equals("inventory") || commandList[0].equals("inv")) {
             strategy = new InventoryStrategy(player);
-        } else if (command.contains("get")) {
-            strategy = new GetStrategy(player, split);
-        } else if (command.contains("drop")) {
-            strategy = new DropStrategy(player, split);
-        } else if (command.contains("goto")) {
-            strategy = new GotoStrategy(player, split);
-        } else if (command.contains("look")) {
+        } else if (commandList[0].equals("get")) {
+            strategy = new GetStrategy(player, commandList);
+        } else if (commandList[0].equals("drop")) {
+            strategy = new DropStrategy(player, commandList);
+        } else if (commandList[0].equals("goto")) {
+            strategy = new GotoStrategy(player, commandList);
+        } else if (commandList[0].equals("look")) {
             strategy = new LookStrategy(player.getLocation());
-        } else if (command.contains("health")) {
+        } else if (commandList[0].equals("health")) {
             strategy = new HealthStrategy(player);
         } else {
-            strategy = new TriggerStrategy(player, game, split);
+            strategy = new TriggerStrategy(player, game, commandList);
         }
 
-        String string = strategy.process();
-        System.out.printf("%s\n", string);
+        return strategy.process();
     }
 
 }

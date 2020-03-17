@@ -8,8 +8,8 @@ public class Location extends Entity {
     private EntityMap<Furniture> furnitureMap = new EntityMap<>();
     private EntityMap<Player> playerMap = new EntityMap<>();
 
-    public Location(String name, String description) {
-        super(name, description);
+    public Location(String id, String description) {
+        super(id, description);
     }
 
     public void addEntity(Location entity) {

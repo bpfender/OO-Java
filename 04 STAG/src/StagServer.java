@@ -44,7 +44,7 @@ class StagServer {
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException {
         String line = in.readLine();
 
-        Controller controller = new Controller(game, line);
-        out.write(controller.processLine());
+        Controller controller = new Controller(game);
+        out.write(controller.processLine(line));
     }
 }
