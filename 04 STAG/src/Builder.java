@@ -19,6 +19,7 @@ import org.json.simple.parser.JSONParser;
 public class Builder {
     private final String entityFilename;
     private final String actionFilename;
+    private Game game = new Game();
 
     public Builder(String entityFilename, String actionFilename) {
         this.entityFilename = entityFilename;
@@ -26,8 +27,6 @@ public class Builder {
     }
 
     public Game buildWorld() {
-        Game game = new Game();
-
         final ArrayList<Graph> layoutGraph = loadEntitiesFile();
         final JSONObject actionJSON = loadActionsFile();
 
@@ -37,8 +36,8 @@ public class Builder {
         }
 
         try {
-            processEntities(game, layoutGraph);
-            processActions(game, actionJSON);
+            processEntities(layoutGraph);
+            processActions(actionJSON);
         } catch (IllegalArgumentException e) {
             System.err.println(e);
             System.exit(1);
@@ -74,7 +73,7 @@ public class Builder {
         return null;
     }
 
-    private void processEntities(Game game, ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
+    private void processEntities(ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
         if (!layoutGraph.get(0).getId().getId().equals("layout")) {
             throw new IllegalArgumentException("Expected 'layout' graph in file\n");
         }
@@ -137,7 +136,9 @@ public class Builder {
                         location.addEntity(new Furniture(nodeId, nodeDescription));
                         break;
                     case "characters":
-                        location.addEntity(new Character(nodeId, nodeDescription));
+                        Character character = new Character(nodeId, nodeDescription, location);
+                        location.addEntity(character);
+                        game.addEntity(character);
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid entity in .dot file\n");
@@ -175,7 +176,7 @@ public class Builder {
         return null;
     }
 
-    private void processActions(Game game, JSONObject actionJSON) throws IllegalArgumentException {
+    private void processActions(JSONObject actionJSON) throws IllegalArgumentException {
         JSONArray actionsList = (JSONArray) actionJSON.get("actions");
         if (actionsList == null) {
             throw new IllegalArgumentException("Could not find 'actions' object in JSON\n");

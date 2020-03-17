@@ -27,10 +27,6 @@ public class Controller {
     private String processCommandString(Game game, String[] commandList) {
         CommandStrategy strategy;
 
-        for (String s : commandList) {
-            System.out.printf("%s\n", s);
-        }
-
         if (commandList[0].equals("inventory") || commandList[0].equals("inv")) {
             strategy = new InventoryStrategy(player);
         } else if (commandList[0].equals("get")) {

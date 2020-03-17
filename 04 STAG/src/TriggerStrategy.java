@@ -5,18 +5,18 @@ public class TriggerStrategy implements CommandStrategy {
     final Player player;
     final Location location;
     final Game game;
-    final String[] command;
+    final String[] commandList;
 
-    public TriggerStrategy(Player player, Game game, String[] command) {
+    public TriggerStrategy(Player player, Game game, String[] commandList) {
         this.player = player;
         location = player.getLocation();
         this.game = game;
-        this.command = command;
+        this.commandList = commandList;
     }
 
     @Override
     public String process() {
-        Action action = getAction(command, game);
+        Action action = getAction();
         if (action == null) {
             return "This is an invalid action\n";
         }
@@ -84,17 +84,19 @@ public class TriggerStrategy implements CommandStrategy {
                 player.getInventoryMap().addEntity(unplaced.getArtefactMap().removeEntity(id));
             } else if (game.getLocationMap().containsEntity(id)) {
                 location.addEntity(game.getLocationMap().getEntity(id));
-            } else if (unplaced.getCharacterMap().containsEntity(id)) {
-                location.addEntity(unplaced.getCharacterMap().removeEntity(id));
+            } else if (game.getCharacterMap().containsEntity(id)) {
+                Character character = game.getCharacterMap().getEntity(id);
+                location.addEntity(character.getLocation().getCharacterMap().removeEntity(id));
+                character.setLocation(location);
             } else if (unplaced.getFurnitureMap().containsEntity(id)) {
                 location.addEntity(unplaced.getFurnitureMap().removeEntity(id));
             }
         }
     }
 
-    private Action getAction(String[] command, Game game) {
-        for (int i = 1; i < command.length; i++) {
-            Action action = game.getAction(command[i].trim());
+    private Action getAction() {
+        for (String command : commandList) {
+            Action action = game.getAction(command);
             if (action != null) {
                 return action;
             }

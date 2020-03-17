@@ -23,7 +23,7 @@ public class LookStrategy implements CommandStrategy {
             output += "You look around and see...\n";
 
             for (String item : furnitureMap.listEntities()) {
-                output += location.getFurnitureMap().getEntity(item).getDescription();
+                output += location.getFurnitureMap().getEntity(item).getDescription() + "\n";
             }
         }
 

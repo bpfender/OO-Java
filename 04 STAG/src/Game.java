@@ -7,11 +7,10 @@ import java.util.HashMap;
 
 public class Game {
     private EntityMap<Location> locationMap = new EntityMap<>();
-    private EntityMap<Player> playerMap = new EntityMap<>();
+    private EntityMap<Player> playerMap = new EntityMap<>();;
+    private EntityMap<Character> characterMap = new EntityMap<>();
     private HashMap<String, Action> actions = new HashMap<String, Action>();
     private Location startLocation;
-
-    // TODO seperate record for unplaced?
 
     public void addEntity(Location entity) {
         locationMap.addEntity(entity);
@@ -19,6 +18,14 @@ public class Game {
 
     public void addEntity(Player entity) {
         playerMap.addEntity(entity);
+    }
+
+    public void addEntity(Character entity) {
+        characterMap.addEntity(entity);
+    }
+
+    public EntityMap<Character> getCharacterMap() {
+        return characterMap;
     }
 
     public EntityMap<Location> getLocationMap() {
