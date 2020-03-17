@@ -17,19 +17,15 @@ public class TriggerStrategy implements CommandStrategy {
     @Override
     public String process() {
         Action action = getAction(command, game);
-        String description = new String();
-
         if (action == null) {
             return "This is an invalid action\n";
         }
 
         for (String id : action.getSubjects()) {
             if (!checkSubjectExists(id)) {
-                // FIXME, doesn't tell all
-                return "Can't perform action without" + id;
+                return "Can't perform action without" + id + "\n";
             }
         }
-        description = description.concat(action.getNarration());
 
         for (String id : action.getConsumed()) {
             consumeEntity(id);
@@ -38,7 +34,14 @@ public class TriggerStrategy implements CommandStrategy {
             produceEntity(id);
         }
 
-        return description + "\n";
+        // TODO this is very unneat at the moment
+
+        if (player.getHealth() == 0) {
+            resetPlayer();
+            return action.getNarration() + "\n" + "You died!" + "\n";
+        }
+
+        return action.getNarration() + "\n";
     }
 
     private boolean checkSubjectExists(String id) {
@@ -47,10 +50,9 @@ public class TriggerStrategy implements CommandStrategy {
 
     }
 
-    // TODO string returns
     private void consumeEntity(String id) {
         if (id.toLowerCase().equals("health")) {
-            // TODO health handling
+            player.setHealth(player.getHealth() - 1);
         } else {
             if (player.getInventoryMap().removeEntity(id) != null) {
             } else if (location.getArtefactMap().removeEntity(id) != null) {
@@ -58,37 +60,40 @@ public class TriggerStrategy implements CommandStrategy {
             } else if (location.getCharacterMap().removeEntity(id) != null) {
             } else if (location.getPathMap().removeEntity(id) != null) {
             }
-            // TODO consume paths?
         }
     }
 
-    // TODO string return
+    private void resetPlayer() {
+        game.getStartLocation().addEntity(location.getPlayerMap().removeEntity(player.getName()));
+        player.setLocation(game.getStartLocation());
+        player.setHealth(3);
+
+        for (String item : player.getInventoryMap().listEntities()) {
+            location.addEntity(player.getInventoryMap().removeEntity(item));
+        }
+
+    }
+
     private void produceEntity(String id) {
         Location unplaced = game.getLocationMap().getEntity("unplaced");
-        System.out.println(id);
 
         if (id.toLowerCase().equals("health")) {
-            // TODO health handling
+            player.setHealth(player.getHealth() + 1);
         } else {
             if (unplaced.getArtefactMap().containsEntity(id)) {
                 player.getInventoryMap().addEntity(unplaced.getArtefactMap().removeEntity(id));
-                System.out.println("Artefact produced" + id);
             } else if (game.getLocationMap().containsEntity(id)) {
                 location.addEntity(game.getLocationMap().getEntity(id));
-                System.out.println("Path produced" + id);
             } else if (unplaced.getCharacterMap().containsEntity(id)) {
                 location.addEntity(unplaced.getCharacterMap().removeEntity(id));
-                System.out.println("Character produced" + id);
             } else if (unplaced.getFurnitureMap().containsEntity(id)) {
                 location.addEntity(unplaced.getFurnitureMap().removeEntity(id));
-                System.out.println("Furniture produced" + id);
             }
         }
     }
 
     private Action getAction(String[] command, Game game) {
         for (int i = 1; i < command.length; i++) {
-            System.out.println(command[i]);
             Action action = game.getAction(command[i].trim());
             if (action != null) {
                 return action;
