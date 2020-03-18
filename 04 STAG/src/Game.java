@@ -9,6 +9,7 @@ public class Game {
     private EntityMap<Location> locationMap = new EntityMap<>();
     private EntityMap<Player> playerMap = new EntityMap<>();;
     private EntityMap<Character> characterMap = new EntityMap<>();
+
     private HashMap<String, Action> actions = new HashMap<String, Action>();
     private Location startLocation;
 
