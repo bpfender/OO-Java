@@ -23,6 +23,7 @@ public class GotoStrategy implements CommandStrategy {
         if (newLocation == null) {
             return "There's no path leading to" + locationName + "\n\n";
         } else {
+            // FIXME todo as observer?
             player.setLocation(newLocation);
             newLocation.addEntity(player);
             currentLocation.getPlayerMap().removeEntity(player.getName());

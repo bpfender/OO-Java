@@ -136,9 +136,7 @@ public class Builder {
                         location.addEntity(new Furniture(nodeId, nodeDescription));
                         break;
                     case "characters":
-                        Character character = new Character(nodeId, nodeDescription, location);
-                        location.addEntity(character);
-                        game.addEntity(character);
+                        location.addEntity(new Character(nodeId, nodeDescription));
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid entity in .dot file\n");

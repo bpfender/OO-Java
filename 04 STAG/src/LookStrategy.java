@@ -47,15 +47,14 @@ public class LookStrategy implements CommandStrategy {
         }
 
         if (playerMap.getSize() > 1) {
-            output += "\nYou see some other intrepid adventurers travelling the world. They are called ";
+            output += "\nYou see some other intrepid adventurers, ";
             for (String name : playerMap.listEntities()) {
                 if (!name.equals(player.getName())) {
                     output += name + " and ";
                 }
             }
             output = output.replaceAll("(and )$", "");
-            output += ".\n";
-
+            output += "travelling the world.\n";
         }
 
         if (pathMap.getSize() == 0) {

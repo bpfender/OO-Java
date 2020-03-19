@@ -19,6 +19,7 @@ public class Controller {
         if ((player = game.getPlayerMap().getEntity(playerId)) == null) {
             player = new Player(playerId, "An intrepid adventurer", game.getStartLocation());
             game.getPlayerMap().addEntity(player);
+            game.getStartLocation().addEntity(player);
         }
 
         return processCommandString(game, commandList);
