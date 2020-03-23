@@ -80,18 +80,21 @@ public class TriggerStrategy implements CommandStrategy {
         if (id.toLowerCase().equals("health")) {
             player.setHealth(player.getHealth() + 1);
         } else {
+            // FIXME this is problematic. Need global lists of entities
             if (unplaced.getArtefactMap().containsEntity(id)) {
                 player.getInventoryMap().addEntity(unplaced.getArtefactMap().removeEntity(id));
             } else if (game.getLocationMap().containsEntity(id)) {
                 location.addEntity(game.getLocationMap().getEntity(id));
-            } else if (game.getCharacterMap().containsEntity(id)) {
-                Character character = game.getCharacterMap().getEntity(id);
-                location.addEntity(character.getLocation().getCharacterMap().removeEntity(id));
-                character.setLocation(location);
+            } else if (unplaced.getCharacterMap().containsEntity(id)) {
+                location.addEntity(unplaced.getCharacterMap().removeEntity(id));
             } else if (unplaced.getFurnitureMap().containsEntity(id)) {
                 location.addEntity(unplaced.getFurnitureMap().removeEntity(id));
+            } else {
+                player.getInventoryMap().addEntity(new Artefact(id, "This is a" + id));
             }
         }
+
+        // TODO report nothing happened!
     }
 
     private Action getAction() {

@@ -10,8 +10,14 @@ public class Controller {
     }
 
     public String processLine(String line) {
+
         String input = line.toLowerCase().trim(); // Trim any leading or trailing whitespace and lowercase input
+
         String split[] = input.split("(\\s*+):(\\s*+)"); // Split on first colon and any surroumding whitespace
+
+        if (split.length == 1) {
+            return "NO INPUT";
+        }
 
         final String playerId = split[0];
         final String[] commandList = split[1].split("\\s+"); // Split command string on whitespace
