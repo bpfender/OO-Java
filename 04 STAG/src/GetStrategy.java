@@ -1,6 +1,3 @@
-/**
- * GetStrategy
- */
 public class GetStrategy implements CommandStrategy {
     private final Player player;
     private final String[] commandList;

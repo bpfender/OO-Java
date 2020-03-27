@@ -1,6 +1,3 @@
-/**
- * Player
- */
 public class Player extends Character {
     private EntityMap<Artefact> inventoryMap = new EntityMap<>();
     private int health = 3;

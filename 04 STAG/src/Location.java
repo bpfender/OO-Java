@@ -1,6 +1,3 @@
-/**
- * Locations
- */
 public class Location extends Entity {
     private EntityMap<Location> pathMap = new EntityMap<>();
     private EntityMap<Character> characterMap = new EntityMap<>();

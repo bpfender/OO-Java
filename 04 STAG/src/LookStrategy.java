@@ -43,7 +43,7 @@ public class LookStrategy implements CommandStrategy {
         String artefactDescription = new String();
 
         if (artefactMap.getSize() == 1) {
-            artefactDescription += "There's a " + artefactMap.listEntities().get(0) + " lying on the ground.\n";
+            artefactDescription += "There's a " + artefactMap.listEntities().get(0) + " lying on the ground.\n\n";
         } else if (artefactMap.getSize() > 1) {
             artefactDescription += "Several items including a ";
             for (String item : artefactMap.listEntities()) {
@@ -51,7 +51,7 @@ public class LookStrategy implements CommandStrategy {
             }
             artefactDescription = artefactDescription.replaceAll("(and )$", "");
 
-            artefactDescription += "are strewn around.\n";
+            artefactDescription += "are strewn around.\n\n";
         }
 
         return artefactDescription;
@@ -83,8 +83,8 @@ public class LookStrategy implements CommandStrategy {
                     playerDescription += name + " and ";
                 }
             }
-            playerDescription = playerDescription.replaceAll("(and )$", "");
-            playerDescription += ", travelling the world.\n";
+            playerDescription = playerDescription.replaceAll("( and )$", "");
+            playerDescription += ", travelling the world.\n\n";
         }
 
         return playerDescription;
@@ -95,9 +95,9 @@ public class LookStrategy implements CommandStrategy {
         String pathDescription = new String();
 
         if (pathMap.getSize() == 0) {
-            pathDescription += "\nUnfortunately you can't see any paths leading away. You are stuck here...\n";
+            pathDescription += "Unfortunately you can't see any paths leading away. You are stuck here...\n";
         } else if (pathMap.getSize() == 1) {
-            pathDescription += "\nYou see a path going to the " + pathMap.listEntities().get(0) + ".\n";
+            pathDescription += "You see a path going to the " + pathMap.listEntities().get(0) + ".\n";
         } else {
             pathDescription += "You see a number of paths going to the ";
 

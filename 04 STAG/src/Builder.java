@@ -13,9 +13,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- * World
- */
 public class Builder {
     private Game game = new Game();
     private final String entityFilename;

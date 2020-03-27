@@ -1,20 +1,23 @@
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
 
-public class StagClient
-{
-    public static void main(String args[])
-    {
-        if(args.length != 1) System.out.println("Usage: java StageClient <player-name>");
+public class StagClient {
+    public static void main(String args[]) {
+        if (args.length != 1)
+            System.out.println("Usage: java StageClient <player-name>");
         else {
             String playerName = args[0];
             BufferedReader commandLine = new BufferedReader(new InputStreamReader(System.in));
-            while(true) handleNextCommand(commandLine, playerName);
+            while (true)
+                handleNextCommand(commandLine, playerName);
         }
     }
 
-    private static void handleNextCommand(BufferedReader commandLine, String playerName)
-    {
+    private static void handleNextCommand(BufferedReader commandLine, String playerName) {
         try {
             String incoming;
             System.out.print("\n" + playerName + ": ");
@@ -24,11 +27,12 @@ public class StagClient
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.write(playerName + ": " + command + "\n");
             out.flush();
-            while((incoming = in.readLine()) != null) System.out.println(incoming);
+            while ((incoming = in.readLine()) != null)
+                System.out.println(incoming);
             in.close();
             out.close();
             socket.close();
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             System.out.println(ioe);
         }
     }

@@ -1,6 +1,3 @@
-/**
- * TriggerStrategy
- */
 public class TriggerStrategy implements CommandStrategy {
     private final Player player;
     private final Location location;
@@ -28,9 +25,10 @@ public class TriggerStrategy implements CommandStrategy {
             }
         }
 
-        // Check that items can still be produced
+        // Check that items can be produced
         for (String id : action.getProduced()) {
-            if (!(checkEntityExists(id, game.getLocationMap().getEntity("unplaced")) || id.equals("health"))) {
+            if (!(checkEntityExists(id, game.getLocationMap().getEntity("unplaced")) || id.equals("health")
+                    || game.getLocationMap().containsEntity(id))) {
                 return "Nothing happened\n";
             }
         }

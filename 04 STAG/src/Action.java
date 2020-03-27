@@ -1,8 +1,5 @@
 import java.util.ArrayList;
 
-/**
- * Actions
- */
 public class Action {
     private final ArrayList<String> triggers;
     private final ArrayList<String> subjects;

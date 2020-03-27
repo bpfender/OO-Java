@@ -1,6 +1,3 @@
-/**
- * HealthStrategy
- */
 public class HealthStrategy implements CommandStrategy {
     private final Player player;
 

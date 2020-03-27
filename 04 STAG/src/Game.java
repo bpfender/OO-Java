@@ -1,10 +1,6 @@
 import java.util.HashMap;
 
-/**
- * World
- */
-// TODO should this be a singleton?
-
+// Could/should this be implemented as a singleton?
 public class Game {
     private EntityMap<Location> locationMap = new EntityMap<>();
     private EntityMap<Player> playerMap = new EntityMap<>();;

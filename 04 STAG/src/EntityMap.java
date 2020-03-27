@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * EntityMap
- */
 public class EntityMap<T extends Entity> {
     private HashMap<String, T> map = new HashMap<>();
     private int size = 0;

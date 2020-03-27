@@ -1,6 +1,3 @@
-/**
- * CommandHandler
- */
 public class Controller {
     private Game game;
     private Player player;

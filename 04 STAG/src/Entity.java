@@ -10,7 +10,6 @@ public abstract class Entity {
         this.description = description;
     }
 
-    // TODO this needs to be renamed
     public String getName() {
         return id;
     }
