@@ -2,7 +2,7 @@
  * HealthStrategy
  */
 public class HealthStrategy implements CommandStrategy {
-    final Player player;
+    private final Player player;
 
     public HealthStrategy(Player player) {
         this.player = player;

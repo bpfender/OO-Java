@@ -18,6 +18,7 @@ public class Game {
 
     public void addEntity(Player entity) {
         playerMap.addEntity(entity);
+        startLocation.addEntity(entity);
     }
 
     public EntityMap<Location> getLocationMap() {

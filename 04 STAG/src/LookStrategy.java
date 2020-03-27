@@ -1,6 +1,6 @@
 public class LookStrategy implements CommandStrategy {
-    final Location location;
-    final Player player;
+    private final Location location;
+    private final Player player;
 
     public LookStrategy(Player player) {
         this.location = player.getLocation();
@@ -10,71 +10,104 @@ public class LookStrategy implements CommandStrategy {
     @Override
     public String process() {
         String output = new String();
+        output += location.getDescription() + "...\n\n";
+        output += reportFurniture();
+        output += reportArtefacts();
+        output += reportCharacters();
+        output += reportPlayers();
+        output += reportPaths();
 
-        EntityMap<Furniture> furnitureMap = location.getFurnitureMap();
-        EntityMap<Artefact> artefactMap = location.getArtefactMap();
-        EntityMap<Character> characterMap = location.getCharacterMap();
-        EntityMap<Location> pathMap = location.getPathMap();
-        EntityMap<Player> playerMap = location.getPlayerMap();
-
-        output += location.getDescription() + "\n";
-
-        if (furnitureMap.getSize() > 0) {
-            output += "You look around and see...\n";
-
-            for (String item : furnitureMap.listEntities()) {
-                output += location.getFurnitureMap().getEntity(item).getDescription() + "\n";
-            }
-        }
-
-        if (artefactMap.getSize() == 1) {
-            output += "\nThere's a " + artefactMap.listEntities().get(0) + " lying on the ground.\n";
-        } else if (artefactMap.getSize() > 1) {
-            output += "Several items, including a ";
-            for (String item : artefactMap.listEntities()) {
-                output += item + " and ";
-            }
-            output = output.replaceAll("(and )$", "");
-
-            output += "are strewn around\n";
-        }
-
-        if (characterMap.getSize() > 0) {
-            output += "\nSome curious faces are peering at you. You spot...\n";
-            for (String item : characterMap.listEntities()) {
-                output += characterMap.getEntity(item).getDescription() + "\n";
-            }
-        }
-
-        if (playerMap.getSize() > 1) {
-            output += "\nYou see some other intrepid adventurers, ";
-            for (String name : playerMap.listEntities()) {
-                if (!name.equals(player.getName())) {
-                    output += name + " and ";
-                }
-            }
-            output = output.replaceAll("(and )$", "");
-            output += "travelling the world.\n";
-        }
-
-        if (pathMap.getSize() == 0) {
-            output += "\nUnfortunately you can't see any paths leading away. You are stuck here forever...\n";
-        } else if (pathMap.getSize() == 1) {
-            output += "\nYou see a path going to the " + pathMap.listEntities().get(0) + ".\n";
-        } else {
-            output += "You see a number of paths, going to the ";
-
-            for (String item : pathMap.listEntities()) {
-                output = output.concat(item + " , or a ");
-            }
-            output = output.replaceAll("(, or a )$", "");
-            output += ".\n";
-
-            output += "leading away.\n";
-
-        }
-
-        return output + "\n";
+        return output;
     }
 
+    private String reportFurniture() {
+        EntityMap<Furniture> furnitureMap = location.getFurnitureMap();
+        String furnitureDescription = new String();
+
+        if (furnitureMap.getSize() > 0) {
+            furnitureDescription += "You look around and see...\n";
+
+            for (String item : furnitureMap.listEntities()) {
+                furnitureDescription += "  -" + location.getFurnitureMap().getEntity(item).getDescription() + "\n";
+            }
+
+            furnitureDescription += "\n";
+        }
+
+        return furnitureDescription;
+
+    }
+
+    private String reportArtefacts() {
+        EntityMap<Artefact> artefactMap = location.getArtefactMap();
+        String artefactDescription = new String();
+
+        if (artefactMap.getSize() == 1) {
+            artefactDescription += "There's a " + artefactMap.listEntities().get(0) + " lying on the ground.\n";
+        } else if (artefactMap.getSize() > 1) {
+            artefactDescription += "Several items including a ";
+            for (String item : artefactMap.listEntities()) {
+                artefactDescription += item + " and ";
+            }
+            artefactDescription = artefactDescription.replaceAll("(and )$", "");
+
+            artefactDescription += "are strewn around.\n";
+        }
+
+        return artefactDescription;
+    }
+
+    private String reportCharacters() {
+        EntityMap<Character> characterMap = location.getCharacterMap();
+        String characterDescription = new String();
+
+        if (characterMap.getSize() > 0) {
+            characterDescription += "Some curious faces are peering at you. You spot...\n";
+            for (String item : characterMap.listEntities()) {
+                characterDescription += characterMap.getEntity(item).getDescription() + "\n";
+            }
+            characterDescription += "\n";
+        }
+
+        return characterDescription;
+    }
+
+    private String reportPlayers() {
+        EntityMap<Player> playerMap = location.getPlayerMap();
+        String playerDescription = new String();
+
+        if (playerMap.getSize() > 1) {
+            playerDescription += "You see some other intrepid adventurers, ";
+            for (String name : playerMap.listEntities()) {
+                if (!name.equals(player.getName())) {
+                    playerDescription += name + " and ";
+                }
+            }
+            playerDescription = playerDescription.replaceAll("(and )$", "");
+            playerDescription += ", travelling the world.\n";
+        }
+
+        return playerDescription;
+    }
+
+    private String reportPaths() {
+        EntityMap<Location> pathMap = location.getPathMap();
+        String pathDescription = new String();
+
+        if (pathMap.getSize() == 0) {
+            pathDescription += "\nUnfortunately you can't see any paths leading away. You are stuck here...\n";
+        } else if (pathMap.getSize() == 1) {
+            pathDescription += "\nYou see a path going to the " + pathMap.listEntities().get(0) + ".\n";
+        } else {
+            pathDescription += "You see a number of paths going to the ";
+
+            for (String item : pathMap.listEntities()) {
+                pathDescription = pathDescription.concat(item + ", or a ");
+            }
+            pathDescription = pathDescription.replaceAll("(, or a )$", "");
+            pathDescription += ", leading away.\n";
+        }
+
+        return pathDescription;
+    }
 }

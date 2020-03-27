@@ -2,10 +2,10 @@
  * TriggerStrategy
  */
 public class TriggerStrategy implements CommandStrategy {
-    final Player player;
-    final Location location;
-    final Game game;
-    final String[] commandList;
+    private final Player player;
+    private final Location location;
+    private final Game game;
+    private final String[] commandList;
 
     public TriggerStrategy(Player player, Game game, String[] commandList) {
         this.player = player;
@@ -21,12 +21,21 @@ public class TriggerStrategy implements CommandStrategy {
             return "This is an invalid action\n";
         }
 
+        // Check nevessary subjects exist
         for (String id : action.getSubjects()) {
-            if (!checkSubjectExists(id)) {
-                return "Can't perform action without" + id + "\n";
+            if (!checkEntityExists(id, location)) {
+                return "Can't perform action without " + id + "\n";
             }
         }
 
+        // Check that items can still be produced
+        for (String id : action.getProduced()) {
+            if (!(checkEntityExists(id, game.getLocationMap().getEntity("unplaced")) || id.equals("health"))) {
+                return "Nothing happened\n";
+            }
+        }
+
+        // Consume and produce items
         for (String id : action.getConsumed()) {
             consumeEntity(id);
         }
@@ -34,19 +43,19 @@ public class TriggerStrategy implements CommandStrategy {
             produceEntity(id);
         }
 
-        // TODO this is very unneat at the moment
-
+        // Would this work bettery in some sort of observer pattern?
         if (player.getHealth() == 0) {
             resetPlayer();
-            return action.getNarration() + "\n" + "You died!" + "\n";
+            return action.getNarration() + "\n\n" + "You died and dropped any items in your inventory!" + "\n";
         }
 
         return action.getNarration() + "\n";
     }
 
-    private boolean checkSubjectExists(String id) {
+    private boolean checkEntityExists(String id, Location location) {
         return player.getInventoryMap().containsEntity(id) || location.getArtefactMap().containsEntity(id)
-                || location.getFurnitureMap().containsEntity(id) || location.getCharacterMap().containsEntity(id);
+                || location.getFurnitureMap().containsEntity(id) || location.getCharacterMap().containsEntity(id)
+                || location.getPathMap().containsEntity(id);
 
     }
 
@@ -63,38 +72,35 @@ public class TriggerStrategy implements CommandStrategy {
         }
     }
 
-    private void resetPlayer() {
-        game.getStartLocation().addEntity(location.getPlayerMap().removeEntity(player.getName()));
-        player.setLocation(game.getStartLocation());
-        player.setHealth(3);
-
-        for (String item : player.getInventoryMap().listEntities()) {
-            location.addEntity(player.getInventoryMap().removeEntity(item));
-        }
-
-    }
-
     private void produceEntity(String id) {
         Location unplaced = game.getLocationMap().getEntity("unplaced");
 
         if (id.toLowerCase().equals("health")) {
             player.setHealth(player.getHealth() + 1);
         } else {
-            // FIXME this is problematic. Need global lists of entities
             if (unplaced.getArtefactMap().containsEntity(id)) {
-                player.getInventoryMap().addEntity(unplaced.getArtefactMap().removeEntity(id));
+                player.addEntity(unplaced.getArtefactMap().removeEntity(id));
             } else if (game.getLocationMap().containsEntity(id)) {
                 location.addEntity(game.getLocationMap().getEntity(id));
             } else if (unplaced.getCharacterMap().containsEntity(id)) {
                 location.addEntity(unplaced.getCharacterMap().removeEntity(id));
             } else if (unplaced.getFurnitureMap().containsEntity(id)) {
                 location.addEntity(unplaced.getFurnitureMap().removeEntity(id));
-            } else {
-                player.getInventoryMap().addEntity(new Artefact(id, "This is a" + id));
             }
         }
+    }
 
-        // TODO report nothing happened!
+    private void resetPlayer() {
+        Location startLocation = game.getStartLocation();
+
+        startLocation.addEntity(location.getPlayerMap().removeEntity(player.getName()));
+        player.setLocation(startLocation);
+        player.setHealth(3);
+
+        for (String item : player.getInventoryMap().listEntities()) {
+            location.addEntity(player.getInventoryMap().removeEntity(item));
+        }
+
     }
 
     private Action getAction() {

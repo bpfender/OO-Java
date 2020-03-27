@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class InventoryStrategy implements CommandStrategy {
 
-    final Player player;
+    private final Player player;
 
     public InventoryStrategy(Player player) {
         this.player = player;
@@ -19,9 +19,9 @@ public class InventoryStrategy implements CommandStrategy {
         String output = new String("You have some items in your inventory:\n");
 
         for (String i : items) {
-            output += i.toUpperCase() + ": " + player.getInventoryMap().getEntity(i).getDescription() + "\n";
+            output += "  -" + player.getInventoryMap().getEntity(i).getDescription() + "\n";
         }
 
-        return output + "\n";
+        return output;
     }
 }

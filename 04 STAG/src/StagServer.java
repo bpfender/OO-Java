@@ -2,19 +2,22 @@ import java.io.*;
 import java.net.*;
 
 class StagServer {
-    static Game game;
+    private Controller controller;
 
     public static void main(String args[]) {
-        if (args.length != 2)
+        if (args.length != 2) {
             System.out.println("Usage: java StagServer <entity-file> <action-file>");
-        else {
+            System.exit(-1);
+        } else {
             new StagServer(args[0], args[1], 8888);
         }
     }
 
     public StagServer(String entityFilename, String actionFilename, int portNumber) {
         Builder builder = new Builder(entityFilename, actionFilename);
-        game = builder.buildWorld();
+        Game game = builder.buildGame();
+
+        controller = new Controller(game);
 
         try {
             ServerSocket ss = new ServerSocket(portNumber);
@@ -43,8 +46,6 @@ class StagServer {
 
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException {
         String line = in.readLine();
-
-        Controller controller = new Controller(game);
         out.write(controller.processLine(line));
     }
 }

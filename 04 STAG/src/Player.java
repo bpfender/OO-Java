@@ -11,6 +11,10 @@ public class Player extends Character {
         this.location = start;
     }
 
+    public void addEntity(Artefact artefact) {
+        inventoryMap.addEntity(artefact);
+    }
+
     public EntityMap<Artefact> getInventoryMap() {
         return inventoryMap;
     }

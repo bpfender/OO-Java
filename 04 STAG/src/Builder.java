@@ -17,20 +17,22 @@ import org.json.simple.parser.JSONParser;
  * World
  */
 public class Builder {
+    private Game game = new Game();
     private final String entityFilename;
     private final String actionFilename;
-    private Game game = new Game();
 
     public Builder(String entityFilename, String actionFilename) {
         this.entityFilename = entityFilename;
         this.actionFilename = actionFilename;
     }
 
-    public Game buildWorld() {
+    public Game buildGame() {
         final ArrayList<Graph> layoutGraph = loadEntitiesFile();
         final JSONObject actionJSON = loadActionsFile();
 
-        // TODO exception handling in server?
+        // Would it be better to throw exceptions back to the server class?
+        // Slightly weird structure to be able to check both files can be loaded. Is
+        // there a better way of doing this?
         if (layoutGraph == null || actionJSON == null) {
             System.exit(1);
         }
@@ -65,9 +67,8 @@ public class Builder {
 
             return layoutGraph;
 
-        } catch (FileNotFoundException | ParseException e) {
+        } catch (ParseException | IOException e) {
             System.err.println(e);
-        } catch (IOException ignore) {
         }
 
         return null;
@@ -75,7 +76,7 @@ public class Builder {
 
     private void processEntities(ArrayList<Graph> layoutGraph) throws IllegalArgumentException {
         if (!layoutGraph.get(0).getId().getId().equals("layout")) {
-            throw new IllegalArgumentException("Expected 'layout' graph in file\n");
+            throw new IllegalArgumentException("Expected 'layout' graph in .dot file\n");
         }
 
         ArrayList<Graph> entities = layoutGraph.get(0).getSubgraphs();
@@ -84,7 +85,7 @@ public class Builder {
         ArrayList<Edge> pathsEdgesArray = getGraphByName(entities, "paths").getEdges();
 
         if (locationsGraphArray == null || pathsEdgesArray == null) {
-            throw new IllegalArgumentException("Expected a locations and paths graph in file\n");
+            throw new IllegalArgumentException("Expected a locations and paths graph in .dot file\n");
         }
 
         for (Graph l : locationsGraphArray) {
@@ -103,7 +104,7 @@ public class Builder {
             Location path = game.getLocationMap().getEntity(target);
 
             if (location == null || path == null) {
-                throw new IllegalArgumentException("Path to non-existent location specified\n");
+                throw new IllegalArgumentException("Path to non-existent location specified in .dot file\n");
             }
 
             location.addEntity(path);
@@ -128,6 +129,8 @@ public class Builder {
                 String nodeDescription = n.getAttribute("description");
 
                 // What if an entity gets added to the game? Should this code be somewhere else?
+                // Can this be made into a factory? Can't figure out how to modify return type
+                // based on string
                 switch (entityName) {
                     case "artefacts":
                         location.addEntity(new Artefact(nodeId, nodeDescription));
@@ -166,11 +169,10 @@ public class Builder {
 
             return (JSONObject) parser.parse(reader);
 
-        } catch (FileNotFoundException | org.json.simple.parser.ParseException e) {
+        } catch (IOException | org.json.simple.parser.ParseException e) {
             System.err.println(e);
-        } catch (IOException e) {
-
         }
+
         return null;
     }
 

@@ -13,19 +13,18 @@ public class Controller {
 
         String input = line.toLowerCase().trim(); // Trim any leading or trailing whitespace and lowercase input
 
-        String split[] = input.split("(\\s*+):(\\s*+)"); // Split on first colon and any surroumding whitespace
+        String splitLine[] = input.split("(\\s*[:]\\s*)"); // Split on first colon and any surroumding whitespace
 
-        if (split.length == 1) {
-            return "NO INPUT";
+        if (splitLine.length == 1) {
+            return "No action specified";
         }
 
-        final String playerId = split[0];
-        final String[] commandList = split[1].split("\\s+"); // Split command string on whitespace
+        final String playerId = splitLine[0];
+        final String[] commandList = splitLine[1].split("\\s+"); // Split command string on (any) whitespace
 
         if ((player = game.getPlayerMap().getEntity(playerId)) == null) {
             player = new Player(playerId, "An intrepid adventurer", game.getStartLocation());
-            game.getPlayerMap().addEntity(player);
-            game.getStartLocation().addEntity(player);
+            game.addEntity(player);
         }
 
         return processCommandString(game, commandList);
