@@ -1,0 +1,56 @@
+Entered query:   CREATE DATABASE coursework;
+Server response: OK
+
+Entered query:   USE coursework;
+Server response: OK
+
+Entered query:   CREATE TABLE marks (name, mark);
+Server response: OK
+
+Entered query:   INSERT INTO marks VALUES ('Steve', 65);
+Server response: OK
+
+Entered query:   INSERT INTO marks VALUES ('Dave', 55);
+Server response: OK
+
+Entered query:   INSERT INTO marks VALUES ('Bob', 35);
+Server response: OK
+
+Entered query:   INSERT INTO marks VALUES ('Clive', 20);
+Server response: OK
+
+Entered query:   SELECT * FROM marks;
+Server response:
+id  name   mark
+1   Steve  65
+2   Dave   55
+3   Bob    35
+4   Clive  20
+
+Entered query:   DELETE FROM marks WHERE name == 'Dave';
+Server response: OK
+
+Entered query:   SELECT * FROM marks;
+Server response:
+id  name   mark
+1   Steve  65
+3   Bob    35
+4   Clive  20
+
+Entered query:   DELETE FROM marks WHERE mark < 40;
+Server response: OK
+
+Entered query:   SELECT * FROM marks;
+Server response:
+id  name   mark
+1   Steve  65
+
+Entered query:   SELECT * FROM marks
+Server response: ERROR Missing ;
+
+Entered query:   SELECT * FROM grades;
+Server response: ERROR Unknown table 'grades'
+
+Entered query:   DELETE INTO marks WHERE name == 'Steve';
+Server response: ERROR Unexpected token 'INTO'
+
