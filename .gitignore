@@ -23,3 +23,13 @@
 hs_err_pid*
 
 .vscode/
+
+.classpath
+
+.project
+
+JavaTest.code-workspace
+
+.settings/
+
+bin/

@@ -14,6 +14,7 @@ public class DBClient {
                 handleNextCommand(commandLine, out, in);
         } catch (IOException ioe) {
             System.out.println(ioe);
+
         }
     }
 
