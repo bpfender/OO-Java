@@ -9,13 +9,10 @@ public class Use implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO context should load the appropriate database
-        // context.use(databaseName);
-        if (true) {
-            return databaseName;
-        } else {
-            return "An error ocurred";
+        if (context.useDatabase(databaseName)) {
+            return "OK";
         }
+        return "ERROR Unknown database " + databaseName;
     }
 
 }

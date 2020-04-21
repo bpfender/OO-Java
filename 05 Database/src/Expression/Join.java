@@ -1,17 +1,19 @@
 package Expression;
 
 public class Join implements Expression {
-    String table;
-    Expression and;
+    private Expression and;
+    private Expression on;
 
-    public Join(String table, Expression and) {
-        this.table = table;
+    public Join(Expression and, Expression on) {
         this.and = and;
+        this.on = on;
     }
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
+        // context.setAction("join");
+        and.interpret(context);
+        on.interpret(context);
         return null;
     }
 

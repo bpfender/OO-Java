@@ -9,9 +9,10 @@ public class CreateDatabase implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
-        // context.createDatabase(databaseName);
-        return null;
+        if (context.createDatabase(databaseName)) {
+            return "OK";
+        }
+        return "ERROR " + databaseName + " already exists";
     }
 
 }
