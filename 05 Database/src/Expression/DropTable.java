@@ -10,9 +10,17 @@ public class DropTable implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
-        // context.dropTable(tableName);
-        return null;
+        switch (context.dropTable(tableName)) {
+            case 0:
+                return "OK";
+            case -1:
+                return "ERROR No database specified";
+            case -2:
+                return "ERROR Unknown table " + tableName;
+            default:
+                return "ERROR Undefined error";
+        }
+
     }
 
 }

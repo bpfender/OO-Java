@@ -24,14 +24,20 @@ public class Database {
         return true;
     }
 
-    public Table fromTable(String table) {
-        return tables.get(table);
+    public Table fromTable(String tableName) {
+        return tables.get(tableName);
     }
 
-    public boolean dropTable(String table) {
+    public boolean dropTable(String tableName) {
+
         // Check that table exists
         // Delete table and contents if it does
-        return false;
+        // QUESTION does this remove all references properly
+        if (tables.remove(tableName) == null) {
+            return false;
+        }
+
+        return true;
     }
 
 }

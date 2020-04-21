@@ -9,9 +9,11 @@ public class Drop implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
-        // context.drop(attribute);
-        return null;
+        if (context.drop(attribute)) {
+            return "OK";
+        }
+
+        return "ERROR Unknown attribute " + attribute;
     }
 
 }

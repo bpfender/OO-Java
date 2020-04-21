@@ -10,9 +10,10 @@ public class DropDatabase implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
-        // context.dropDatabase(databaseName);
-        return null;
+        if (context.dropDatabase(databaseName)) {
+            return "OK";
+        }
+        return "ERROR Unknown table " + databaseName;
     }
 
 }

@@ -13,6 +13,9 @@ import Database.*;
 
 public class Context {
     private Database activeDatabase;
+
+    private Table activeTable;
+
     private Map<String, Database> databases = new HashMap<>();
 
     public Context() {
@@ -38,6 +41,7 @@ public class Context {
         if (activeDatabase.createTable(tableName, attributeList)) {
             return 0;
         }
+
         return -2;
     }
 
@@ -52,9 +56,59 @@ public class Context {
     }
 
     public boolean dropDatabase(String databaseName) {
-        // check that database exists
-        // delete if exists
-        return false;
+        Database tmp = databases.remove(databaseName);
+
+        if (tmp == null) {
+            return false;
+        }
+
+        // QUESTION does this remove all references to database
+        if (tmp == activeDatabase) {
+            activeDatabase = null;
+        }
+
+        return true;
+    }
+
+    public int dropTable(String tableName) {
+        if (activeDatabase == null) {
+            return -1;
+        }
+
+        if (activeDatabase.dropTable(tableName)) {
+            return 0;
+        }
+
+        return -2;
+    }
+
+    public int setTable(String tableName) {
+        if (activeDatabase == null) {
+            return -1;
+        }
+
+        Table tmp = activeDatabase.fromTable(tableName);
+
+        if (tmp == null) {
+            return -2;
+        }
+
+        activeTable = tmp;
+        return 0;
+        // QUESTION resetting activeTable after query is over?
+    }
+
+    // QUESTION better to have overloaded execute method?
+    public boolean add(String attribute) {
+        return activeTable.addAttribute(attribute);
+    }
+
+    public boolean drop(String attribute) {
+        return activeTable.dropAttribute(attribute);
+    }
+
+    public boolean insert(List<String> data) {
+        return activeTable.insertValues(data);
     }
 
 }

@@ -9,9 +9,11 @@ public class Add implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
-        // context.add(attribute);
-        return null;
+        if (context.add(attribute)) {
+            return "OK";
+        }
+
+        return "ERROR Attribute already exists";
     }
 
 }
