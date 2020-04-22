@@ -9,10 +9,8 @@ public class Where implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
-        // context.setConditions(conditions);
-        // return context.select();
-        return null;
+        context.setFilter(conditions);
+        return context.search();
     }
 
 }

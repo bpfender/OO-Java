@@ -1,10 +1,12 @@
 package Expression;
 
+import java.util.ArrayList;
+
 public class Select implements Expression {
-    private String attributes;
+    private ArrayList<String> attributes;
     private Expression from;
 
-    public Select(String attributes, Expression from) {
+    public Select(ArrayList<String> attributes, Expression from) {
         this.attributes = attributes;
         this.from = from;
     }
@@ -12,8 +14,12 @@ public class Select implements Expression {
     @Override
     public String interpret(Context context) {
         // TODO Auto-generated method stub
-        // context.setAttributes(attributes);
-        return from.interpret(context);
+        if (context.select(attributes)) {
+            return from.interpret(context);
+        }
+
+        return "ERROR No database set";
+
     }
 
 }

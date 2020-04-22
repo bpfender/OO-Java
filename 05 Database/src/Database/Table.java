@@ -1,6 +1,7 @@
 package Database;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +10,12 @@ import java.util.Stack;
 public class Table {
     private String tableName = new String();
 
+    private ArrayList<Integer> ids = new ArrayList<>();
     private Map<String, Column> columns = new LinkedHashMap<>();
+    private int lastId = 0;
 
     // TODO reusing ids?
     private Stack<Integer> freeIds = new Stack<>();
-
-    private List<Record> rows;
 
     public Table(String tableName, List<String> attributes) {
         this.tableName = tableName;
@@ -26,14 +27,22 @@ public class Table {
         }
     }
 
+    public Collection<String> getAttributes() {
+        return columns.keySet();
+    }
+
     public boolean insertValues(List<String> data) {
         if (data.size() == columns.size()) {
-            for (Column col : columns.values()) {
+            ids.add(++lastId);
 
+            // QUESTION neater way to do this?
+            int index = 0;
+            for (Column col : columns.values()) {
+                col.addValue(data.get(index));
+                index++;
             }
         }
         // No reusing of indexes;
-        // No analysis on data types currently
         return false;
     }
 
@@ -52,9 +61,12 @@ public class Table {
 
         columns.put(attribute, new Column());
         return true;
+
+        // FIXME prevent adding * and id
     }
 
     public boolean dropAttribute(String attribute) {
+        // FIXME prevent dropping id
         if (columns.remove(attribute) == null) {
             return false;
         }

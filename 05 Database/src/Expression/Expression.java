@@ -18,6 +18,7 @@ package Expression;
 //https://medium.com/@denisanikin/what-an-in-memory-database-is-and-how-it-persists-data-efficiently-f43868cff4c1
 //https://dzone.com/articles/how-three-fundamental-data-structures-impact-stora
 //https://www.tutorialcup.com/dbms/selection-algorithm.htm
+//https://hpi.de/fileadmin/user_upload/fachgebiete/plattner/teaching/DataStructures/2011/In-Memory_Data_Structures.pdf
 
 public interface Expression {
     public String interpret(Context context);

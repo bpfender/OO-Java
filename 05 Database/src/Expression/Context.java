@@ -1,6 +1,8 @@
 package Expression;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ public class Context {
     private Database activeDatabase;
 
     private Table activeTable;
+    private ArrayList<String> activeAttributes;
 
     private Map<String, Database> databases = new HashMap<>();
 
@@ -109,6 +112,36 @@ public class Context {
 
     public boolean insert(List<String> data) {
         return activeTable.insertValues(data);
+    }
+
+    public boolean select(ArrayList<String> attributes) {
+        if (activeDatabase == null) {
+            return false;
+        }
+
+        activeAttributes = attributes;
+        return false;
+    }
+
+    public boolean selectQuery() {
+        Collection<String> tableAttributes = activeTable.getAttributes();
+
+        if (!(activeAttributes.size() == 1 && activeAttributes.contains("*"))) {
+            for (String attribute : activeAttributes) {
+                if (!tableAttributes.contains(attribute)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void setFilter() {
+
+    }
+
+    public String search() {
+        return null;
     }
 
 }
