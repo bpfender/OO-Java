@@ -1,16 +1,20 @@
 package Expression;
 
-public class Where implements Expression {
-    private String conditions;
+import ConditionTree.*;
 
-    public Where(String conditions) {
+public class Where implements Expression {
+    private Node conditions;
+
+    public Where(Node conditions) {
         this.conditions = conditions;
     }
 
     @Override
     public String interpret(Context context) {
-        context.setFilter(conditions);
-        return context.search();
+        if (context.setFilter(conditions)) {
+            return context.search();
+        }
+        return "ERROR Invalid attribute specified in WHERE clause";
     }
 
 }

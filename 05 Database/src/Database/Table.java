@@ -27,8 +27,24 @@ public class Table {
         }
     }
 
+    public Column getColumn(String attribute) {
+        return columns.get(attribute);
+    }
+
+    public String getId(Integer index) {
+        return String.valueOf(ids.get(index));
+    }
+
+    public void deleteId(Integer index) {
+        ids.remove(index);
+    }
+
     public Collection<String> getAttributes() {
         return columns.keySet();
+    }
+
+    public Collection<Column> getColumns() {
+        return columns.values();
     }
 
     public boolean insertValues(List<String> data) {

@@ -8,16 +8,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntBinaryOperator;
 
+import ConditionTree.Node;
 import Database.*;
 
 // Could potentially have hashmap associating name with file path?
 // FIXME currently non-persistent
 
 public class Context {
+    public enum Mode {
+        SELECT, UPDATE, DELETE
+    };
+
     private Database activeDatabase;
 
     private Table activeTable;
     private ArrayList<String> activeAttributes;
+    private ArrayList<Integer> activeIndices;
+    private HashMap<String, String> updateValues;
+    private Mode mode;
 
     private Map<String, Database> databases = new HashMap<>();
 
@@ -136,12 +144,78 @@ public class Context {
         return true;
     }
 
-    public void setFilter() {
+    public boolean setFilter(Node conditionTree) {
+        if ((activeIndices = conditionTree.returnIndices(activeTable)) == null) {
+            return false;
+        }
+        return true;
+    }
+
+    // FIXME this will have to be renamed to execute - possible use of strategy
+    // pattern here
+    public String search() {
+
+        switch (mode) {
+            case UPDATE:
+                return update();
+            case DELETE:
+                return delete();
+            default:
+                break;
+        }
+
+        String searchString = new String();
+
+        for (Integer i : activeIndices) {
+            searchString += activeTable.getId(i);
+            for (String attrib : activeAttributes) {
+                searchString += activeTable.getColumn(attrib).getColumnValues().get(i);
+            }
+        }
+
+        return searchString;
+    }
+
+    public boolean setNameValuePairs(HashMap<String, String> values) {
+        this.updateValues = values;
+
+        for (String key : values.keySet()) {
+            Collection<String> attributes = activeTable.getAttributes();
+            if (!attributes.contains(key)) {
+                return false;
+            }
+        }
+        return true;
 
     }
 
-    public String search() {
-        return null;
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    public String update() {
+        for (String key : updateValues.keySet()) {
+            String value = updateValues.get(key);
+            Column col = activeTable.getColumn(key);
+
+            for (Integer i : activeIndices) {
+                col.updateValue(i, value);
+            }
+        }
+
+        return "OK";
+    }
+
+    public String delete() {
+        for (Integer i : activeIndices) {
+            activeTable.deleteId(i);
+
+            for (Column col : activeTable.getColumns()) {
+                col.deleteValue(i);
+            }
+        }
+
+        return "OK";
     }
 
 }
