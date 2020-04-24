@@ -27,7 +27,7 @@ public class Parser {
     }
 
     private void tokenizeQuery(String query) {
-        Matcher m = Pattern.compile("[a-zA-Z_0-9]+|[(,)]|[><=!]+").matcher(query);
+        Matcher m = Pattern.compile("[a-zA-Z_0-9]+|[(,)]|[><=!]+|[*]").matcher(query);
         while (m.find()) {
             tokens.push(m.group());
         }
@@ -50,9 +50,9 @@ public class Parser {
         } else if (token.equals("alter")) {
             return parseAlter();
         } else if (token.equals("insert")) {
-
+            return parseInsert();
         } else if (token.equals("select")) {
-
+            return parseSelect();
         } else if (token.equals("update")) {
 
         } else if (token.equals("delete")) {
@@ -139,7 +139,7 @@ public class Parser {
             String token = tokens.pop();
 
             if (token.equals(")") || token.equals(",")) {
-                error = "ERROR Must specify attributes";
+                error = "ERROR Must specify values";
                 return null;
             }
 
@@ -243,4 +243,27 @@ public class Parser {
         return null;
     }
 
+    private Expression parseInsert() {
+        String token = tokens.pop();
+        if (!token.equals("into")) {
+            error = "ERROR Expected INTO";
+            return null;
+        }
+
+        String name = parseName();
+
+        if (name != null) {
+            List<String> values = parseAttributeList();
+            if (values != null) {
+                return new Insert(name, values);
+            }
+        }
+
+        return null;
+    }
+
+    private Expression parseSelect() {
+
+        return null;
+    }
 }

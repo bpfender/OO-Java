@@ -4,7 +4,7 @@ public class Alter implements Expression {
     private String tableName;
     private Expression expression;
 
-    public Alter(String tableName, Add expression) {
+    public Alter(String tableName, Expression expression) {
         this.tableName = tableName;
         this.expression = expression;
     }
