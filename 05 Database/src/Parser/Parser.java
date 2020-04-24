@@ -18,6 +18,11 @@ public class Parser {
         }
 
         tokenizeQuery(query);
+        if (tokens.empty()) {
+            error = "ERROR Require query arguments";
+            return null;
+        }
+
         return parseCommand();
     }
 
@@ -37,11 +42,11 @@ public class Parser {
         }
 
         if (token.equals("use")) {
-            parseUse();
+            return parseUse();
         } else if (token.equals("create")) {
-            parseCreate();
+            return parseCreate();
         } else if (token.equals("drop")) {
-
+            return parseDrop();
         } else if (token.equals("alter")) {
 
         } else if (token.equals("insert")) {
@@ -55,10 +60,10 @@ public class Parser {
         } else if (token.equals("join")) {
 
         } else {
-            error = "ERROR Invalid command";
+            error = "ERROR Invalid command " + token;
             return null;
         }
-
+        return null;
     }
 
     private Expression parseUse() {
@@ -74,42 +79,96 @@ public class Parser {
     private Expression parseCreate() {
         String token = tokens.pop();
 
-        if (tokens.empty()) {
-            error = "ERROR expected more arguments";
-            return null;
-        }
-
         if (token.equals("table")) {
-            return parseCreateTable(splitQuery[1]);
-
+            return parseCreateTable();
         } else if (token.equals("database")) {
-            return parseCreateDatabase(splitQuery[1]);
+            return parseCreateDatabase();
+        } else {
+            error = "ERROR Unexpected token";
+            return null;
         }
-
-        error = "ERROR Unexpected token";
-        return null;
     }
 
-    private Expression parseCreateDatabase(String remainingQuery) {
-        String[] splitQuery = remainingQuery.split("\\s", 2);
-
-        if (splitQuery.length > 1) {
-            error = "ERROR unexpected arguments at end of query";
+    private Expression parseCreateDatabase() {
+        if (tokens.empty()) {
+            error = "ERROR Must specify name";
             return null;
         }
 
-        return new CreateDatabase(splitQuery[0]);
-    }
+        String token = tokens.pop();
 
-    private Expression parseCreateTable(String remainingQuery) {
-        String[] splitQuery = remainingQuery.split("\\s", 2);
-        List<String> attributeList = null;
-
-        if (splitQuery.length > 1) {
-
+        if (!tokens.empty()) {
+            error = "ERROR Unexpected arguments at end of query";
+            return null;
         }
 
-        return new CreateTable(splitQuery[0], attributeList);
+        return new CreateDatabase(token);
+    }
+
+    private Expression parseCreateTable() {
+        if (tokens.empty()) {
+            error = "ERROR Must specify name";
+            return null;
+        }
+
+        String token = tokens.pop();
+
+        if (tokens.empty()) {
+            return new CreateTable(token, null);
+        }
+
+        if (tokens.pop().equals("(")) {
+            List<String> attributes = parseAttributeList();
+            if (!tokens.empty()) {
+                error = "ERROR Unexpected tokens after attribute list";
+                return null;
+            }
+            return new CreateTable(token, attributes);
+
+        } else {
+            error = "ERROR Expected (<attributeList>)";
+            return null;
+        }
+
+    }
+
+    private List<String> parseAttributeList() {
+        List<String> attributes = new ArrayList<>();
+
+        while (!tokens.empty()) {
+            String token = tokens.pop();
+
+            if (token.equals(")") || token.equals(",")) {
+                error = "ERROR Must specify attributes";
+                return null;
+            }
+
+            attributes.add(token);
+            if (!tokens.empty()) {
+                token = tokens.pop();
+                if (token.equals(")")) {
+                    return attributes;
+                }
+            }
+
+        }
+        error = "ERROR Expected closing )";
+        return null;
+
+    }
+
+    private Expression parseDrop() {
+        String token = tokens.pop();
+
+        if (token.equals("database")) {
+
+        } else if (token.equals("table")) {
+
+        } else {
+            error = "ERROR Unexpected token";
+            return null;
+        }
+
     }
 
 }

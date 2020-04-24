@@ -16,7 +16,7 @@ import Database.*;
 
 public class Context {
     public enum Mode {
-        SELECT, UPDATE, DELETE
+        USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
     };
 
     private Database activeDatabase;
