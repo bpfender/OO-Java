@@ -160,15 +160,37 @@ public class Parser {
     private Expression parseDrop() {
         String token = tokens.pop();
 
+        String name = parseName();
+
         if (token.equals("database")) {
-
+            if (name != null) {
+                return new DropDatabase(name);
+            }
         } else if (token.equals("table")) {
-
+            if (name != null) {
+                return new DropTable(name);
+            }
         } else {
             error = "ERROR Unexpected token";
             return null;
         }
 
+        return null;
+    }
+
+    private String parseName() {
+        if (tokens.empty()) {
+            error = "ERROR No name specified";
+            return null;
+        }
+
+        String name = tokens.pop();
+
+        if (!tokens.empty()) {
+            error = "ERROR More tokens than expected";
+            return null;
+        }
+        return name;
     }
 
 }
