@@ -48,7 +48,7 @@ public class Parser {
         } else if (token.equals("drop")) {
             return parseDrop();
         } else if (token.equals("alter")) {
-
+            return parseAlter();
         } else if (token.equals("insert")) {
 
         } else if (token.equals("select")) {
@@ -161,6 +161,10 @@ public class Parser {
         String token = tokens.pop();
 
         String name = parseName();
+        if (!tokens.empty()) {
+            error = "ERROR more tokens than expected";
+            return null;
+        }
 
         if (token.equals("database")) {
             if (name != null) {
@@ -185,12 +189,58 @@ public class Parser {
         }
 
         String name = tokens.pop();
+        return name;
+    }
 
-        if (!tokens.empty()) {
-            error = "ERROR More tokens than expected";
+    private Expression parseAlter() {
+        String token = tokens.pop();
+
+        if (!token.equals("table")) {
+            error = "ERROR Expected TABLE argument";
             return null;
         }
-        return name;
+
+        String name = parseName();
+        if (name == null) {
+            return null;
+        }
+
+        Expression alterationType = parseAlterationType();
+        if (alterationType != null) {
+            return new Alter(name, alterationType);
+        }
+
+        return null;
+
+    }
+
+    private Expression parseAlterationType() {
+        if (tokens.empty()) {
+            error = "ERROR Expected more tokens";
+            return null;
+        }
+
+        String name = parseName();
+        if (!tokens.empty()) {
+            error = "ERROR more tokens than expected";
+            return null;
+        }
+
+        String token = tokens.pop();
+        if (token.equals("add")) {
+            if (name != null) {
+                return new Add(name);
+            }
+        } else if (token.equals("drop")) {
+            if (name != null) {
+                return new Drop(name);
+            }
+        } else {
+            error = "ERROR Unexpected token";
+            return null;
+        }
+
+        return null;
     }
 
 }
