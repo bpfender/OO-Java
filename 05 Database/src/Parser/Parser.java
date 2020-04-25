@@ -149,6 +149,10 @@ public class Parser {
                 if (token.equals(")")) {
                     return attributes;
                 }
+                if (!token.equals(",")) {
+                    error = "ERROR expected ,";
+                    return null;
+                }
             }
 
         }
@@ -270,6 +274,9 @@ public class Parser {
         }
 
         ArrayList<String> attributeList = parseWildAttribList();
+        if (attributeList == null) {
+            return null;
+        }
 
         return null;
     }
@@ -278,7 +285,44 @@ public class Parser {
         String token = tokens.pop();
         if (tokens.empty()) {
             error = "Error expected more tokens";
+            return null;
         }
+
+        ArrayList<String> attributes = new ArrayList<>();
+
+        if (token.equals("*")) {
+            attributes.add(token);
+            return attributes;
+        }
+
+        if (token.equals("from")) {
+            error = "ERROR no attributes specified";
+            return null;
+        }
+
+        while (!tokens.empty()) {
+            if (!token.matches("[a-zA-z_0-9]+")) {
+                error = "ERROR expected attribute";
+                return null;
+            }
+
+            attributes.add(token);
+            token = tokens.pop();
+
+            if (token.equals("from")) {
+                return attributes;
+            }
+
+            if (!tokens.empty()) {
+                token = tokens.pop();
+                if (!token.equals(",")) {
+                    error = "ERROR expected ,";
+                    return null;
+                }
+            }
+        }
+        error = "ERROR expected more tokens";
+        return null;
 
     }
 

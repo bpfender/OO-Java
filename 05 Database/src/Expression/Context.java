@@ -20,7 +20,6 @@ public class Context {
     };
 
     private Database activeDatabase;
-
     private Table activeTable;
     private ArrayList<String> activeAttributes;
     private ArrayList<Integer> activeIndices;
