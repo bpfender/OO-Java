@@ -263,7 +263,23 @@ public class Parser {
     }
 
     private Expression parseSelect() {
+        String token = tokens.pop();
+        if (tokens.empty()) {
+            error = "Error expected more tokens";
+            return null;
+        }
+
+        ArrayList<String> attributeList = parseWildAttribList();
 
         return null;
     }
+
+    private ArrayList<String> parseWildAttribList() {
+        String token = tokens.pop();
+        if (tokens.empty()) {
+            error = "Error expected more tokens";
+        }
+
+    }
+
 }
