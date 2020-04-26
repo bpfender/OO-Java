@@ -2,23 +2,33 @@ package Parser;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Tokenizer {
 
-    private class Token {
-        private Type token;
-        private String value;
+    public class Token {
+        public Type token;
+        public String value;
 
         public Token(Type token, String value) {
             this.token = token;
             this.value = value;
         }
+
+        public Type getToken() {
+            return token;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
     }
 
     private class TokenInfo {
-        private Pattern regex;
-        private Type type;
+        Pattern regex;
+        Type type;
 
         public TokenInfo(Pattern regex, Type type) {
             this.regex = regex;
@@ -32,7 +42,7 @@ public class Tokenizer {
     };
 
     List<TokenInfo> tokenSelectors;
-    List<Token> tokens;
+    LinkedList<Token> tokens = new LinkedList<>();
 
     public Tokenizer() {
         tokenSelectors = new LinkedList<>();
@@ -58,7 +68,7 @@ public class Tokenizer {
         addRegex("^(\s*\\(\s*)", Type.OPENBRACKET);
         addRegex("^(\s*\\)\s*)", Type.CLOSEBRACKET);
         addRegex("^(\s*,\s*)", Type.COMMA);
-        addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(\s+LIKE\s+))\s*)", Type.OPERATOR);
+        addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)", Type.OPERATOR); // QUESTION does like need a \s+
         addRegex("^(\s*\\*\s*)", Type.WILD);
         addRegex("^(\s*'.*'\s*)", Type.STRING);// allows empty string
         addRegex("^(\s*((true)|(false))\s*)", Type.BOOLEAN);
@@ -71,9 +81,33 @@ public class Tokenizer {
         tokenSelectors.add(new TokenInfo(Pattern.compile(regex), type));
     }
 
-    public void tokenize(String input) {
+    // http://cogitolearning.co.uk/2013/04/writing-a-parser-in-java-the-tokenizer/
+    public boolean tokenize(String input) {
         tokens.clear();
         String query = input.trim();
+
+        while (!query.isBlank()) {
+            boolean match = false;
+
+            for (TokenInfo info : tokenSelectors) {
+                Matcher m = info.regex.matcher(query);
+                if (m.find()) {
+                    match = true;
+
+                    String description = m.group().trim();
+                    tokens.add(new Token(info.type, description));
+
+                    query = m.replaceFirst("");
+                    break;
+                }
+
+            }
+
+            if (!match) {
+                return false;
+            }
+        }
+        return true;
 
     }
 
