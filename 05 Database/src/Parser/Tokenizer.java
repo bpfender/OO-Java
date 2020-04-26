@@ -37,8 +37,9 @@ public class Tokenizer {
     }
 
     public enum Type {
-        USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN, TABLE, DATABASE, VALUES, FROM, WHERE, SET, AND,
-        ON, OPENBRACKET, CLOSEBRACKET, COMMA, OPERATOR, WILD, STRING, BOOLEAN, FLOAT, INTEGER, NAME, ERROR
+        USE, CREATE, ADD, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN, TABLE, DATABASE, VALUES, FROM, WHERE, SET,
+        AND, ON, INTO, OPENBRACKET, CLOSEBRACKET, COMMA, OPERATOR, WILD, LITERAL, STRING, BOOLEAN, FLOAT, INTEGER, NAME,
+        ERROR
     };
 
     List<TokenInfo> tokenSelectors;
@@ -49,12 +50,13 @@ public class Tokenizer {
 
         addRegex("^(use\s+)", Type.USE);
         addRegex("^(create\s+)", Type.CREATE);
+        addRegex("^(add\s+)", Type.ADD);
         addRegex("^(drop\s+)", Type.DROP);
-        addRegex("^(alter\s+table\s+)", Type.ALTER);
-        addRegex("^(insert\s+into\s+)", Type.INSERT);
+        addRegex("^(alter\s+)", Type.ALTER);
+        addRegex("^(insert\s+)", Type.INSERT);
         addRegex("^(select\s+)", Type.SELECT);
         addRegex("^(update\s+)", Type.UPDATE);
-        addRegex("^(delete\s+from\s+)", Type.DELETE);
+        addRegex("^(delete\s+)", Type.DELETE);
         addRegex("^(join\s+)", Type.JOIN);
         addRegex("^(table\s+)", Type.TABLE);
         addRegex("^(database\s+)", Type.DATABASE);
@@ -64,16 +66,17 @@ public class Tokenizer {
         addRegex("^(set\s+)", Type.SET);
         addRegex("^(and\s+)", Type.AND);
         addRegex("^(on\s+)", Type.ON);
+        addRegex("^(into\s+)", Type.INTO);
 
         addRegex("^(\s*\\(\s*)", Type.OPENBRACKET);
         addRegex("^(\s*\\)\s*)", Type.CLOSEBRACKET);
         addRegex("^(\s*,\s*)", Type.COMMA);
         addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)", Type.OPERATOR); // QUESTION does like need a \s+
         addRegex("^(\s*\\*\s*)", Type.WILD);
-        addRegex("^(\s*'.*'\s*)", Type.STRING);// allows empty string
-        addRegex("^(\s*((true)|(false))\s*)", Type.BOOLEAN);
-        addRegex("^(\s*[0-9]+.[0-9]+\s*)", Type.FLOAT);
-        addRegex("^(\s*[0-9]+\s*)", Type.INTEGER); // order is important here
+        addRegex("^(\s*'.*'\s*)", Type.LITERAL);// allows empty string
+        addRegex("^(\s*((true)|(false))\s*)", Type.LITERAL);
+        addRegex("^(\s*[0-9]+.[0-9]+\s*)", Type.LITERAL);
+        addRegex("^(\s*[0-9]+\s*)", Type.LITERAL); // order is important here
         addRegex("^(\s*[a-zA-Z_]+\s*)", Type.NAME); // disallows digits in name
     }
 

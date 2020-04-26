@@ -7,9 +7,12 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ConditionTree.Node;
 import Expression.*;
 import Parser.Tokenizer.Token;
 import Parser.Tokenizer.Type;
+
+//TODO error should be thrown!!
 
 public class Parser {
     Tokenizer tokenizer = new Tokenizer();
@@ -34,7 +37,11 @@ public class Parser {
 
         tokens = tokenizer.tokens;
 
-        return parseCommand();
+        try {
+            return parseCommand()
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private void nextToken() {
@@ -45,7 +52,7 @@ public class Parser {
         activeToken = tokens.pop();
     }
 
-    private Expression parseCommand() {
+    private Expression parseCommand() throws Exception {
         Expression expression = null;
         nextToken();
 
@@ -54,15 +61,19 @@ public class Parser {
                 expression = parseUse();
                 break;
             case CREATE:
-                expresion = parseCreate();
+                expression = parseCreate();
                 break;
             case DROP:
+                expression = parseDrop();
                 break;
             case ALTER:
+                expression = parseAlter();
                 break;
             case INSERT:
+                expression = parseInsert();
                 break;
             case SELECT:
+                expression = parseSelect();
                 break;
             case UPDATE:
                 break;
@@ -74,36 +85,204 @@ public class Parser {
                 error = "ERROR Unexpected token. Invalid command";
                 break;
         }
-
+        // TODO check no tokens left
         return expression;
     }
 
-    private Expression parseUse() {
+    private Expression parseUse() throws Exception {
+        return new Use(parseName());
+    }
+
+    private Expression parseCreate() throws Exception {
+        nextToken();
+
+        switch (activeToken.token) {
+            case TABLE:
+                String name = parseName();
+                if (tokens.isEmpty()) {
+                    return new CreateTable(name, null);
+                } else {
+                    parseOpenBracket();
+                    List<String> attributes = parseList(Type.NAME);
+                    parseCloseBracket();
+
+                    return new CreateTable(name, attributes);
+                }
+
+            case DATABASE:
+                return new CreateDatabase(parseName());
+            default:
+                throw new Exception("ERROR Must specify whether to create database or table");
+        }
+    }
+
+    private Expression parseDrop() throws Exception {
+        nextToken();
+
+        switch (activeToken.token) {
+            case TABLE:
+                return new DropTable(parseName());
+            case DATABASE:
+                return new DropDatabase(parseName());
+            default:
+                throw new Exception ("ERROR Must specify what to DROP")
+        }
+    }
+
+    private Expression parseAlter() throws Exception {
+        nextToken();
+        if (activeToken.token != Type.TABLE) {
+            throw new Exception("ERROR Expected TABLE token");
+        }
+
+        String name = parseName();
+        Expression alterType;
+
+        nextToken();
+        switch (activeToken.token) {
+            case ADD:
+                alterType = new Add(parseName());
+                break;
+            case DROP:
+                alterType = new Drop(parseName());
+                break;
+            default:
+                throw new Exception("ERROR Expected ADD or DROP");
+        }
+
+        return new Alter(name, alterType);
+    }
+
+    private Expression parseInsert() throws Exception {
+        nextToken();
+        if (activeToken.token != Type.INTO) {
+            throw new Exception("ERROR Expected INTO");
+        }
+
+        String name = parseName();
+
+        nextToken();
+        if (activeToken.token != Type.VALUES) {
+            throw new Exception("ERROR Expected VALUES token");
+        }
+
+        parseOpenBracket();
+        List<String> attributes = parseList(Type.LITERAL);
+        parseCloseBracket();
+
+        return new Insert(name, attributes);
+    }
+
+    private Expression parseSelect() throws Exception {
+        nextToken();
+
+        List<String> attributes = new ArrayList<>();
+
+        switch (activeToken.token) {
+            case WILD:
+                attributes.add("*");
+                break;
+            case OPENBRACKET:
+                attributes = parseList(Type.NAME);
+                parseCloseBracket();
+                break;
+            default:
+                throw new Exception("ERROR Expected * or attributes");
+        }
+
+        return new Select(attributes, parseFrom());
+
+    }
+
+    private Expression parseFrom() throws Exception {
+        nextToken();
+
+        String name;
+        switch (activeToken.token) {
+            case FROM:
+                name = parseName();
+                break;
+            default:
+                throw new Exception("ERROR Expected FROM");
+
+        }
+
+        return new From(name, parseWhere());
+    }
+
+    private Expression parseWhere() throws Exception {
+        nextToken();
+        switch (activeToken.token) {
+            case WHERE:
+                return new Where(parseCondition());
+            default:
+                return null;
+        }
+    }
+
+    private Node parseCondition() throws Exception {
+        nextToken();
+
+        switch (activeToken.token) {
+            case OPENBRACKET:
+                break;
+            case NAME:
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private List<String> parseList(Type type) throws Exception {
+        List<String> attributes = new ArrayList<>();
+
+        nextToken();
+
+        while (activeToken.token == type) {
+            attributes.add(activeToken.value);
+
+            if (tokens.peek().token != Type.COMMA) {
+                return attributes;
+            }
+            nextToken(); // consume comma
+            nextToken(); // consume attirbute
+        }
+
+        throw new Exception("ERROR Unexprected value in list");
+
+    }
+
+    private String parseName() throws Exception {
         nextToken();
 
         switch (activeToken.token) {
             case NAME:
-                return new Use(activeToken.value);
+                return activeToken.value;
             default:
-                error = "ERROR Expected name to be specifed";
-                return null;
+                throw new Exception("ERROR Must specify name");
+
         }
     }
 
-    private Expression parseCreate() {
+    private void parseOpenBracket() throws Exception {
         nextToken();
-
-
         switch (activeToken.token) {
-            case TABLE:
-                break;
-            case DATABASE:
+            case OPENBRACKET:
+                return;
             default:
-                error = "ERROR Must specify whether to create database or table";
-                return null;
+                throw new Exception("ERROR Expected opening bracket");
         }
     }
 
-    private 
+    private void parseCloseBracket() throws Exception {
+        nextToken();
+        switch (activeToken.token) {
+            case CLOSEBRACKET:
+                return;
+            default:
+                throw new Exception("ERROR Expected closing bracket");
+        }
+    }
 
 }
