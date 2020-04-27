@@ -38,8 +38,8 @@ public class Tokenizer {
 
     public enum Type {
         USE, CREATE, ADD, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN, TABLE, DATABASE, VALUES, FROM, WHERE, SET,
-        AND, ON, INTO, OPENBRACKET, CLOSEBRACKET, COMMA, OPERATOR, WILD, LITERAL, STRING, BOOLEAN, FLOAT, INTEGER, NAME,
-        ERROR
+        AND, OR, ON, INTO, OPENBRACKET, CLOSEBRACKET, COMMA, OPERATOR, WILD, LITERAL, STRING, BOOLEAN, FLOAT, INTEGER,
+        NAME, ERROR, EQUAL, GREATER, LESS, GREATEREQUAL, LESSEQUAL, NOTEQUAL, LIKE
     };
 
     List<TokenInfo> tokenSelectors;
@@ -65,14 +65,26 @@ public class Tokenizer {
         addRegex("^(where\s+)", Type.WHERE);
         addRegex("^(set\s+)", Type.SET);
         addRegex("^(and\s+)", Type.AND);
+        addRegex("^(or\s+)", Type.OR);
         addRegex("^(on\s+)", Type.ON);
         addRegex("^(into\s+)", Type.INTO);
 
         addRegex("^(\s*\\(\s*)", Type.OPENBRACKET);
         addRegex("^(\s*\\)\s*)", Type.CLOSEBRACKET);
         addRegex("^(\s*,\s*)", Type.COMMA);
-        addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)", Type.OPERATOR); // QUESTION does like need a \s+
+
+        addRegex("^(\s*==\s*)", Type.EQUAL); // QUESTION does like need a \s+
+        addRegex("^(\s*>\s*)", Type.GREATER);
+        addRegex("^(\s*<\s*)", Type.LESS);
+        addRegex("^(\s*>=\s*)", Type.GREATEREQUAL);
+        addRegex("^(\s*<=\s*)", Type.LESSEQUAL);
+        addRegex("^(\s*!=\s*)", Type.NOTEQUAL);
+        addRegex("^(\s*LIKE\s+)", Type.LIKE);
+
+        // addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)", Type.OPERATOR);
+
         addRegex("^(\s*\\*\s*)", Type.WILD);
+
         addRegex("^(\s*'.*'\s*)", Type.LITERAL);// allows empty string
         addRegex("^(\s*((true)|(false))\s*)", Type.LITERAL);
         addRegex("^(\s*[0-9]+.[0-9]+\s*)", Type.LITERAL);

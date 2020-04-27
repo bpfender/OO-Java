@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ConditionTree.*;
+import ConditionTree.AndNode;
 import ConditionTree.Node;
+import ConditionTree.OperatorNode;
 import Expression.*;
 import Parser.Tokenizer.Token;
 import Parser.Tokenizer.Type;
@@ -190,7 +194,7 @@ public class Parser {
                 throw new Exception("ERROR Expected * or attributes");
         }
 
-        return new Select(attributes, parseFrom());
+        return new Select((ArrayList<String>) attributes, parseFrom());
 
     }
 
@@ -225,13 +229,85 @@ public class Parser {
 
         switch (activeToken.token) {
             case OPENBRACKET:
-                break;
+                Node condition;
+                Node leftNode = parseCondition();
+                parseCloseBracket();
+
+                nextToken();
+                switch (activeToken.token) {
+                    case AND:
+                        parseOpenBracket();
+                        condition = new AndNode(leftNode, parseCondition());
+                        break;
+                    case OR:
+                        parseOpenBracket();
+                        condition = new OrNode(leftNode, parseCondition());
+                        break;
+                    default:
+                        throw new Exception("ERROR Expected AND or OR");
+
+                }
+                parseCloseBracket();
+                return condition;
             case NAME:
-                break;
+                String name = activeToken.value;
+                Predicate<String> operator = parseOperator();
+                return new OperatorNode(name, operator);
             default:
-                break;
+                throw new Exception("ERROR In condition 1");
         }
 
+    }
+
+    private Predicate<String> parseOperator() throws Exception {
+        nextToken();
+        Predicate<String> operator;
+        String value;
+
+        switch (activeToken.token) {
+            case EQUAL:
+                value = parseValue();
+                operator = i -> (i.equals(value));
+                break;
+            case GREATER:
+                value = parseValue();
+                operator = i -> (Float.parseFloat(i) > Float.parseFloat(value));
+                break;
+            case LESS:
+                value = parseValue();
+                operator = i -> (Float.parseFloat(i) < Float.parseFloat(value));
+                break;
+            case GREATEREQUAL:
+                value = parseValue();
+                operator = i -> (Float.parseFloat(i) >= Float.parseFloat(value));
+                break;
+            case LESSEQUAL:
+                value = parseValue();
+                operator = i -> (Float.parseFloat(i) <= Float.parseFloat(value));
+                break;
+            case NOTEQUAL:
+                value = parseValue();
+                operator = i -> (!i.equals(value));
+                break;
+            case LIKE:
+                value = parseValue();
+                operator = i -> (i.contains(value));
+                break;
+            default:
+                throw new Exception("ERROR Invalid comparison operator");
+        }
+
+        return operator;
+    }
+
+    private String parseValue() throws Exception {
+        nextToken();
+        switch (activeToken.token) {
+            case LITERAL:
+                return activeToken.value;
+            default:
+                throw new Exception("ERROR Expected literal value");
+        }
     }
 
     private List<String> parseList(Type type) throws Exception {
