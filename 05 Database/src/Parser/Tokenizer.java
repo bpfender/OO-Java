@@ -38,8 +38,8 @@ public class Tokenizer {
 
     public enum Type {
         USE, CREATE, ADD, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN, TABLE, DATABASE, VALUES, FROM, WHERE, SET,
-        AND, OR, ON, INTO, OPENBRACKET, CLOSEBRACKET, COMMA, OPERATOR, WILD, LITERAL, STRING, BOOLEAN, FLOAT, INTEGER,
-        NAME, ERROR, EQUAL, GREATER, LESS, GREATEREQUAL, LESSEQUAL, NOTEQUAL, LIKE
+        AND, OR, ON, INTO, OPENBRACKET, CLOSEBRACKET, COMMA, PAIR, OPERATOR, WILD, LITERAL, STRING, BOOLEAN, FLOAT,
+        INTEGER, NAME, ERROR, EQUAL, GREATER, LESS, GREATEREQUAL, LESSEQUAL, NOTEQUAL, LIKE
     };
 
     List<TokenInfo> tokenSelectors;
@@ -48,6 +48,7 @@ public class Tokenizer {
     public Tokenizer() {
         tokenSelectors = new LinkedList<>();
 
+        // COMMANDS
         addRegex("^(use\s+)", Type.USE);
         addRegex("^(create\s+)", Type.CREATE);
         addRegex("^(add\s+)", Type.ADD);
@@ -58,6 +59,8 @@ public class Tokenizer {
         addRegex("^(update\s+)", Type.UPDATE);
         addRegex("^(delete\s+)", Type.DELETE);
         addRegex("^(join\s+)", Type.JOIN);
+
+        // OPTHER WORDS
         addRegex("^(table\s+)", Type.TABLE);
         addRegex("^(database\s+)", Type.DATABASE);
         addRegex("^(values\s+)", Type.VALUES);
@@ -69,10 +72,13 @@ public class Tokenizer {
         addRegex("^(on\s+)", Type.ON);
         addRegex("^(into\s+)", Type.INTO);
 
+        // PUCNCTUATION
         addRegex("^(\s*\\(\s*)", Type.OPENBRACKET);
         addRegex("^(\s*\\)\s*)", Type.CLOSEBRACKET);
         addRegex("^(\s*,\s*)", Type.COMMA);
+        addRegex("^(\s*=\s*)", Type.PAIR);
 
+        // OPERATORS
         addRegex("^(\s*==\s*)", Type.EQUAL); // QUESTION does like need a \s+
         addRegex("^(\s*>\s*)", Type.GREATER);
         addRegex("^(\s*<\s*)", Type.LESS);
@@ -83,6 +89,7 @@ public class Tokenizer {
 
         // addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)", Type.OPERATOR);
 
+        // VALUES
         addRegex("^(\s*\\*\s*)", Type.WILD);
 
         addRegex("^(\s*'.*'\s*)", Type.LITERAL);// allows empty string

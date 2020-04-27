@@ -1,6 +1,7 @@
 package Parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -80,14 +81,16 @@ public class Parser {
                 expression = parseSelect();
                 break;
             case UPDATE:
+                expression = parseUpdate();
                 break;
             case DELETE:
+                expression = parseDelete();
                 break;
             case JOIN:
+                expression = parseJoin();
                 break;
             default:
-                error = "ERROR Unexpected token. Invalid command";
-                break;
+                throw new Exception("ERROR Unexpected token. Invalid command");
         }
         // TODO check no tokens left
         return expression;
@@ -196,6 +199,94 @@ public class Parser {
 
         return new Select((ArrayList<String>) attributes, parseFrom());
 
+    }
+
+    private Expression parseUpdate() throws Exception {
+        String name = parseName();
+        return new Update(name, parseSet());
+    }
+
+    private Expression parseDelete() throws Exception {
+        return parseFrom();
+        // TODO this doesn't handle variable where at the moment.
+    }
+
+    private Expression parseJoin() throws Exception {
+        String name1 = parseName();
+        parseAnd();
+        String name2 = parseName();
+
+        parseOn();
+
+        String attrib1 = parseName();
+        parseAnd();
+        String attrib2 = parseName();
+
+        return new Join(new And(name1, name2), new On(attrib1, attrib2));
+
+    }
+
+    private void parseAnd() throws Exception {
+        nextToken();
+        switch (activeToken.token) {
+            case AND:
+                break;
+            default:
+                throw new Exception("ERROR Expected AND");
+        }
+    }
+
+    private void parseOn() throws Exception {
+        nextToken();
+        switch (activeToken.token) {
+            case OR:
+                break;
+            default:
+                throw new Exception("ERROR Expected OR");
+        }
+
+    }
+
+    private Expression parseSet() throws Exception {
+        nextToken();
+
+        switch (activeToken.token) {
+            case SET:
+                HashMap<String, String> nameValuePairs = parseNameValueList();
+                return new Set(nameValuePairs, parseWhere());
+            default:
+                throw new Exception("ERROR Expected SET token");
+        }
+    }
+
+    private HashMap<String, String> parseNameValueList() throws Exception {
+        HashMap<String, String> nameValuePairs = new HashMap<>();
+
+        parseNameValuePair(nameValuePairs);
+
+        while (tokens.peek().token == Type.COMMA) {
+            nextToken();
+            parseNameValuePair(nameValuePairs);
+        }
+
+        return nameValuePairs;
+    }
+
+    private void parseNameValuePair(HashMap<String, String> nameValuePairs) throws Exception {
+        String name = parseName();
+
+        nextToken();
+        switch (activeToken.token) {
+            case PAIR:
+                break;
+            default:
+                throw new Exception("ERROR Expect = operator");
+        }
+
+        nextToken();
+        String value = parseValue();
+
+        nameValuePairs.put(name, value);
     }
 
     private Expression parseFrom() throws Exception {
