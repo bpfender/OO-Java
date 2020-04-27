@@ -34,6 +34,7 @@ public class Parser {
             error = "ERROR: Semicolon missing from end of query";
             return null;
         }
+        query = query.substring(0, query.length() - 1);
 
         if (!tokenizer.tokenize(query)) {
             error = "ERROR: Invalid token in query";
@@ -43,10 +44,15 @@ public class Parser {
         tokens = tokenizer.tokens;
 
         try {
-            return parseCommand()
+            return parseCommand();
         } catch (Exception e) {
+            System.out.println(e);
             return null;
         }
+    }
+
+    public String getError() {
+        return error;
     }
 
     private void nextToken() {
@@ -60,6 +66,9 @@ public class Parser {
     private Expression parseCommand() throws Exception {
         Expression expression = null;
         nextToken();
+
+        System.out.println("COMMAND: " + activeToken.value);
+        System.out.println(activeToken.token);
 
         switch (activeToken.token) {
             case USE:
@@ -132,7 +141,7 @@ public class Parser {
             case DATABASE:
                 return new DropDatabase(parseName());
             default:
-                throw new Exception ("ERROR Must specify what to DROP")
+                throw new Exception("ERROR Must specify what to DROP");
         }
     }
 
