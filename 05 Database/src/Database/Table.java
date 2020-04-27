@@ -10,7 +10,7 @@ import java.util.Stack;
 public class Table {
     private String tableName = new String();
 
-    private ArrayList<Integer> ids = new ArrayList<>();
+    public ArrayList<Integer> ids = new ArrayList<>();
     private Map<String, Column> columns = new LinkedHashMap<>();
     private int lastId = 0;
 
@@ -48,7 +48,9 @@ public class Table {
     }
 
     public boolean insertValues(List<String> data) {
+
         if (data.size() == columns.size()) {
+            System.out.println(columns);
             ids.add(++lastId);
 
             // QUESTION neater way to do this?
@@ -57,6 +59,7 @@ public class Table {
                 col.addValue(data.get(index));
                 index++;
             }
+            return true;
         }
         // No reusing of indexes;
         return false;

@@ -24,7 +24,7 @@ public class Context {
     private ArrayList<String> activeAttributes;
     private ArrayList<Integer> activeIndices;
     private HashMap<String, String> updateValues;
-    private Mode mode;
+    private Mode mode = Mode.SELECT;
 
     private Map<String, Database> databases = new HashMap<>();
 
@@ -127,7 +127,7 @@ public class Context {
         }
 
         activeAttributes = attributes;
-        return false;
+        return true;
     }
 
     public boolean selectQuery() {
@@ -144,6 +144,11 @@ public class Context {
     }
 
     public boolean setFilter(Node conditionTree) {
+        if (conditionTree == null) {
+            activeIndices = activeTable.ids;
+            return true;
+        }
+
         if ((activeIndices = conditionTree.returnIndices(activeTable)) == null) {
             return false;
         }

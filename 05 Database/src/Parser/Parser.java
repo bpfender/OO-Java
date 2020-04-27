@@ -57,10 +57,11 @@ public class Parser {
 
     private void nextToken() {
         if (tokens.isEmpty()) {
-            activeToken = null;
+            activeToken.token = Type.END;
+            activeToken.value = null;
+        } else {
+            activeToken = tokens.pop();
         }
-
-        activeToken = tokens.pop();
     }
 
     private Expression parseCommand() throws Exception {
@@ -68,7 +69,7 @@ public class Parser {
         nextToken();
 
         System.out.println("COMMAND: " + activeToken.value);
-        System.out.println(activeToken.token);
+        System.out.println("TOKEN: " + activeToken.token);
 
         switch (activeToken.token) {
             case USE:
@@ -270,7 +271,6 @@ public class Parser {
 
     private HashMap<String, String> parseNameValueList() throws Exception {
         HashMap<String, String> nameValuePairs = new HashMap<>();
-
         parseNameValuePair(nameValuePairs);
 
         while (tokens.peek().token == Type.COMMA) {
@@ -292,7 +292,6 @@ public class Parser {
                 throw new Exception("ERROR Expect = operator");
         }
 
-        nextToken();
         String value = parseValue();
 
         nameValuePairs.put(name, value);
@@ -310,7 +309,6 @@ public class Parser {
                 throw new Exception("ERROR Expected FROM");
 
         }
-
         return new From(name, parseWhere());
     }
 

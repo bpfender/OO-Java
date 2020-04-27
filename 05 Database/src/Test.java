@@ -8,13 +8,294 @@ public class Test {
 
         Parser parser = new Parser();
         Context context = new Context();
+        Expression expression;
 
-        Expression expression = parser.parseQuery("create table name;");
+        expression = parser.parseQuery("create database markbook;");
         if (expression == null) {
             System.out.println(parser.getError());
         } else {
+            System.out.println("PARSE SUCCESS");
             System.out.println(expression.interpret(context));
         }
-    }
 
+        expression = parser.parseQuery("use markbook;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("create table marks(name, mark, pass);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("insert into marks values ('Steve', 65, true);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("insert into marks values ('Dave', 55, true);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("insert into marks values ('Bob', 35, false);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("insert into marks values ('Clive', 20, false);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("select * from marks;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("select * from marks where name != 'Dave';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("select * from marks where pass == true;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("update marks set mark = 38 where name =='Clive';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("select * from marks where name == 'Clive';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("delete from marks where name == 'Clive';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("select * from marks;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("delete from marks where mark < 40;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("select * from marks;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("use imdb;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("drop table actors;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("drop table movies;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("drop table roles;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("drop database imdb;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("create database imdb;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("use imdb;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("create table actors (name, nationality, awards);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("INSERT INTO actors VALUES ('Hugh Grant', 'British', 3);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("INSERT INTO actors VALUES ('Toni Collette', 'Australian', 12);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("INSERT INTO actors VALUES ('James Caan', 'American', 8);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("INSERT INTO actors VALUES ('Emma Thompson', 'British', 10);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("CREATE TABLE movies (name, genre);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("INSERT INTO movies VALUES ('Mickey Blue Eyes', 'Comedy');");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("INSERT INTO movies VALUES ('About a Boy', 'Comedy');");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("INSERT INTO movies VALUES ('Sense and Sensibility', 'Period Drama');");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("SELECT id FROM movies WHERE name == 'Mickey Blue Eyes';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("SELECT id FROM movies WHERE name == 'About a Boy';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("SELECT id FROM movies WHERE name == 'Sense and Sensibility';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'Hugh Grant';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'Toni Collette';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'James Caan';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'Emma Thompson';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+        expression = parser.parseQuery("CREATE TABLE roles (name, movie_id, actor_id);");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+        }
+
+    }
 }

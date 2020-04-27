@@ -15,6 +15,7 @@ public class From implements Expression {
             case 0:
                 if (where == null) {
                     if (context.selectQuery()) {
+                        context.setFilter(null);
                         return context.search();
                     }
                     return "ERROR Invalid attribute specified";

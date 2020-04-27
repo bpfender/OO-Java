@@ -39,7 +39,7 @@ public class Tokenizer {
     public enum Type {
         USE, CREATE, ADD, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN, TABLE, DATABASE, VALUES, FROM, WHERE, SET,
         AND, OR, ON, INTO, OPENBRACKET, CLOSEBRACKET, COMMA, PAIR, OPERATOR, WILD, LITERAL, STRING, BOOLEAN, FLOAT,
-        INTEGER, NAME, ERROR, EQUAL, GREATER, LESS, GREATEREQUAL, LESSEQUAL, NOTEQUAL, LIKE
+        INTEGER, NAME, ERROR, EQUAL, GREATER, LESS, GREATEREQUAL, LESSEQUAL, NOTEQUAL, LIKE, END
     };
 
     List<TokenInfo> tokenSelectors;
@@ -72,12 +72,6 @@ public class Tokenizer {
         addRegex("^(on\\s+)", Type.ON);
         addRegex("^(into\\s+)", Type.INTO);
 
-        // PUCNCTUATION
-        addRegex("^(\\s*\\(\\s*)", Type.OPENBRACKET);
-        addRegex("^(\\s*\\)\\s*)", Type.CLOSEBRACKET);
-        addRegex("^(\\s*,\\s*)", Type.COMMA);
-        addRegex("^(\\s*=\\s*)", Type.PAIR);
-
         // OPERATORS
         addRegex("^(\\s*==\\s*)", Type.EQUAL); // QUESTION does like need a \s+
         addRegex("^(\\s*>\\s*)", Type.GREATER);
@@ -86,6 +80,12 @@ public class Tokenizer {
         addRegex("^(\\s*<=\\s*)", Type.LESSEQUAL);
         addRegex("^(\\s*!=\\s*)", Type.NOTEQUAL);
         addRegex("^(\\s*LIKE\\s+)", Type.LIKE);
+
+        // PUCNCTUATION
+        addRegex("^(\\s*\\(\\s*)", Type.OPENBRACKET);
+        addRegex("^(\\s*\\)\\s*)", Type.CLOSEBRACKET);
+        addRegex("^(\\s*,\\s*)", Type.COMMA);
+        addRegex("^(\\s*=\\s*)", Type.PAIR);
 
         // addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)", Type.OPERATOR);
 
@@ -100,7 +100,7 @@ public class Tokenizer {
     }
 
     private void addRegex(String regex, Type type) {
-        tokenSelectors.add(new TokenInfo(Pattern.compile(regex), type));
+        tokenSelectors.add(new TokenInfo(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), type));
     }
 
     // http://cogitolearning.co.uk/2013/04/writing-a-parser-in-java-the-tokenizer/
