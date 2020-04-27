@@ -11,9 +11,10 @@ public class OperatorNode extends Node {
     Predicate<String> comparison;
     ArrayList<Integer> indices = new ArrayList<>();
 
-    public OperatorNode(String attribute, String value, Predicate<String> comparison) {
+    public OperatorNode(String attribute, Predicate<String> comparison) {
+        super(null, null);
         this.attribute = attribute;
-        this.value = value;
+        // this.value = value;
         this.comparison = comparison;
     }
 

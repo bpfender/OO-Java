@@ -6,6 +6,11 @@ import Database.Table;
 
 public class OrNode extends Node {
 
+    public OrNode(Node leftNode, Node rightNode) {
+        super(leftNode, rightNode);
+        // TODO Auto-generated constructor stub
+    }
+
     @Override
     public ArrayList<Integer> returnIndices(Table table) {
         ArrayList<Integer> leftResult = leftNode.returnIndices(table);
