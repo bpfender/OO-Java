@@ -29,6 +29,7 @@ public class OperatorNode extends Node {
         ArrayList<String> values = column.getColumnValues();
 
         for (int i = 0; i < values.size(); i++) {
+            System.out.println("DIAG" + i);
             if (comparison.test(values.get(i))) {
                 indices.add(i);
             }

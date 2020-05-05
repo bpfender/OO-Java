@@ -191,17 +191,16 @@ public class Parser {
     }
 
     private Expression parseSelect() throws Exception {
-        nextToken();
 
         List<String> attributes = new ArrayList<>();
 
-        switch (activeToken.token) {
+        switch (tokens.peek().token) {
             case WILD:
+                nextToken();
                 attributes.add("*");
                 break;
-            case OPENBRACKET:
+            case NAME:
                 attributes = parseList(Type.NAME);
-                parseCloseBracket();
                 break;
             default:
                 throw new Exception("ERROR Expected * or attributes");
@@ -274,7 +273,7 @@ public class Parser {
         parseNameValuePair(nameValuePairs);
 
         while (tokens.peek().token == Type.COMMA) {
-            nextToken();
+            nextToken(); // consume comma
             parseNameValuePair(nameValuePairs);
         }
 

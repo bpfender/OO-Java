@@ -22,7 +22,7 @@ public class Context {
     private Database activeDatabase;
     private Table activeTable;
     private ArrayList<String> activeAttributes;
-    private ArrayList<Integer> activeIndices;
+    private ArrayList<Integer> activeIndices = new ArrayList<>();
     private HashMap<String, String> updateValues;
     private Mode mode = Mode.SELECT;
 
@@ -132,6 +132,7 @@ public class Context {
 
     public boolean selectQuery() {
         Collection<String> tableAttributes = activeTable.getAttributes();
+        mode = Mode.SELECT;
 
         if (!(activeAttributes.size() == 1 && activeAttributes.contains("*"))) {
             for (String attribute : activeAttributes) {
@@ -139,19 +140,30 @@ public class Context {
                     return false;
                 }
             }
+        } else {
+            activeAttributes.clear();
+            for (String attribute : tableAttributes) {
+                activeAttributes.add(attribute);
+            }
         }
+
         return true;
     }
 
     public boolean setFilter(Node conditionTree) {
+
         if (conditionTree == null) {
-            activeIndices = activeTable.ids;
+            activeIndices.clear();
+            for (Integer i : activeTable.ids) {
+                activeIndices.add(i - 1);
+            }
             return true;
         }
 
         if ((activeIndices = conditionTree.returnIndices(activeTable)) == null) {
             return false;
         }
+        // System.out.println(conditionTree.returnIndices(activeTable));
         return true;
     }
 
@@ -173,7 +185,9 @@ public class Context {
         for (Integer i : activeIndices) {
             searchString += activeTable.getId(i);
             for (String attrib : activeAttributes) {
+                System.out.println(attrib);
                 searchString += activeTable.getColumn(attrib).getColumnValues().get(i);
+
             }
         }
 

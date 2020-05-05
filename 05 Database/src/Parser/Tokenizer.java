@@ -73,12 +73,13 @@ public class Tokenizer {
         addRegex("^(into\\s+)", Type.INTO);
 
         // OPERATORS
+        // order is important
         addRegex("^(\\s*==\\s*)", Type.EQUAL); // QUESTION does like need a \s+
-        addRegex("^(\\s*>\\s*)", Type.GREATER);
-        addRegex("^(\\s*<\\s*)", Type.LESS);
         addRegex("^(\\s*>=\\s*)", Type.GREATEREQUAL);
         addRegex("^(\\s*<=\\s*)", Type.LESSEQUAL);
         addRegex("^(\\s*!=\\s*)", Type.NOTEQUAL);
+        addRegex("^(\\s*>\\s*)", Type.GREATER);
+        addRegex("^(\\s*<\\s*)", Type.LESS);
         addRegex("^(\\s*LIKE\\s+)", Type.LIKE);
 
         // PUCNCTUATION
@@ -92,7 +93,7 @@ public class Tokenizer {
         // VALUES
         addRegex("^(\\s*\\*\\s*)", Type.WILD);
 
-        addRegex("^(\\s*'.*'\\s*)", Type.LITERAL);// allows empty string
+        addRegex("^(\\s*'[A-Za-z_ 0-9.]*'\\s*)", Type.LITERAL);// QUESTION make sure this matches everything
         addRegex("^(\\s*((true)|(false))\\s*)", Type.LITERAL);
         addRegex("^(\\s*[0-9]+.[0-9]+\\s*)", Type.LITERAL);
         addRegex("^(\\s*[0-9]+\\s*)", Type.LITERAL); // order is important here
