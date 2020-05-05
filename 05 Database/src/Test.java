@@ -106,7 +106,31 @@ public class Test {
             System.out.println(expression.interpret(context));
         }
 
-        expression = parser.parseQuery("delete from marks where name == 'Clive';");
+        expression = parser.parseQuery("delete from marks where name == 'Dave';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("select * from marks;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("delete from marks where mark < 40;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
+        expression = parser.parseQuery("select * from marks;");
         if (expression == null) {
             System.out.println(parser.getError());
         } else {
@@ -115,27 +139,6 @@ public class Test {
         }
 
         System.exit(1);
-
-        expression = parser.parseQuery("select * from marks;");
-        if (expression == null) {
-            System.out.println(parser.getError());
-        } else {
-            System.out.println("PARSE SUCCESS");
-        }
-
-        expression = parser.parseQuery("delete from marks where mark < 40;");
-        if (expression == null) {
-            System.out.println(parser.getError());
-        } else {
-            System.out.println("PARSE SUCCESS");
-        }
-
-        expression = parser.parseQuery("select * from marks;");
-        if (expression == null) {
-            System.out.println(parser.getError());
-        } else {
-            System.out.println("PARSE SUCCESS");
-        }
 
         expression = parser.parseQuery("use imdb;");
         if (expression == null) {

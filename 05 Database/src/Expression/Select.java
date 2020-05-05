@@ -2,6 +2,8 @@ package Expression;
 
 import java.util.ArrayList;
 
+import Expression.Context.Mode;
+
 public class Select implements Expression {
     private ArrayList<String> attributes;
     private Expression from;
@@ -13,6 +15,7 @@ public class Select implements Expression {
 
     @Override
     public String interpret(Context context) {
+        context.setMode(Mode.SELECT);
         // TODO Auto-generated method stub
         if (context.select(attributes)) {
             return from.interpret(context);

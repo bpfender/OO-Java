@@ -216,7 +216,7 @@ public class Parser {
     }
 
     private Expression parseDelete() throws Exception {
-        return parseFrom();
+        return new Delete(parseFrom());
         // TODO this doesn't handle variable where at the moment.
     }
 

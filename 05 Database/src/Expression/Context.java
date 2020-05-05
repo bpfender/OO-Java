@@ -132,7 +132,6 @@ public class Context {
 
     public boolean selectQuery() {
         Collection<String> tableAttributes = activeTable.getAttributes();
-        mode = Mode.SELECT;
 
         if (!(activeAttributes.size() == 1 && activeAttributes.contains("*"))) {
             for (String attribute : activeAttributes) {
@@ -154,10 +153,11 @@ public class Context {
 
         if (conditionTree == null) {
             activeIndices.clear();
-            for (Integer i : activeTable.ids) {
-                activeIndices.add(i - 1);
+            for (int i = 0; i < activeTable.ids.size(); i++) {
+                activeIndices.add(i);
             }
             return true;
+
         }
 
         if ((activeIndices = conditionTree.returnIndices(activeTable)) == null) {
@@ -170,7 +170,7 @@ public class Context {
     // FIXME this will have to be renamed to execute - possible use of strategy
     // pattern here
     public String search() {
-
+        System.out.println("CONTEXT MODE:" + mode);
         switch (mode) {
             case UPDATE:
                 return update();
@@ -181,7 +181,6 @@ public class Context {
         }
 
         String searchString = new String();
-
         for (Integer i : activeIndices) {
             searchString += activeTable.getId(i);
             for (String attrib : activeAttributes) {
@@ -225,14 +224,19 @@ public class Context {
     }
 
     public String delete() {
-        for (Integer i : activeIndices) {
-            activeTable.deleteId(i);
+        System.out.println(activeIndices);
+
+        for (int i = activeIndices.size() - 1; i >= 0; i--) {
+            System.out.println(activeTable.ids);
+
+            int index = activeIndices.get(i);
+
+            activeTable.ids.remove(index); // something funny going on here... check remove ids function
 
             for (Column col : activeTable.getColumns()) {
-                col.deleteValue(i);
+                col.deleteValue(index);
             }
         }
-
         return "OK";
     }
 

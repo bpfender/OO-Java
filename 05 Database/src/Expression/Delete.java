@@ -11,6 +11,7 @@ public class Delete implements Expression {
 
     @Override
     public String interpret(Context context) {
+        System.out.println("EXPRESSION DELETE");
         context.setMode(Mode.DELETE);
         return from.interpret(context);
     }
