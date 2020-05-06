@@ -1,8 +1,8 @@
-package Parser;
+package Tokenizer;
 
 public class Token {
-    public TokenType token;
-    public String value;
+    private TokenType token;
+    private String value;
 
     public Token(TokenType token, String value) {
         this.token = token;

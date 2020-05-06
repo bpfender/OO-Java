@@ -1,4 +1,4 @@
-package Parser;
+package Tokenizer;
 // TODO remove redundant types
 
 // This class defines all tokens that might occur in a query.This allows definition of tokens 

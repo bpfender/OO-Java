@@ -11,6 +11,7 @@ import ConditionTree.AndNode;
 import ConditionTree.Node;
 import ConditionTree.OperatorNode;
 import Expression.*;
+import Tokenizer.*;
 
 //https://www.clear.rice.edu/comp212/05-spring/lectures/36/
 
@@ -27,6 +28,11 @@ public class Parser {
 
     String error;
 
+    // TODO this should probably just throw an error
+    // TODO this functionality can probably be modified. One try catch block,
+    // handling multi-line queries etc.
+    // TODO still need to deal with too long queries
+    // TODO error can be concatenated ERROR: +?
     public Expression parseQuery(String query) {
         String input = query.trim();
 
@@ -54,65 +60,52 @@ public class Parser {
         return error;
     }
 
+    // Updates the activeToken with the next token in the queue. If the end of the
+    // queue is reached, an END type is returned, which can be used to check that a
+    // query terminated correctly/too/early/too late
     private void nextToken() {
         if (tokenQueue.isEmpty()) {
-            activeToken.token = TokenType.END;
-            activeToken.value = null;
+            activeToken = new Token(TokenType.END, null);
         } else {
             activeToken = tokenQueue.pop();
         }
     }
 
     private Expression parseCommand() throws Exception {
-        Expression expression = null;
         nextToken();
 
-        System.out.println("COMMAND: " + activeToken.value);
-        System.out.println("TOKEN: " + activeToken.token);
-
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case USE:
-                expression = parseUse();
-                break;
+                return parseUse();
             case CREATE:
-                expression = parseCreate();
-                break;
+                return parseCreate();
             case DROP:
-                expression = parseDrop();
-                break;
+                return parseDrop();
             case ALTER:
-                expression = parseAlter();
-                break;
+                return parseAlter();
             case INSERT:
-                expression = parseInsert();
-                break;
+                return parseInsert();
             case SELECT:
-                expression = parseSelect();
-                break;
+                return parseSelect();
             case UPDATE:
-                expression = parseUpdate();
-                break;
+                return parseUpdate();
             case DELETE:
-                expression = parseDelete();
-                break;
+                return parseDelete();
             case JOIN:
-                expression = parseJoin();
-                break;
+                return parseJoin();
             default:
-                throw new Exception("ERROR Unexpected token. Invalid command");
+                throw new Exception("ERROR: Unexpected token. Invalid command");
         }
-        // TODO check no tokens left
-        return expression;
     }
 
-    private Expression parseUse() throws Exception {
+    private Use parseUse() throws Exception {
         return new Use(parseName());
     }
 
     private Expression parseCreate() throws Exception {
         nextToken();
 
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case TABLE:
                 String name = parseName();
                 if (tokenQueue.isEmpty()) {
@@ -135,7 +128,7 @@ public class Parser {
     private Expression parseDrop() throws Exception {
         nextToken();
 
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case TABLE:
                 return new DropTable(parseName());
             case DATABASE:
@@ -147,7 +140,7 @@ public class Parser {
 
     private Expression parseAlter() throws Exception {
         nextToken();
-        if (activeToken.token != TokenType.TABLE) {
+        if (activeToken.getToken() != TokenType.TABLE) {
             throw new Exception("ERROR Expected TABLE token");
         }
 
@@ -155,7 +148,7 @@ public class Parser {
         Expression alterTokenType;
 
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case ADD:
                 alterTokenType = new Add(parseName());
                 break;
@@ -171,14 +164,14 @@ public class Parser {
 
     private Expression parseInsert() throws Exception {
         nextToken();
-        if (activeToken.token != TokenType.INTO) {
+        if (activeToken.getToken() != TokenType.INTO) {
             throw new Exception("ERROR Expected INTO");
         }
 
         String name = parseName();
 
         nextToken();
-        if (activeToken.token != TokenType.VALUES) {
+        if (activeToken.getToken() != TokenType.VALUES) {
             throw new Exception("ERROR Expected VALUES token");
         }
 
@@ -193,7 +186,7 @@ public class Parser {
 
         List<String> attributes = new ArrayList<>();
 
-        switch (tokenQueue.peek().token) {
+        switch (tokenQueue.peek().getToken()) {
             case WILD:
                 nextToken();
                 attributes.add("*");
@@ -237,7 +230,7 @@ public class Parser {
 
     private void parseAnd() throws Exception {
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case AND:
                 break;
             default:
@@ -247,7 +240,7 @@ public class Parser {
 
     private void parseOn() throws Exception {
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case ON:
                 break;
             default:
@@ -259,7 +252,7 @@ public class Parser {
     private Expression parseSet() throws Exception {
         nextToken();
 
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case SET:
                 HashMap<String, String> nameValuePairs = parseNameValueList();
                 return new Set(nameValuePairs, parseWhere());
@@ -272,7 +265,7 @@ public class Parser {
         HashMap<String, String> nameValuePairs = new HashMap<>();
         parseNameValuePair(nameValuePairs);
 
-        while (tokenQueue.peek().token == TokenType.COMMA) {
+        while (tokenQueue.peek().getToken() == TokenType.COMMA) {
             nextToken(); // consume comma
             parseNameValuePair(nameValuePairs);
         }
@@ -284,7 +277,7 @@ public class Parser {
         String name = parseName();
 
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case PAIR:
                 break;
             default:
@@ -300,7 +293,7 @@ public class Parser {
         nextToken();
 
         String name;
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case FROM:
                 name = parseName();
                 break;
@@ -313,7 +306,7 @@ public class Parser {
 
     private Expression parseWhere() throws Exception {
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case WHERE:
                 return new Where(parseCondition());
             default:
@@ -324,14 +317,14 @@ public class Parser {
     private Node parseCondition() throws Exception {
         nextToken();
 
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case OPENBRACKET:
                 Node condition;
                 Node leftNode = parseCondition();
                 parseCloseBracket();
 
                 nextToken();
-                switch (activeToken.token) {
+                switch (activeToken.getToken()) {
                     case AND:
                         parseOpenBracket();
                         condition = new AndNode(leftNode, parseCondition());
@@ -347,7 +340,7 @@ public class Parser {
                 parseCloseBracket();
                 return condition;
             case NAME:
-                String name = activeToken.value;
+                String name = activeToken.getValue();
                 Predicate<String> operator = parseOperator();
                 return new OperatorNode(name, operator);
             default:
@@ -361,7 +354,7 @@ public class Parser {
         Predicate<String> operator;
         String value;
 
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case EQUAL:
                 value = parseValue();
                 operator = i -> (i.equals(value));
@@ -399,9 +392,9 @@ public class Parser {
 
     private String parseValue() throws Exception {
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case LITERAL:
-                return activeToken.value;
+                return activeToken.getValue();
             default:
                 throw new Exception("ERROR Expected literal value");
         }
@@ -412,10 +405,10 @@ public class Parser {
 
         nextToken();
 
-        while (activeToken.token == type) {
-            attributes.add(activeToken.value);
+        while (activeToken.getToken() == type) {
+            attributes.add(activeToken.getValue());
 
-            if (tokenQueue.peek().token != TokenType.COMMA) {
+            if (tokenQueue.peek().getToken() != TokenType.COMMA) {
                 return attributes;
             }
             nextToken(); // consume comma
@@ -429,9 +422,9 @@ public class Parser {
     private String parseName() throws Exception {
         nextToken();
 
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case NAME:
-                return activeToken.value;
+                return activeToken.getValue();
             default:
                 throw new Exception("ERROR Must specify name");
 
@@ -440,7 +433,7 @@ public class Parser {
 
     private void parseOpenBracket() throws Exception {
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case OPENBRACKET:
                 return;
             default:
@@ -450,7 +443,7 @@ public class Parser {
 
     private void parseCloseBracket() throws Exception {
         nextToken();
-        switch (activeToken.token) {
+        switch (activeToken.getToken()) {
             case CLOSEBRACKET:
                 return;
             default:

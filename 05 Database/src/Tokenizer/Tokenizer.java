@@ -1,4 +1,4 @@
-package Parser;
+package Tokenizer;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
