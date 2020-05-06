@@ -12,32 +12,35 @@ import ConditionTree.Node;
 import ConditionTree.OperatorNode;
 import Expression.*;
 
-//TODO error should be thrown!!
 //https://www.clear.rice.edu/comp212/05-spring/lectures/36/
 
-public class Parser {
-    Tokenizer tokenizer = new Tokenizer();
-    LinkedList<Token> tokens;
-    Token activeToken;
+// The parser analyses the tokenized query to check that it conforms to the grammar. 
+// Based on this, it builds an expression which is returned as an Expression type. 
+// This can then be interpreted as a query
 
-    String query;
+public class Parser {
+    // TODO seperate out the tokenizer constructor call
+    Tokenizer tokenizer = new Tokenizer();
+
+    Token activeToken;
+    LinkedList<Token> tokenQueue;
+
     String error;
 
-    public Expression parseQuery(String input) {
-        query = input.trim();
+    public Expression parseQuery(String query) {
+        String input = query.trim();
 
-        if (!query.endsWith(";")) {
+        if (!input.endsWith(";")) {
             error = "ERROR: Semicolon missing from end of query";
             return null;
         }
-        query = query.substring(0, query.length() - 1);
+        input = input.substring(0, input.length() - 1);
 
-        if (!tokenizer.tokenize(query)) {
-            error = "ERROR: Invalid token in query";
-            return null;
+        try {
+            tokenQueue = tokenizer.tokenize(input);
+        } catch (Exception e) {
+            error = e.getMessage();
         }
-
-        tokens = tokenizer.tokens;
 
         try {
             return parseCommand();
@@ -52,11 +55,11 @@ public class Parser {
     }
 
     private void nextToken() {
-        if (tokens.isEmpty()) {
+        if (tokenQueue.isEmpty()) {
             activeToken.token = TokenType.END;
             activeToken.value = null;
         } else {
-            activeToken = tokens.pop();
+            activeToken = tokenQueue.pop();
         }
     }
 
@@ -112,7 +115,7 @@ public class Parser {
         switch (activeToken.token) {
             case TABLE:
                 String name = parseName();
-                if (tokens.isEmpty()) {
+                if (tokenQueue.isEmpty()) {
                     return new CreateTable(name, null);
                 } else {
                     parseOpenBracket();
@@ -190,7 +193,7 @@ public class Parser {
 
         List<String> attributes = new ArrayList<>();
 
-        switch (tokens.peek().token) {
+        switch (tokenQueue.peek().token) {
             case WILD:
                 nextToken();
                 attributes.add("*");
@@ -269,7 +272,7 @@ public class Parser {
         HashMap<String, String> nameValuePairs = new HashMap<>();
         parseNameValuePair(nameValuePairs);
 
-        while (tokens.peek().token == TokenType.COMMA) {
+        while (tokenQueue.peek().token == TokenType.COMMA) {
             nextToken(); // consume comma
             parseNameValuePair(nameValuePairs);
         }
@@ -412,7 +415,7 @@ public class Parser {
         while (activeToken.token == type) {
             attributes.add(activeToken.value);
 
-            if (tokens.peek().token != TokenType.COMMA) {
+            if (tokenQueue.peek().token != TokenType.COMMA) {
                 return attributes;
             }
             nextToken(); // consume comma

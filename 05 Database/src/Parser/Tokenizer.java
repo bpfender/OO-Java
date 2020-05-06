@@ -1,7 +1,7 @@
 package Parser;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,8 +11,8 @@ public class Tokenizer {
     // the Tokenizer class. It is used to store the regex pattern and the
     // corresponding token type, which is in turn used to build the Token stack.
     private class TokenInfo {
-        Pattern regex;
-        TokenType type;
+        protected Pattern regex;
+        protected TokenType type;
 
         public TokenInfo(Pattern regex, TokenType type) {
             this.regex = regex;
@@ -20,13 +20,21 @@ public class Tokenizer {
         }
     }
 
-    List<TokenInfo> tokenSelectors;
-    LinkedList<Token> tokens = new LinkedList<>();
+    private ArrayList<TokenInfo> tokenSelectors = new ArrayList<>();
 
+    // TODO: could this be defined as a queue?
+    // The tokens queue is used to build the list of tokens during tokenization and
+    // to return the next token during parsing
+    private LinkedList<Token> tokenQueue = new LinkedList<>();
+
+    // The constructor adds each regex to the tokenSelector array. Order matters,
+    // with first entries added being matched before later entries. As such,
+    // reserved keywords are matched first, followed by operators, then punctuation
+    // and finally literal values. Regexes exclude whitespace automatically. For
+    // words, there must be at elast one space to seperate it from the next token,
+    // operators are able to deal with no spaces
     public Tokenizer() {
-        tokenSelectors = new LinkedList<>();
-
-        // COMMANDS
+        // Command Tokens (reserved keywords)
         addRegex("^(use\\s+)", TokenType.USE);
         addRegex("^(create\\s+)", TokenType.CREATE);
         addRegex("^(add\\s+)", TokenType.ADD);
@@ -38,7 +46,7 @@ public class Tokenizer {
         addRegex("^(delete\\s+)", TokenType.DELETE);
         addRegex("^(join\\s+)", TokenType.JOIN);
 
-        // OPTHER WORDS
+        // Other reserved keywords
         addRegex("^(table\\s+)", TokenType.TABLE);
         addRegex("^(database\\s+)", TokenType.DATABASE);
         addRegex("^(values\\s+)", TokenType.VALUES);
@@ -50,9 +58,9 @@ public class Tokenizer {
         addRegex("^(on\\s+)", TokenType.ON);
         addRegex("^(into\\s+)", TokenType.INTO);
 
-        // OPERATORS
-        // order is important
-        addRegex("^(\\s*==\\s*)", TokenType.EQUAL); // QUESTION does like need a \s+
+        // Operators (order is important, multiple character operators are checked
+        // first)
+        addRegex("^(\\s*==\\s*)", TokenType.EQUAL);
         addRegex("^(\\s*>=\\s*)", TokenType.GREATEREQUAL);
         addRegex("^(\\s*<=\\s*)", TokenType.LESSEQUAL);
         addRegex("^(\\s*!=\\s*)", TokenType.NOTEQUAL);
@@ -60,18 +68,14 @@ public class Tokenizer {
         addRegex("^(\\s*<\\s*)", TokenType.LESS);
         addRegex("^(\\s*LIKE\\s+)", TokenType.LIKE);
 
-        // PUCNCTUATION
+        // Punctuation
         addRegex("^(\\s*\\(\\s*)", TokenType.OPENBRACKET);
         addRegex("^(\\s*\\)\\s*)", TokenType.CLOSEBRACKET);
         addRegex("^(\\s*,\\s*)", TokenType.COMMA);
         addRegex("^(\\s*=\\s*)", TokenType.PAIR);
 
-        // addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)",
-        // TokenType.OPERATOR);
-
-        // VALUES
+        // Values
         addRegex("^(\\s*\\*\\s*)", TokenType.WILD);
-
         addRegex("^(\\s*'[A-Za-z_ 0-9.]*'\\s*)", TokenType.LITERAL);// QUESTION make sure this matches everything
         addRegex("^(\\s*((true)|(false))\\s*)", TokenType.LITERAL);
         addRegex("^(\\s*[0-9]+.[0-9]+\\s*)", TokenType.LITERAL);
@@ -79,26 +83,41 @@ public class Tokenizer {
         addRegex("^(\\s*[a-zA-Z_]+\\s*)", TokenType.NAME); // disallows digits in name
     }
 
+    // Compiles a case insensitive pattern matcher, which gets added to a new
+    // TokenInfo class and in turn added to the tokenSelectors list. This allows
+    // later matching of the string against the pattern
     private void addRegex(String regex, TokenType type) {
         tokenSelectors.add(new TokenInfo(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), type));
     }
 
+    // Source:
     // http://cogitolearning.co.uk/2013/04/writing-a-parser-in-java-the-tokenizer/
-    public boolean tokenize(String input) {
-        tokens.clear();
+    // Tokenize first ensures that the tokenQueue is cleared of previous tokens. A
+    // while loop scans the input for tokens until no matching token can be found or
+    // the string is empty. The begining of the string is scanned, if a matching
+    // token is found, the token and value are added to the tokenQueue and that part
+    // of the input is removed. This is repeated until the input is consumed. If no
+    // token is matched, an error is thrown
+    public LinkedList<Token> tokenize(String input) throws Exception {
+        tokenQueue.clear();
+
+        // TODO is this actually needed
+        // TODO .isBlank vs .isEmpty?
+        // TODO Remove nesting
         String query = input.trim();
-        System.out.println("QUERY:" + query);
-
         while (!query.isBlank()) {
-            boolean match = false;
+            boolean tokenMatch = false;
 
-            for (TokenInfo info : tokenSelectors) {
-                Matcher m = info.regex.matcher(query);
+            for (TokenInfo tokenInfo : tokenSelectors) {
+                Matcher m = tokenInfo.regex.matcher(query);
+
                 if (m.find()) {
-                    match = true;
-                    String description = m.group().trim().replaceAll("'", ""); // FIXME super dirty
-                    System.out.println("MATCH " + description + " " + info.type);
-                    tokens.add(new Token(info.type, description));
+                    tokenMatch = true;
+
+                    // TODO slightly neater string sanitisation
+                    String description = m.group().trim().replaceAll("'", "");
+
+                    tokenQueue.add(new Token(tokenInfo.type, description));
 
                     query = m.replaceFirst("");
                     break;
@@ -106,12 +125,12 @@ public class Tokenizer {
 
             }
 
-            if (!match) {
-                return false;
+            if (!tokenMatch) {
+                throw new Exception("ERROR Invalid token in region '" + query + "'");
             }
         }
-        return true;
 
+        return tokenQueue;
     }
 
 }
