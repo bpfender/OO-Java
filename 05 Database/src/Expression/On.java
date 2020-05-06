@@ -11,7 +11,8 @@ public class On implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // context.on(attribute1, attribute2);
+        System.out.println("JOINS: " + attribute1 + " " + attribute2);
+        context.setJoinOn(attribute1, attribute2);
         return null;
     }
 

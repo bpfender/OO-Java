@@ -3,7 +3,7 @@ package Database;
 import java.util.ArrayList;
 
 public class Column {
-    private String columnName = new String();
+    protected String columnName = new String();
     private ArrayList<String> column;
 
     public Column() {

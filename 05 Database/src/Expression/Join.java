@@ -1,5 +1,7 @@
 package Expression;
 
+import Expression.Context.Mode;
+
 public class Join implements Expression {
     private Expression and;
     private Expression on;
@@ -11,10 +13,11 @@ public class Join implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // context.setAction("join");
+        // FIXME no error checking on this at the moment
+        context.setMode(Mode.JOIN);
         and.interpret(context);
         on.interpret(context);
-        return null;
+        return context.search();
     }
 
 }

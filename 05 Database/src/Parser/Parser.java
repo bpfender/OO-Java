@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import ConditionTree.*;
 import ConditionTree.AndNode;
@@ -18,6 +15,7 @@ import Parser.Tokenizer.Token;
 import Parser.Tokenizer.Type;
 
 //TODO error should be thrown!!
+//https://www.clear.rice.edu/comp212/05-spring/lectures/36/
 
 public class Parser {
     Tokenizer tokenizer = new Tokenizer();
@@ -217,7 +215,8 @@ public class Parser {
 
     private Expression parseDelete() throws Exception {
         return new Delete(parseFrom());
-        // TODO this doesn't handle variable where at the moment.
+        // TODO this doesn't handle variable where at the moment i.e. must have where-
+        // ensure!
     }
 
     private Expression parseJoin() throws Exception {
@@ -248,10 +247,10 @@ public class Parser {
     private void parseOn() throws Exception {
         nextToken();
         switch (activeToken.token) {
-            case OR:
+            case ON:
                 break;
             default:
-                throw new Exception("ERROR Expected OR");
+                throw new Exception("ERROR Expected ON");
         }
 
     }

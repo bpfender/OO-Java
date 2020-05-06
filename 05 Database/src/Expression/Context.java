@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.function.IntBinaryOperator;
 
 import ConditionTree.Node;
@@ -13,7 +14,7 @@ import Database.*;
 
 // Could potentially have hashmap associating name with file path?
 // FIXME currently non-persistent
-
+//FIXME clearing values properly
 public class Context {
     public enum Mode {
         USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
@@ -26,7 +27,11 @@ public class Context {
     private HashMap<String, String> updateValues;
     private Mode mode = Mode.SELECT;
 
+    private ArrayList<Table> joinTables = new ArrayList<>();
+
     private Map<String, Database> databases = new HashMap<>();
+
+    Table temp;
 
     public Context() {
     }
@@ -176,6 +181,8 @@ public class Context {
                 return update();
             case DELETE:
                 return delete();
+            case JOIN:
+                return join();
             default:
                 break;
         }
@@ -192,6 +199,82 @@ public class Context {
         }
 
         return searchString;
+    }
+
+    // FIXME no error handling at the moment
+    public String tablesToJoin(String table1, String table2) {
+        System.out.println(setTable(table1));
+        joinTables.add(activeTable);
+        System.out.println(setTable(table2));
+        joinTables.add(activeTable);
+
+        return null;
+    }
+
+    public String join() {
+        String searchString = new String();
+        for (Integer i : activeIndices) {
+            searchString += temp.getId(i) + " ";
+            for (String attrib : activeAttributes) {
+                System.out.println(attrib);
+                searchString += temp.getColumn(attrib).getColumnValues().get(i) + " ";
+
+            }
+            searchString += "\n";
+        }
+
+        return searchString;
+    }
+
+    public String setJoinOn(String column1, String column2) {
+        System.out.println(joinTables.get(0).getColumn(column1));
+
+        ArrayList<String> col1 = joinTables.get(0).getColumn(column1).getColumnValues();
+        ArrayList<String> col2 = joinTables.get(1).getColumn(column2).getColumnValues();
+
+        ArrayList<Integer> indices1 = new ArrayList<>();
+        ArrayList<Integer> indices2 = new ArrayList<>();
+        ArrayList<SimpleEntry<Integer, Integer>> indices = new ArrayList<>();
+
+        int i = 0, j = 0;
+        for (String val1 : col1) {
+            for (String val2 : col2) {
+                if (val1.equals(val2)) {
+                    indices1.add(i);
+                    indices2.add(j);
+                    indices.add(new SimpleEntry<Integer, Integer>(i, j));
+                }
+
+                j++;
+            }
+            i++;
+        }
+
+        List<String> tempAttribs = new ArrayList<>();
+
+        for (String attrib : joinTables.get(0).getAttributes()) {
+            tempAttribs.add(joinTables.get(0).getTableName() + "." + attrib);
+        }
+        for (String attrib : joinTables.get(1).getAttributes()) {
+            tempAttribs.add(joinTables.get(1).getTableName() + "." + attrib);
+        }
+
+        temp = new Table("temp", tempAttribs);
+        List<String> valueList = new ArrayList<>();
+        for (SimpleEntry<Integer, Integer> entry : indices) {
+            valueList.clear();
+            for (Column col : joinTables.get(0).getColumns()) {
+                valueList.add(col.getColumnValues().get(entry.getKey()));
+            }
+
+            for (Column col : joinTables.get(1).getColumns()) {
+                valueList.add(col.getColumnValues().get(entry.getValue()));
+            }
+            temp.insertValues(valueList);
+        }
+
+        return null;
+
     }
 
     public boolean setNameValuePairs(HashMap<String, String> values) {

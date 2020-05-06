@@ -11,9 +11,10 @@ public class And implements Expression {
 
     @Override
     public String interpret(Context context) {
-        // TODO Auto-generated method stub
-        // context.boolean(arg1,arg2);
-        // context.run();
+        // TODO Auto-generated method stub]
+        // FIXME no error handling at the moment
+        System.out.println("JOIN TABLES: " + arg1 + " " + arg2);
+        context.tablesToJoin(arg1, arg2);
         return null;
     }
 

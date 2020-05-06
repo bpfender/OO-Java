@@ -483,6 +483,14 @@ public class Test {
             System.out.println(expression.interpret(context));
         }
 
+        expression = parser.parseQuery("JOIN actors AND roles ON id AND actor_id;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
+        }
+
         System.exit(1);
 
     }
