@@ -11,8 +11,6 @@ import ConditionTree.AndNode;
 import ConditionTree.Node;
 import ConditionTree.OperatorNode;
 import Expression.*;
-import Parser.Tokenizer.Token;
-import Parser.Tokenizer.Type;
 
 //TODO error should be thrown!!
 //https://www.clear.rice.edu/comp212/05-spring/lectures/36/
@@ -55,7 +53,7 @@ public class Parser {
 
     private void nextToken() {
         if (tokens.isEmpty()) {
-            activeToken.token = Type.END;
+            activeToken.token = TokenType.END;
             activeToken.value = null;
         } else {
             activeToken = tokens.pop();
@@ -118,7 +116,7 @@ public class Parser {
                     return new CreateTable(name, null);
                 } else {
                     parseOpenBracket();
-                    List<String> attributes = parseList(Type.NAME);
+                    List<String> attributes = parseList(TokenType.NAME);
                     parseCloseBracket();
 
                     return new CreateTable(name, attributes);
@@ -146,43 +144,43 @@ public class Parser {
 
     private Expression parseAlter() throws Exception {
         nextToken();
-        if (activeToken.token != Type.TABLE) {
+        if (activeToken.token != TokenType.TABLE) {
             throw new Exception("ERROR Expected TABLE token");
         }
 
         String name = parseName();
-        Expression alterType;
+        Expression alterTokenType;
 
         nextToken();
         switch (activeToken.token) {
             case ADD:
-                alterType = new Add(parseName());
+                alterTokenType = new Add(parseName());
                 break;
             case DROP:
-                alterType = new Drop(parseName());
+                alterTokenType = new Drop(parseName());
                 break;
             default:
                 throw new Exception("ERROR Expected ADD or DROP");
         }
 
-        return new Alter(name, alterType);
+        return new Alter(name, alterTokenType);
     }
 
     private Expression parseInsert() throws Exception {
         nextToken();
-        if (activeToken.token != Type.INTO) {
+        if (activeToken.token != TokenType.INTO) {
             throw new Exception("ERROR Expected INTO");
         }
 
         String name = parseName();
 
         nextToken();
-        if (activeToken.token != Type.VALUES) {
+        if (activeToken.token != TokenType.VALUES) {
             throw new Exception("ERROR Expected VALUES token");
         }
 
         parseOpenBracket();
-        List<String> attributes = parseList(Type.LITERAL);
+        List<String> attributes = parseList(TokenType.LITERAL);
         parseCloseBracket();
 
         return new Insert(name, attributes);
@@ -198,7 +196,7 @@ public class Parser {
                 attributes.add("*");
                 break;
             case NAME:
-                attributes = parseList(Type.NAME);
+                attributes = parseList(TokenType.NAME);
                 break;
             default:
                 throw new Exception("ERROR Expected * or attributes");
@@ -271,7 +269,7 @@ public class Parser {
         HashMap<String, String> nameValuePairs = new HashMap<>();
         parseNameValuePair(nameValuePairs);
 
-        while (tokens.peek().token == Type.COMMA) {
+        while (tokens.peek().token == TokenType.COMMA) {
             nextToken(); // consume comma
             parseNameValuePair(nameValuePairs);
         }
@@ -406,7 +404,7 @@ public class Parser {
         }
     }
 
-    private List<String> parseList(Type type) throws Exception {
+    private List<String> parseList(TokenType type) throws Exception {
         List<String> attributes = new ArrayList<>();
 
         nextToken();
@@ -414,7 +412,7 @@ public class Parser {
         while (activeToken.token == type) {
             attributes.add(activeToken.value);
 
-            if (tokens.peek().token != Type.COMMA) {
+            if (tokens.peek().token != TokenType.COMMA) {
                 return attributes;
             }
             nextToken(); // consume comma

@@ -7,40 +7,18 @@ import java.util.regex.Pattern;
 
 public class Tokenizer {
 
-    public class Token {
-        public Type token;
-        public String value;
-
-        public Token(Type token, String value) {
-            this.token = token;
-            this.value = value;
-        }
-
-        public Type getToken() {
-            return token;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-    }
-
+    // TokenInfo is declared as a private class because it will only ever be used by
+    // the Tokenizer class. It is used to store the regex pattern and the
+    // corresponding token type, which is in turn used to build the Token stack.
     private class TokenInfo {
         Pattern regex;
-        Type type;
+        TokenType type;
 
-        public TokenInfo(Pattern regex, Type type) {
+        public TokenInfo(Pattern regex, TokenType type) {
             this.regex = regex;
             this.type = type;
         }
     }
-
-    public enum Type {
-        USE, CREATE, ADD, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN, TABLE, DATABASE, VALUES, FROM, WHERE, SET,
-        AND, OR, ON, INTO, OPENBRACKET, CLOSEBRACKET, COMMA, PAIR, OPERATOR, WILD, LITERAL, STRING, BOOLEAN, FLOAT,
-        INTEGER, NAME, ERROR, EQUAL, GREATER, LESS, GREATEREQUAL, LESSEQUAL, NOTEQUAL, LIKE, END
-    };
 
     List<TokenInfo> tokenSelectors;
     LinkedList<Token> tokens = new LinkedList<>();
@@ -49,58 +27,59 @@ public class Tokenizer {
         tokenSelectors = new LinkedList<>();
 
         // COMMANDS
-        addRegex("^(use\\s+)", Type.USE);
-        addRegex("^(create\\s+)", Type.CREATE);
-        addRegex("^(add\\s+)", Type.ADD);
-        addRegex("^(drop\\s+)", Type.DROP);
-        addRegex("^(alter\\s+)", Type.ALTER);
-        addRegex("^(insert\\s+)", Type.INSERT);
-        addRegex("^(select\\s+)", Type.SELECT);
-        addRegex("^(update\\s+)", Type.UPDATE);
-        addRegex("^(delete\\s+)", Type.DELETE);
-        addRegex("^(join\\s+)", Type.JOIN);
+        addRegex("^(use\\s+)", TokenType.USE);
+        addRegex("^(create\\s+)", TokenType.CREATE);
+        addRegex("^(add\\s+)", TokenType.ADD);
+        addRegex("^(drop\\s+)", TokenType.DROP);
+        addRegex("^(alter\\s+)", TokenType.ALTER);
+        addRegex("^(insert\\s+)", TokenType.INSERT);
+        addRegex("^(select\\s+)", TokenType.SELECT);
+        addRegex("^(update\\s+)", TokenType.UPDATE);
+        addRegex("^(delete\\s+)", TokenType.DELETE);
+        addRegex("^(join\\s+)", TokenType.JOIN);
 
         // OPTHER WORDS
-        addRegex("^(table\\s+)", Type.TABLE);
-        addRegex("^(database\\s+)", Type.DATABASE);
-        addRegex("^(values\\s+)", Type.VALUES);
-        addRegex("^(from\\s+)", Type.FROM);
-        addRegex("^(where\\s+)", Type.WHERE);
-        addRegex("^(set\\s+)", Type.SET);
-        addRegex("^(and\\s+)", Type.AND);
-        addRegex("^(or\\s+)", Type.OR);
-        addRegex("^(on\\s+)", Type.ON);
-        addRegex("^(into\\s+)", Type.INTO);
+        addRegex("^(table\\s+)", TokenType.TABLE);
+        addRegex("^(database\\s+)", TokenType.DATABASE);
+        addRegex("^(values\\s+)", TokenType.VALUES);
+        addRegex("^(from\\s+)", TokenType.FROM);
+        addRegex("^(where\\s+)", TokenType.WHERE);
+        addRegex("^(set\\s+)", TokenType.SET);
+        addRegex("^(and\\s+)", TokenType.AND);
+        addRegex("^(or\\s+)", TokenType.OR);
+        addRegex("^(on\\s+)", TokenType.ON);
+        addRegex("^(into\\s+)", TokenType.INTO);
 
         // OPERATORS
         // order is important
-        addRegex("^(\\s*==\\s*)", Type.EQUAL); // QUESTION does like need a \s+
-        addRegex("^(\\s*>=\\s*)", Type.GREATEREQUAL);
-        addRegex("^(\\s*<=\\s*)", Type.LESSEQUAL);
-        addRegex("^(\\s*!=\\s*)", Type.NOTEQUAL);
-        addRegex("^(\\s*>\\s*)", Type.GREATER);
-        addRegex("^(\\s*<\\s*)", Type.LESS);
-        addRegex("^(\\s*LIKE\\s+)", Type.LIKE);
+        addRegex("^(\\s*==\\s*)", TokenType.EQUAL); // QUESTION does like need a \s+
+        addRegex("^(\\s*>=\\s*)", TokenType.GREATEREQUAL);
+        addRegex("^(\\s*<=\\s*)", TokenType.LESSEQUAL);
+        addRegex("^(\\s*!=\\s*)", TokenType.NOTEQUAL);
+        addRegex("^(\\s*>\\s*)", TokenType.GREATER);
+        addRegex("^(\\s*<\\s*)", TokenType.LESS);
+        addRegex("^(\\s*LIKE\\s+)", TokenType.LIKE);
 
         // PUCNCTUATION
-        addRegex("^(\\s*\\(\\s*)", Type.OPENBRACKET);
-        addRegex("^(\\s*\\)\\s*)", Type.CLOSEBRACKET);
-        addRegex("^(\\s*,\\s*)", Type.COMMA);
-        addRegex("^(\\s*=\\s*)", Type.PAIR);
+        addRegex("^(\\s*\\(\\s*)", TokenType.OPENBRACKET);
+        addRegex("^(\\s*\\)\\s*)", TokenType.CLOSEBRACKET);
+        addRegex("^(\\s*,\\s*)", TokenType.COMMA);
+        addRegex("^(\\s*=\\s*)", TokenType.PAIR);
 
-        // addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)", Type.OPERATOR);
+        // addRegex("^(\s*((==)|(>)|(<)|(>=)|(<=)|(!=)|(LIKE\s+))\s*)",
+        // TokenType.OPERATOR);
 
         // VALUES
-        addRegex("^(\\s*\\*\\s*)", Type.WILD);
+        addRegex("^(\\s*\\*\\s*)", TokenType.WILD);
 
-        addRegex("^(\\s*'[A-Za-z_ 0-9.]*'\\s*)", Type.LITERAL);// QUESTION make sure this matches everything
-        addRegex("^(\\s*((true)|(false))\\s*)", Type.LITERAL);
-        addRegex("^(\\s*[0-9]+.[0-9]+\\s*)", Type.LITERAL);
-        addRegex("^(\\s*[0-9]+\\s*)", Type.LITERAL); // order is important here
-        addRegex("^(\\s*[a-zA-Z_]+\\s*)", Type.NAME); // disallows digits in name
+        addRegex("^(\\s*'[A-Za-z_ 0-9.]*'\\s*)", TokenType.LITERAL);// QUESTION make sure this matches everything
+        addRegex("^(\\s*((true)|(false))\\s*)", TokenType.LITERAL);
+        addRegex("^(\\s*[0-9]+.[0-9]+\\s*)", TokenType.LITERAL);
+        addRegex("^(\\s*[0-9]+\\s*)", TokenType.LITERAL); // order is important here
+        addRegex("^(\\s*[a-zA-Z_]+\\s*)", TokenType.NAME); // disallows digits in name
     }
 
-    private void addRegex(String regex, Type type) {
+    private void addRegex(String regex, TokenType type) {
         tokenSelectors.add(new TokenInfo(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), type));
     }
 
