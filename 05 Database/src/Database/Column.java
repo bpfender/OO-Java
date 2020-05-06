@@ -4,7 +4,20 @@ import java.util.ArrayList;
 
 public class Column {
     private String columnName = new String();
-    private ArrayList<String> column = new ArrayList<>();
+    private ArrayList<String> column;
+
+    public Column() {
+        column = new ArrayList<>();
+    }
+
+    // QUESTION slightly dubious about initialisation here
+    public Column(int size) {
+        column = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            column.add("");
+        }
+
+    }
 
     public void addValue(String value) {
         column.add(value);

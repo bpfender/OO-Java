@@ -78,7 +78,7 @@ public class Table {
             return false;
         }
 
-        columns.put(attribute, new Column());
+        columns.put(attribute, new Column(ids.size()));
         return true;
 
         // FIXME prevent adding * and id

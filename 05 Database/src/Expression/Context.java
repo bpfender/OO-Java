@@ -182,12 +182,13 @@ public class Context {
 
         String searchString = new String();
         for (Integer i : activeIndices) {
-            searchString += activeTable.getId(i);
+            searchString += activeTable.getId(i) + " ";
             for (String attrib : activeAttributes) {
                 System.out.println(attrib);
-                searchString += activeTable.getColumn(attrib).getColumnValues().get(i);
+                searchString += activeTable.getColumn(attrib).getColumnValues().get(i) + " ";
 
             }
+            searchString += "\n";
         }
 
         return searchString;

@@ -117,7 +117,7 @@ public class Tokenizer {
                 Matcher m = info.regex.matcher(query);
                 if (m.find()) {
                     match = true;
-                    String description = m.group().trim();
+                    String description = m.group().trim().replaceAll("'", ""); // FIXME super dirty
                     System.out.println("MATCH " + description + " " + info.type);
                     tokens.add(new Token(info.type, description));
 

@@ -138,13 +138,12 @@ public class Test {
             System.out.println(expression.interpret(context));
         }
 
-        System.exit(1);
-
         expression = parser.parseQuery("use imdb;");
         if (expression == null) {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("drop table actors;");
@@ -152,6 +151,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("drop table movies;");
@@ -159,6 +159,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("drop table roles;");
@@ -166,6 +167,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("drop database imdb;");
@@ -173,6 +175,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("create database imdb;");
@@ -180,6 +183,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("use imdb;");
@@ -187,6 +191,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("create table actors (name, nationality, awards);");
@@ -194,6 +199,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO actors VALUES ('Hugh Grant', 'British', 3);");
@@ -201,6 +207,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO actors VALUES ('Toni Collette', 'Australian', 12);");
@@ -208,6 +215,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO actors VALUES ('James Caan', 'American', 8);");
@@ -215,6 +223,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO actors VALUES ('Emma Thompson', 'British', 10);");
@@ -222,6 +231,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("CREATE TABLE movies (name, genre);");
@@ -229,6 +239,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO movies VALUES ('Mickey Blue Eyes', 'Comedy');");
@@ -236,6 +247,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO movies VALUES ('About a Boy', 'Comedy');");
@@ -243,6 +255,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO movies VALUES ('Sense and Sensibility', 'Period Drama');");
@@ -250,6 +263,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT id FROM movies WHERE name == 'Mickey Blue Eyes';");
@@ -257,6 +271,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT id FROM movies WHERE name == 'About a Boy';");
@@ -264,6 +279,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT id FROM movies WHERE name == 'Sense and Sensibility';");
@@ -271,6 +287,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'Hugh Grant';");
@@ -278,6 +295,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'Toni Collette';");
@@ -285,6 +303,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'James Caan';");
@@ -292,6 +311,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT id FROM actors WHERE name == 'Emma Thompson';");
@@ -299,6 +319,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("CREATE TABLE roles (name, movie_id, actor_id);");
@@ -306,6 +327,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO roles VALUES ('Edward', 3, 1);");
@@ -313,6 +335,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO roles VALUES ('Frank', 1, 3);");
@@ -320,6 +343,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO roles VALUES ('Fiona', 2, 2);");
@@ -327,6 +351,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("INSERT INTO roles VALUES ('Elinor', 3, 4);");
@@ -334,6 +359,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+
         }
 
         expression = parser.parseQuery("SELECT * FROM actors WHERE awards < 5;");
@@ -341,13 +367,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
-        }
-
-        expression = parser.parseQuery("");
-        if (expression == null) {
-            System.out.println(parser.getError());
-        } else {
-            System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("ALTER TABLE actors ADD age;");
@@ -355,6 +375,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT * FROM actors;");
@@ -362,6 +383,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("UPDATE actors SET age = 45 WHERE name == 'Hugh Grant';");
@@ -369,6 +391,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT * FROM actors WHERE name == 'Hugh Grant';");
@@ -376,6 +399,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT nationality FROM actors WHERE name == 'Hugh Grant';");
@@ -383,6 +407,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("ALTER TABLE actors DROP age;");
@@ -390,6 +415,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("SELECT * FROM actors WHERE name == 'Hugh Grant';");
@@ -397,6 +423,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+
         }
 
         expression = parser.parseQuery("SELECT * FROM actors WHERE (awards > 5) AND (nationality == 'British');");
@@ -404,6 +431,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+
         }
 
         expression = parser.parseQuery(
@@ -412,6 +440,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+
         }
 
         expression = parser.parseQuery("SELECT * FROM actors WHERE name LIKE 'an';");
@@ -419,6 +448,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+
         }
 
         expression = parser.parseQuery("SELECT * FROM actors WHERE awards >= 10;");
@@ -426,6 +456,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("DELETE FROM actors WHERE name == 'Hugh Grant';");
@@ -433,6 +464,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("DELETE FROM actors WHERE name == 'James Caan';");
@@ -440,6 +472,7 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
 
         expression = parser.parseQuery("DELETE FROM actors WHERE name == 'Emma Thompson';");
@@ -447,7 +480,10 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
+            System.out.println(expression.interpret(context));
         }
+
+        System.exit(1);
 
     }
 }
