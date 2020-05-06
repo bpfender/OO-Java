@@ -19,7 +19,7 @@ public class Table {
 
     public Table(String tableName, List<String> attributes) {
         this.tableName = tableName;
-        columns.put("id", new Column());
+        // columns.put("id", new Column());
 
         if (attributes != null) {
             for (String col : attributes) {
@@ -57,9 +57,7 @@ public class Table {
             // QUESTION neater way to do this?
             int index = 0;
             for (Column col : columns.values()) {
-                if (col.columnName.equals("id")) {
-                    col.addValue(String.valueOf(lastId));
-                }
+
                 col.addValue(data.get(index));
                 index++;
             }
