@@ -100,7 +100,7 @@ public class Tokenizer {
     // token is matched, an error is thrown
     public LinkedList<Token> tokenize(String input) throws Exception {
         tokenQueue.clear();
-
+        // TODO Streamify?
         // TODO is this actually needed
         // TODO .isBlank vs .isEmpty?
         // TODO Remove nesting
@@ -126,7 +126,7 @@ public class Tokenizer {
             }
 
             if (!tokenMatch) {
-                throw new Exception("ERROR Invalid token in region '" + query + "'");
+                throw new Exception("ERROR Invalid input in region '" + query + "'");
             }
         }
 

@@ -130,7 +130,7 @@ public class Context {
         if (activeDatabase == null) {
             return false;
         }
-
+        // TODO set active attributes properly here
         activeAttributes = attributes;
         return true;
     }

@@ -17,7 +17,8 @@ import Tokenizer.*;
 
 // The parser analyses the tokenized query to check that it conforms to the grammar. 
 // Based on this, it builds an expression which is returned as an Expression type. 
-// This can then be interpreted as a query
+// This can then be interpreted as a query. THe parser doesn't do validation on input. It 
+// simply builds the expression to be run
 
 public class Parser {
     // TODO seperate out the tokenizer constructor call
@@ -35,6 +36,7 @@ public class Parser {
     // TODO error can be concatenated ERROR: +?
     public Expression parseQuery(String query) {
         String input = query.trim();
+        System.out.println("QUERY: " + query);
 
         if (!input.endsWith(";")) {
             error = "ERROR: Semicolon missing from end of query";
@@ -71,6 +73,12 @@ public class Parser {
         }
     }
 
+    // TODO can this be refactored into a design pattern (strategy/chain of
+    // responsibiltiy)?
+    // TODO return types of parseMethods
+    // The main switch statement that determines which command is being parsed. All
+    // parsing methods throw an exception on unexpected input, which will get passed
+    // back all the way to here, allowing errors to be handled centrally
     private Expression parseCommand() throws Exception {
         nextToken();
 
@@ -94,7 +102,7 @@ public class Parser {
             case JOIN:
                 return parseJoin();
             default:
-                throw new Exception("ERROR: Unexpected token. Invalid command");
+                throw new Exception("ERROR: Unexpected input. Invalid command '" + activeToken.getValue() + "'");
         }
     }
 
@@ -107,22 +115,30 @@ public class Parser {
 
         switch (activeToken.getToken()) {
             case TABLE:
-                String name = parseName();
-                if (tokenQueue.isEmpty()) {
-                    return new CreateTable(name, null);
-                } else {
-                    parseOpenBracket();
-                    List<String> attributes = parseList(TokenType.NAME);
-                    parseCloseBracket();
-
-                    return new CreateTable(name, attributes);
-                }
-
+                return parseCreateTable();
             case DATABASE:
-                return new CreateDatabase(parseName());
+                return parseCreateDatabase();
             default:
-                throw new Exception("ERROR Must specify whether to create database or table");
+                throw new Exception("ERROR: Must specify whether to CREATE database or table");
         }
+    }
+
+    private CreateTable parseCreateTable() throws Exception {
+        String name = parseName();
+        List<String> attributes = null;
+
+        if (!tokenQueue.isEmpty()) {
+            parseOpenBracket();
+            attributes = parseList(TokenType.NAME);
+            parseCloseBracket();
+        }
+
+        return new CreateTable(name, attributes);
+
+    }
+
+    private CreateDatabase parseCreateDatabase() throws Exception {
+        return new CreateDatabase(parseName());
     }
 
     private Expression parseDrop() throws Exception {
@@ -134,39 +150,40 @@ public class Parser {
             case DATABASE:
                 return new DropDatabase(parseName());
             default:
-                throw new Exception("ERROR Must specify what to DROP");
+                throw new Exception("ERROR: Must specify what to DROP");
         }
     }
 
-    private Expression parseAlter() throws Exception {
-        nextToken();
-        if (activeToken.getToken() != TokenType.TABLE) {
-            throw new Exception("ERROR Expected TABLE token");
-        }
+    private Alter parseAlter() throws Exception {
+        consumeRequiredToken(TokenType.TABLE);
 
-        String name = parseName();
-        Expression alterTokenType;
+        // FIXME this relies on order of evaluation, may be brittle
+        return new Alter(parseName(), parseAlterationType());
+    }
 
+    private Expression parseAlterationType() throws Exception {
         nextToken();
         switch (activeToken.getToken()) {
             case ADD:
-                alterTokenType = new Add(parseName());
-                break;
+                return new Add(parseName());
             case DROP:
-                alterTokenType = new Drop(parseName());
-                break;
+                return new Drop(parseName());
             default:
-                throw new Exception("ERROR Expected ADD or DROP");
+                throw new Exception("ERROR: Expected ADD or DROP");
         }
-
-        return new Alter(name, alterTokenType);
     }
 
-    private Expression parseInsert() throws Exception {
+    // Helper function to consume required tokens that are expected but don't
+    // actually do anything
+    private void consumeRequiredToken(TokenType type) throws Exception {
         nextToken();
-        if (activeToken.getToken() != TokenType.INTO) {
-            throw new Exception("ERROR Expected INTO");
+        if (activeToken.getToken() != type) {
+            throw new Exception("ERROR: Expected " + type);
         }
+    }
+
+    private Insert parseInsert() throws Exception {
+        consumeRequiredToken(TokenType.INTO);
 
         String name = parseName();
 
@@ -175,14 +192,15 @@ public class Parser {
             throw new Exception("ERROR Expected VALUES token");
         }
 
-        parseOpenBracket();
+        consumeRequiredToken(TokenType.OPENBRACKET);
         List<String> attributes = parseList(TokenType.LITERAL);
-        parseCloseBracket();
+        consumeRequiredToken(TokenType.OPENBRACKET);
 
         return new Insert(name, attributes);
     }
 
-    private Expression parseSelect() throws Exception {
+    // TODO
+    private Select parseSelect() throws Exception {
 
         List<String> attributes = new ArrayList<>();
 
@@ -202,18 +220,18 @@ public class Parser {
 
     }
 
-    private Expression parseUpdate() throws Exception {
+    private Update parseUpdate() throws Exception {
         String name = parseName();
         return new Update(name, parseSet());
     }
 
-    private Expression parseDelete() throws Exception {
+    private Delete parseDelete() throws Exception {
         return new Delete(parseFrom());
         // TODO this doesn't handle variable where at the moment i.e. must have where-
         // ensure!
     }
 
-    private Expression parseJoin() throws Exception {
+    private Join parseJoin() throws Exception {
         String name1 = parseName();
         parseAnd();
         String name2 = parseName();
