@@ -102,7 +102,7 @@ public class Context {
             return -1;
         }
 
-        Table tmp = activeDatabase.fromTable(tableName);
+        Table tmp = activeDatabase.getTable(tableName);
 
         if (tmp == null) {
             return -2;

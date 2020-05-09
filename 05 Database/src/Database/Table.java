@@ -5,25 +5,23 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 public class Table {
-    private String tableName = new String();
+    private String tableName;
 
     public ArrayList<Integer> ids = new ArrayList<>();
-    private Map<String, Column> columns = new LinkedHashMap<>();
     private int lastId = 0;
 
-    // TODO reusing ids?
-    private Stack<Integer> freeIds = new Stack<>();
+    private Map<String, Column> columns = new LinkedHashMap<>();
 
     public Table(String tableName, List<String> attributes) {
         this.tableName = tableName;
-        // columns.put("id", new Column());
+
+        // columns.put("ids", new Column());
 
         if (attributes != null) {
-            for (String col : attributes) {
-                columns.put(col, new Column());
+            for (String attributeName : attributes) {
+                columns.put(attributeName, new Column());
             }
         }
     }

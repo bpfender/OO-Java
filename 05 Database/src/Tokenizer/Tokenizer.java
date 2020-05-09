@@ -18,11 +18,11 @@ public class Tokenizer {
             this.regex = regex;
             this.type = type;
         }
+
     }
 
     private ArrayList<TokenInfo> tokenSelectors = new ArrayList<>();
 
-    // TODO: could this be defined as a queue?
     // The tokens queue is used to build the list of tokens during tokenization and
     // to return the next token during parsing
     private LinkedList<Token> tokenQueue = new LinkedList<>();
