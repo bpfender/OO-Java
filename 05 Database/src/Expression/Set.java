@@ -13,11 +13,9 @@ public class Set implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        if (context.setNameValuePairs(values)) {
-            return where.interpret(context);
-        }
-        return "ERROR Unknown attribute specified";
+    public String interpret(Context context) throws Exception {
+        context.setNameValuePairs(values);
+        return where.interpret(context);
     }
 
 }

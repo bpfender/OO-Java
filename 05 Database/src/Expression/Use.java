@@ -8,11 +8,9 @@ public class Use implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        if (context.useDatabase(databaseName)) {
-            return "OK";
-        }
-        return "ERROR Unknown database " + databaseName;
+    public String interpret(Context context) throws Exception {
+        context.useDatabase(databaseName);
+        return "OK";
     }
 
 }

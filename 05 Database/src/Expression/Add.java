@@ -8,12 +8,8 @@ public class Add implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        if (context.add(attribute)) {
-            return "OK";
-        }
-
-        return "ERROR Attribute already exists";
+    public String interpret(Context context) throws Exception {
+        context.add(attribute);
+        return "OK";
     }
-
 }

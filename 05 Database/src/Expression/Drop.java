@@ -8,12 +8,9 @@ public class Drop implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        if (context.drop(attribute)) {
-            return "OK";
-        }
-
-        return "ERROR Unknown attribute " + attribute;
+    public String interpret(Context context) throws Exception {
+        context.drop(attribute);
+        return "OK";
     }
 
 }

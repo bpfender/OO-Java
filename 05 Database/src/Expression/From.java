@@ -10,29 +10,17 @@ public class From implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        switch (context.setTable(table)) {
-            case 0:
-                if (context.selectQuery()) {
-                    if (where == null) {
-                        context.setFilter(null);
-                        return context.search();
-                    } else {
-                        return where.interpret(context);
-                    }
-                }
+    public String interpret(Context context) throws Exception {
+        context.setTable(table);
 
-                return "ERRROR Invalid attribute specified";
+        context.validateSelectAttributes();
 
-            case -1:
-                return "ERROR No database set";
-            // QUESTION, repetition from previous
-            case -2:
-                return "ERROR Unknown table";
-            default:
-                return "ERROR Undefined";
+        if (where == null) {
+            context.setFilter(null);
+            return context.execute();
+        } else {
+            return where.interpret(context);
         }
-
     }
 
 }

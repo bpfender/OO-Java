@@ -20,8 +20,11 @@ public class Context {
         USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
     };
 
+    // Active table and database are loaded based on context of query
     private Database activeDatabase;
     private Table activeTable;
+
+    // Active attributes and indicies define which data values to work with
     private ArrayList<String> activeAttributes;
     private ArrayList<Integer> activeIndices = new ArrayList<>();
 
@@ -41,142 +44,132 @@ public class Context {
     // TODO this will need to be moved to a file handler for serialization
     public void createDatabase(String databaseName) throws Exception {
         if (databases.containsKey(databaseName)) {
-            throw new Exception("ERROR: Database with name " + databaseName + " already exists.");
+            throw new Exception("ERROR: Database " + databaseName + " already exists.");
         }
 
         databases.put(databaseName, new Database(databaseName));
     }
 
-    // TODO these returns are ungainly. Try catch block?
-    public int createTable(String tableName, List<String> attributeList) {
-        if (activeDatabase == null) {
-            return -1;
+    public void createTable(String tableName, List<String> attributeList) throws Exception {
+        checkIfActiveDatabaseSet();
+        if (!activeDatabase.createTable(tableName, attributeList)) {
+            throw new Exception("ERROR: Table " + tableName + " already exists.");
         }
-
-        if (activeDatabase.createTable(tableName, attributeList)) {
-            return 0;
-        }
-
-        return -2;
     }
 
-    public boolean useDatabase(String databaseName) {
-        // find database file corresponding to name and load.
-        // return true if successful, false if not
-        if ((activeDatabase = databases.get(databaseName)) != null) {
-            return true;
+    // TODO this will need to be moved to a file handler for serialization
+    public void useDatabase(String databaseName) throws Exception {
+        if ((activeDatabase = databases.get(databaseName)) == null) {
+            throw new Exception("ERROR: Unknown database " + databaseName + ".");
         }
-
-        return false;
     }
 
-    public boolean dropDatabase(String databaseName) {
+    // TODO this will need to be moved to a file handler for serialization
+    public void dropDatabase(String databaseName) throws Exception {
         Database tmp = databases.remove(databaseName);
 
         if (tmp == null) {
-            return false;
+            throw new Exception("ERROR: Unknown database " + databaseName + ".");
         }
 
-        // QUESTION does this remove all references to database
+        // TODO is this the neatest way of doing it?
+        // If the dropped database was in use, make sure that reference to it is
+        // removed.
         if (tmp == activeDatabase) {
             activeDatabase = null;
+            activeTable = null;
         }
-
-        return true;
     }
 
-    public int dropTable(String tableName) {
-        if (activeDatabase == null) {
-            return -1;
+    public void dropTable(String tableName) throws Exception {
+        checkIfActiveDatabaseSet();
+        if (!activeDatabase.dropTable(tableName)) {
+            throw new Exception("ERROR: Unknown table " + tableName + ".");
         }
 
-        if (activeDatabase.dropTable(tableName)) {
-            return 0;
+        // TODO is this the most elegant way of achieving this?
+        // Remove all references to make sure it gets cleared from memory
+        activeTable = null;
+    }
+
+    public void setTable(String tableName) throws Exception {
+        checkIfActiveDatabaseSet();
+
+        activeTable = activeDatabase.getTable(tableName);
+        if (activeTable == null) {
+            throw new Exception("ERROR: Unknown table " + tableName + ".");
         }
-
-        return -2;
     }
 
-    public int setTable(String tableName) {
-        if (activeDatabase == null) {
-            return -1;
+    // TODO would be nice to have diagnostics on reserved or exists keyword
+    public void add(String attribute) throws Exception {
+        if (!activeTable.addAttribute(attribute)) {
+            throw new Exception("ERROR: Cannot add attribute " + attribute + ".");
         }
+    }
 
-        Table tmp = activeDatabase.getTable(tableName);
-
-        if (tmp == null) {
-            return -2;
+    public void drop(String attribute) throws Exception {
+        if (!activeTable.dropAttribute(attribute)) {
+            throw new Exception("ERROR: Cannot drop attribute " + attribute + ".");
         }
-
-        activeTable = tmp;
-        return 0;
-        // QUESTION resetting activeTable after query is over?
     }
 
-    // QUESTION better to have overloaded execute method?
-    public boolean add(String attribute) {
-        return activeTable.addAttribute(attribute);
-    }
-
-    public boolean drop(String attribute) {
-        return activeTable.dropAttribute(attribute);
-    }
-
-    public boolean insert(List<String> data) {
-        return activeTable.insertValues(data);
-    }
-
-    public boolean select(ArrayList<String> attributes) {
-        if (activeDatabase == null) {
-            return false;
+    // TODO would be nice to have better diagnostics on failure
+    public void insert(List<String> data) throws Exception {
+        if (!activeTable.insertValues(data)) {
+            throw new Exception("ERROR: Cannot insert values.");
         }
-        // TODO set active attributes properly here
+    }
+
+    // TODO how to handle wildcard?
+    public void select(ArrayList<String> attributes) throws Exception {
+        checkIfActiveDatabaseSet();
         activeAttributes = attributes;
-        return true;
     }
 
-    public boolean selectQuery() {
+    // TOOD would prefer to use overloading for this stuff i.e. wildcard
+    // specification
+    public void validateSelectAttributes() throws Exception {
         Collection<String> tableAttributes = activeTable.getAttributes();
 
-        if (!(activeAttributes.size() == 1 && activeAttributes.contains("*"))) {
-            for (String attribute : activeAttributes) {
-                if (!tableAttributes.contains(attribute)) {
-                    return false;
-                }
-            }
-        } else {
-            activeAttributes.clear();
+        if (activeAttributes == null) {
+            activeAttributes = new ArrayList<>();
             for (String attribute : tableAttributes) {
                 activeAttributes.add(attribute);
             }
+        } else {
+            for (String attribute : activeAttributes) {
+                if (!tableAttributes.contains(attribute)) {
+                    throw new Exception("ERROR: Invalid attribute " + attribute + " specified.");
+                }
+            }
         }
-
-        return true;
     }
 
-    public boolean setFilter(Node conditionTree) {
-
+    // TODO handling no filter is a bit messy at the moment
+    public void setFilter(Node conditionTree) throws Exception {
         if (conditionTree == null) {
             activeIndices.clear();
             for (int i = 0; i < activeTable.ids.size(); i++) {
                 activeIndices.add(i);
             }
-            return true;
 
+            // TODO invalid attribute handling in condition tree is interesting...
+        } else {
+            activeIndices = conditionTree.returnIndices(activeTable);
+            if (activeIndices == null) {
+                throw new Exception("ERROR: Invalid attribute specified in WHERE clause.");
+            }
         }
-
-        if ((activeIndices = conditionTree.returnIndices(activeTable)) == null) {
-            return false;
-        }
-        // System.out.println(conditionTree.returnIndices(activeTable));
-        return true;
     }
 
     // FIXME this will have to be renamed to execute - possible use of strategy
     // pattern here
-    public String search() {
+    public String execute() {
         System.out.println("CONTEXT MODE:" + mode);
         switch (mode) {
+            case SELECT:
+                return returnResult();
             case UPDATE:
                 return update();
             case DELETE:
@@ -184,28 +177,35 @@ public class Context {
             case JOIN:
                 return join();
             default:
-                break;
+                return "CURRENTLY A RANDOM OK";
         }
+    }
 
-        String searchString = new String();
+    // TODO Streamify?
+    public String returnResult() {
+        String result = new String();
+
+        // Print headers
+        for (String attrib : activeAttributes) {
+            result += attrib + " ";
+        }
+        result += "\n";
+
+        // print data
         for (Integer i : activeIndices) {
-            searchString += activeTable.getId(i) + " ";
+            // result += activeTable.getId(i) + " ";
             for (String attrib : activeAttributes) {
-                System.out.println(attrib);
-                searchString += activeTable.getColumn(attrib).getColumnValues().get(i) + " ";
-
+                result += activeTable.getColumn(attrib).getColumnValues().get(i) + " ";
             }
-            searchString += "\n";
+            result += "\n";
         }
 
-        return searchString;
+        return result;
     }
 
     // FIXME no error handling at the moment
     public String tablesToJoin(String table1, String table2) {
-        System.out.println(setTable(table1));
         joinTables.add(activeTable);
-        System.out.println(setTable(table2));
         joinTables.add(activeTable);
 
         return null;
@@ -277,16 +277,17 @@ public class Context {
 
     }
 
-    public boolean setNameValuePairs(HashMap<String, String> values) {
-        this.updateValues = values;
+    // TODO no handling of wildcards and id
+    public void setNameValuePairs(HashMap<String, String> values) throws Exception {
 
         for (String key : values.keySet()) {
             Collection<String> attributes = activeTable.getAttributes();
             if (!attributes.contains(key)) {
-                return false;
+                throw new Exception("ERROR: Unknown attribute " + key + " specified.");
             }
         }
-        return true;
+
+        this.updateValues = values;
 
     }
 
@@ -322,6 +323,12 @@ public class Context {
             }
         }
         return "OK";
+    }
+
+    private void checkIfActiveDatabaseSet() throws Exception {
+        if (activeDatabase == null) {
+            throw new Exception("ERROR: No database specified.");
+        }
     }
 
 }

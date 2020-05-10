@@ -73,20 +73,20 @@ public class Table {
 
     }
 
+    // TODO prevent adding of reserved keywords id and *
     public boolean addAttribute(String attribute) {
-        if (columns.containsKey(attribute)) {
+        // TODO should be able to remove id condition eventually
+        if (columns.containsKey(attribute) || attribute.equals("*") || attribute.equals("id")) {
             return false;
         }
 
         columns.put(attribute, new Column(ids.size()));
         return true;
-
-        // FIXME prevent adding * and id
     }
 
     public boolean dropAttribute(String attribute) {
         // FIXME prevent dropping id
-        if (columns.remove(attribute) == null) {
+        if (columns.remove(attribute) == null || attribute.equals("id")) {
             return false;
         }
         return true;

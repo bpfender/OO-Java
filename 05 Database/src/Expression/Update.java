@@ -12,20 +12,10 @@ public class Update implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        switch (context.setTable(tableName)) {
-            case 0:
-                context.setMode(Mode.UPDATE);
-                return set.interpret(context);
-            case -1:
-                return "ERROR No database set";
-            // QUESTION, repetition from previous
-            case -2:
-                return "ERROR Unknown table";
-            default:
-                return "ERROR Undefined";
-        }
-
+    public String interpret(Context context) throws Exception {
+        context.setTable(tableName);
+        context.setMode(Mode.UPDATE);
+        return set.interpret(context);
     }
 
 }

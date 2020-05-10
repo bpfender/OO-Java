@@ -15,20 +15,9 @@ public class Alter implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-
-        switch (context.setTable(tableName)) {
-            case 0:
-                // QUESTION successful type passing?
-                return expression.interpret(context);
-            case -1:
-                return "ERROR No database specified";
-            case -2:
-                return "ERROR Unknown table " + tableName;
-            default:
-                return "ERROR Undefined error";
-
-        }
+    public String interpret(Context context) throws Exception {
+        context.setTable(tableName);
+        return expression.interpret(context);
     }
 
 }

@@ -12,12 +12,12 @@ public class Join implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
+    public String interpret(Context context) throws Exception {
         // FIXME no error checking on this at the moment
         context.setMode(Mode.JOIN);
         and.interpret(context);
         on.interpret(context);
-        return context.search();
+        return context.execute();
     }
 
 }

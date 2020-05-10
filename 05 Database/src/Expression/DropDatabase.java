@@ -5,15 +5,12 @@ public class DropDatabase implements Expression {
 
     public DropDatabase(String databaseName) {
         this.databaseName = databaseName;
-        // TODO error checking of expression type passed in?
     }
 
     @Override
-    public String interpret(Context context) {
-        if (context.dropDatabase(databaseName)) {
-            return "OK";
-        }
-        return "ERROR Unknown table " + databaseName;
+    public String interpret(Context context) throws Exception {
+        context.dropDatabase(databaseName);
+        return "OK";
     }
 
 }

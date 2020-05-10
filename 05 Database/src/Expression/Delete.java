@@ -10,7 +10,9 @@ public class Delete implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
+    // TODO no handling for where error with delete? although this should be picked
+    // up in parsing
+    public String interpret(Context context) throws Exception {
         System.out.println("EXPRESSION DELETE");
         context.setMode(Mode.DELETE);
         return from.interpret(context);

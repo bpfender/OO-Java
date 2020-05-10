@@ -8,20 +8,19 @@ public class Select implements Expression {
     private ArrayList<String> attributes;
     private Expression from;
 
+    // TODO overloading to select between * and attributes?
     public Select(ArrayList<String> attributes, Expression from) {
         this.attributes = attributes;
         this.from = from;
     }
 
     @Override
-    public String interpret(Context context) {
+    public String interpret(Context context) throws Exception {
+        // TODO work on how operating modes are set
         context.setMode(Mode.SELECT);
-        // TODO Auto-generated method stub
-        if (context.select(attributes)) {
-            return from.interpret(context);
-        }
 
-        return "ERROR No database set";
+        context.select(attributes);
+        return from.interpret(context);
 
     }
 

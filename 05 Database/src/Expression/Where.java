@@ -10,11 +10,9 @@ public class Where implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        if (context.setFilter(conditions)) {
-            return context.search();
-        }
-        return "ERROR Invalid attribute specified in WHERE clause";
+    public String interpret(Context context) throws Exception {
+        context.setFilter(conditions);
+        return context.execute();
     }
 
 }

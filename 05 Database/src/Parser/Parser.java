@@ -207,16 +207,13 @@ public class Parser {
         switch (tokenQueue.peek().getToken()) {
             case WILD:
                 getNextToken();
-                attributes.add("*");
-                break;
+                return new Select(null, parseFrom());
             case NAME:
                 attributes = parseList(TokenType.NAME);
-                break;
+                return new Select((ArrayList<String>) attributes, parseFrom());
             default:
                 throw new Exception("ERROR Expected * or attributes");
         }
-
-        return new Select((ArrayList<String>) attributes, parseFrom());
 
     }
 
