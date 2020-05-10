@@ -17,7 +17,7 @@ public class Table {
     public Table(String tableName, List<String> attributes) {
         this.tableName = tableName;
 
-        // columns.put("ids", new Column());
+        columns.put("id", new Column());
 
         if (attributes != null) {
             for (String attributeName : attributes) {
@@ -48,7 +48,7 @@ public class Table {
 
     public boolean insertValues(List<String> data) {
 
-        if (data.size() == columns.size()) {
+        if (data.size() + 1 == columns.size()) {
             System.out.println(columns);
             ids.add(++lastId);
 

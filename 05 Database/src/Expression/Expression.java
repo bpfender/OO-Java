@@ -21,6 +21,6 @@ package Expression;
 //https://hpi.de/fileadmin/user_upload/fachgebiete/plattner/teaching/DataStructures/2011/In-Memory_Data_Structures.pdf
 
 public interface Expression {
-    public String interpret(Context context);
+    public String interpret(Context context) throws Exception;
 
 }

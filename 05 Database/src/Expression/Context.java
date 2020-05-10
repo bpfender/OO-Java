@@ -16,7 +16,7 @@ import Database.*;
 // FIXME currently non-persistent
 //FIXME clearing values properly
 public class Context {
-    public enum Mode {
+    protected enum Mode {
         USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
     };
 
@@ -24,7 +24,9 @@ public class Context {
     private Table activeTable;
     private ArrayList<String> activeAttributes;
     private ArrayList<Integer> activeIndices = new ArrayList<>();
+
     private HashMap<String, String> updateValues;
+
     private Mode mode = Mode.SELECT;
 
     private ArrayList<Table> joinTables = new ArrayList<>();
@@ -36,15 +38,13 @@ public class Context {
     public Context() {
     }
 
-    public boolean createDatabase(String databaseName) {
-        // Check that database exists with that name
-        // if not create database file
+    // TODO this will need to be moved to a file handler for serialization
+    public void createDatabase(String databaseName) throws Exception {
         if (databases.containsKey(databaseName)) {
-            return false;
+            throw new Exception("ERROR: Database with name " + databaseName + " already exists.");
         }
 
         databases.put(databaseName, new Database(databaseName));
-        return true;
     }
 
     // TODO these returns are ungainly. Try catch block?

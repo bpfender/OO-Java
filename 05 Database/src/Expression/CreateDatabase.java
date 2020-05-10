@@ -8,11 +8,9 @@ public class CreateDatabase implements Expression {
     }
 
     @Override
-    public String interpret(Context context) {
-        if (context.createDatabase(databaseName)) {
-            return "OK";
-        }
-        return "ERROR " + databaseName + " already exists";
+    public String interpret(Context context) throws Exception {
+        context.createDatabase(databaseName);
+        return "OK";
     }
 
 }
