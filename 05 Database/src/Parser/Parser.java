@@ -193,10 +193,10 @@ public class Parser {
         }
 
         consumeRequiredToken(TokenType.OPENBRACKET);
-        List<String> attributes = parseList(TokenType.LITERAL);
+        List<String> values = parseList(TokenType.LITERAL);
         consumeRequiredToken(TokenType.CLOSEBRACKET);
 
-        return new Insert(name, attributes);
+        return new Insert(name, values);
     }
 
     // TODO

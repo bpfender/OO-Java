@@ -38,6 +38,8 @@ public class Context {
 
     Table temp;
 
+    // TODO proper execute strategy
+
     public Context() {
     }
 
@@ -115,8 +117,8 @@ public class Context {
     }
 
     // TODO would be nice to have better diagnostics on failure
-    public void insert(List<String> data) throws Exception {
-        if (!activeTable.insertValues(data)) {
+    public void insert(List<String> values) throws Exception {
+        if (!activeTable.insertValues(values)) {
             throw new Exception("ERROR: Cannot insert values.");
         }
     }
