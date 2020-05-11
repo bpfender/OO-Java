@@ -1,13 +1,11 @@
 package Expression;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.function.IntBinaryOperator;
 
 import ConditionTree.Node;
 import Database.*;
@@ -16,9 +14,12 @@ import Database.*;
 // FIXME currently non-persistent
 //FIXME clearing values properly
 public class Context {
+    // Mode is used to determine what action the execute command should take
     protected enum Mode {
         USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
     };
+
+    private Mode mode;
 
     // Active table and database are loaded based on context of query
     private Database activeDatabase;
@@ -29,8 +30,6 @@ public class Context {
     private ArrayList<Integer> activeIndices = new ArrayList<>();
 
     private HashMap<String, String> nameValuePairsUpdate;
-
-    private Mode mode = Mode.SELECT;
 
     private ArrayList<Table> joinTables = new ArrayList<>();
 
@@ -54,9 +53,7 @@ public class Context {
 
     public void createTable(String tableName, List<String> attributeList) throws Exception {
         checkIfActiveDatabaseSet();
-        if (!activeDatabase.createTable(tableName, attributeList)) {
-            throw new Exception("ERROR: Table " + tableName + " already exists.");
-        }
+        activeDatabase.createTable(tableName, attributeList);
     }
 
     // TODO this will need to be moved to a file handler for serialization
@@ -85,10 +82,7 @@ public class Context {
 
     public void dropTable(String tableName) throws Exception {
         checkIfActiveDatabaseSet();
-        if (!activeDatabase.dropTable(tableName)) {
-            throw new Exception("ERROR: Unknown table " + tableName + ".");
-        }
-
+        activeDatabase.dropTable(tableName);
         // TODO is this the most elegant way of achieving this?
         // Remove all references to make sure it gets cleared from memory
         activeTable = null;
@@ -96,11 +90,7 @@ public class Context {
 
     public void setTable(String tableName) throws Exception {
         checkIfActiveDatabaseSet();
-
         activeTable = activeDatabase.getTable(tableName);
-        if (activeTable == null) {
-            throw new Exception("ERROR: Unknown table " + tableName + ".");
-        }
     }
 
     // TODO would be nice to have diagnostics on reserved or exists keyword
@@ -201,12 +191,10 @@ public class Context {
         return data;
     }
 
-    // FIXME no error handling at the moment
-    public String tablesToJoin(String table1, String table2) {
-        joinTables.add(activeTable);
-        joinTables.add(activeTable);
-
-        return null;
+    public void setJoinTables(String table1, String table2) throws Exception {
+        joinTables.clear();
+        joinTables.add(activeDatabase.getTable(table1));
+        joinTables.add(activeDatabase.getTable(table2));
     }
 
     public String join() {
@@ -224,8 +212,9 @@ public class Context {
         return searchString;
     }
 
+    // TODO currently no error checknig
     public String setJoinOn(String column1, String column2) {
-        System.out.println(joinTables.get(0).getColumn(column1));
+        System.out.println("setJoinOn()");
 
         ArrayList<String> col1 = joinTables.get(0).getColumn(column1).getColumnValues();
         ArrayList<String> col2 = joinTables.get(1).getColumn(column2).getColumnValues();
@@ -236,8 +225,11 @@ public class Context {
 
         int i = 0, j = 0;
         for (String val1 : col1) {
+            System.out.print("Val1: " + val1);
             for (String val2 : col2) {
+                System.out.println(" Val2: " + val2);
                 if (val1.equals(val2)) {
+                    System.out.println("JOIN MATCH i: " + i + " j: " + j);
                     indices1.add(i);
                     indices2.add(j);
                     indices.add(new SimpleEntry<Integer, Integer>(i, j));
@@ -248,6 +240,8 @@ public class Context {
             i++;
         }
 
+        System.out.println(indices);
+
         List<String> tempAttribs = new ArrayList<>();
 
         for (String attrib : joinTables.get(0).getAttributes()) {
@@ -256,6 +250,8 @@ public class Context {
         for (String attrib : joinTables.get(1).getAttributes()) {
             tempAttribs.add(joinTables.get(1).getTableName() + "." + attrib);
         }
+
+        System.out.println(tempAttribs);
 
         temp = new Table("temp", tempAttribs);
         List<String> valueList = new ArrayList<>();
@@ -308,7 +304,8 @@ public class Context {
 
         // TODO not totally happy with this backwards loop
         for (int i = activeIndices.size() - 1; i >= 0; i--) {
-            activeTable.deleteRow(i);
+            // TODO can this be cleaned up with finding active indices?
+            activeTable.deleteRow(activeIndices.get(i));
 
         }
         return "OK";

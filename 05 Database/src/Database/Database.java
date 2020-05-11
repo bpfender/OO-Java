@@ -16,28 +16,29 @@ public class Database {
     }
 
     // FIXME creating table with no attributes
-    public boolean createTable(String tableName, List<String> attributes) {
+    public void createTable(String tableName, List<String> attributes) throws Exception {
         // Check that table doesn't exist already. If it does, return false.
         if (tables.containsKey(tableName)) {
-            return false;
+            throw new Exception("ERROR: Table " + tableName + " already exists.");
         }
 
         tables.put(tableName, new Table(tableName, attributes));
-        return true;
     }
 
     // Returns table, or null if it doesn't exist
-    public Table getTable(String tableName) {
-        return tables.get(tableName);
+    public Table getTable(String tableName) throws Exception {
+        Table table = tables.get(tableName);
+        if (table == null) {
+            throw new Exception("ERROR: Unknown table " + tableName + ".");
+        }
+        return table;
     }
 
-    public boolean dropTable(String tableName) {
+    public void dropTable(String tableName) throws Exception {
         // remove() returns null if there was no mapping. As such, return false to
         // indicate table does not exist
         if (tables.remove(tableName) == null) {
-            return false;
+            throw new Exception("ERROR: Unknown table " + tableName + ".");
         }
-
-        return true;
     }
 }

@@ -716,7 +716,33 @@ public class Test {
             }
         }
 
+        expression = parser.parseQuery("SELECT * FROM actors;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            try {
+                String result = expression.interpret(context);
+                System.out.println(result);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
         expression = parser.parseQuery("DELETE FROM actors WHERE name == 'Hugh Grant';");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            try {
+                String result = expression.interpret(context);
+                System.out.println(result);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        expression = parser.parseQuery("SELECT * FROM actors;");
         if (expression == null) {
             System.out.println(parser.getError());
         } else {
@@ -742,6 +768,19 @@ public class Test {
             }
         }
 
+        expression = parser.parseQuery("SELECT * FROM actors;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            try {
+                String result = expression.interpret(context);
+                System.out.println(result);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
         expression = parser.parseQuery("DELETE FROM actors WHERE name == 'Emma Thompson';");
         if (expression == null) {
             System.out.println(parser.getError());
@@ -755,7 +794,18 @@ public class Test {
             }
         }
 
-        System.exit(1);
+        expression = parser.parseQuery("SELECT * FROM actors;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            try {
+                String result = expression.interpret(context);
+                System.out.println(result);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
 
         expression = parser.parseQuery("JOIN actors AND roles ON id AND actor_id;");
         if (expression == null) {
@@ -769,6 +819,8 @@ public class Test {
                 System.out.println(e.getMessage());
             }
         }
+
+        System.exit(1);
 
     }
 }
