@@ -23,6 +23,10 @@ abstract class AbstractColumn<T> {
         column.set(index, value);
     }
 
+    public T getValue(int index) {
+        return column.get(index);
+    }
+
     public ArrayList<T> getColumnValues() {
         return column;
     }

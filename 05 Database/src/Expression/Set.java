@@ -9,7 +9,6 @@ public class Set implements Expression {
     public Set(HashMap<String, String> values, Expression where) {
         this.values = values;
         this.where = where;
-
     }
 
     @Override

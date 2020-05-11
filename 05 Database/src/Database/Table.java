@@ -9,11 +9,8 @@ import java.util.Map;
 public class Table {
     private String tableName;
 
+    private int records = 0;
     private int lastInsertId = 0;
-
-    // TODO this should definitely not be public
-    public ArrayList<Integer> ids = new ArrayList<>();
-
     private Map<String, Column> columns = new LinkedHashMap<>();
 
     public Table(String tableName, List<String> attributes) {
@@ -28,16 +25,12 @@ public class Table {
         }
     }
 
+    public int getTableSize() {
+        return records;
+    }
+
     public Column getColumn(String attribute) {
         return columns.get(attribute);
-    }
-
-    public String getId(Integer index) {
-        return String.valueOf(ids.get(index));
-    }
-
-    public void deleteId(Integer index) {
-        ids.remove(index);
     }
 
     public Collection<String> getAttributes() {
@@ -46,6 +39,28 @@ public class Table {
 
     public Collection<Column> getColumns() {
         return columns.values();
+    }
+
+    public boolean checkAttributeExists(String attribute) {
+        return columns.containsKey(attribute);
+    }
+
+    public ArrayList<String> getAttributeList() {
+        ArrayList<String> attributeList = new ArrayList<>();
+        attributeList.addAll(columns.keySet());
+        return attributeList;
+    }
+
+    // TODO throw exception if empty
+    public void deleteRow(int index) throws Exception {
+        if (records == 0) {
+            throw new Exception("ERROR: Table contains no data to delete");
+        }
+
+        for (Column col : columns.values()) {
+            col.deleteValue(index);
+        }
+        records--;
     }
 
     // TODO this is fucking messy at the moment. Please clean up
@@ -58,37 +73,38 @@ public class Table {
             idAndValues.add(String.valueOf(lastInsertId));
             idAndValues.addAll(values);
 
-            ids.add(lastInsertId);
-
             // QUESTION neater way to do this?
             int index = 0;
             for (Column col : columns.values()) {
                 col.addValue(idAndValues.get(index));
                 index++;
             }
+
+            records++;
             return true;
         }
-        // No reusing of indexes;
         return false;
     }
 
-    // TODO prevent adding of reserved keywords id and *
-    public boolean addAttribute(String attribute) {
-        // TODO should be able to remove id condition eventually
-        if (columns.containsKey(attribute) || attribute.equals("*") || attribute.equals("id")) {
-            return false;
+    // TODO prevent adding of reserved keywords id and * - not needed for *, id
+    // automatically excluded
+    public void addAttribute(String attribute) throws Exception {
+        if (columns.containsKey(attribute)) {
+            throw new Exception("ERROR: Cannot add attribute " + attribute + ".");
         }
 
-        columns.put(attribute, new Column(ids.size()));
-        return true;
+        columns.put(attribute, new Column(records));
     }
 
-    public boolean dropAttribute(String attribute) {
-        // FIXME prevent dropping id
-        if (columns.remove(attribute) == null || attribute.equals("id")) {
-            return false;
+    public void dropAttribute(String attribute) throws Exception {
+        if (attribute.equals("id")) {
+            throw new Exception("ERROR: Cannot drop 'id'. Reserved column.");
         }
-        return true;
+
+        if (columns.remove(attribute) == null) {
+            throw new Exception("ERROR: Cannot drop attribute " + attribute + ". Does not exist.");
+
+        }
     }
 
     public String getTableName() {

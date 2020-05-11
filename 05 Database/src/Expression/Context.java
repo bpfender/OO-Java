@@ -28,7 +28,7 @@ public class Context {
     private ArrayList<String> activeAttributes;
     private ArrayList<Integer> activeIndices = new ArrayList<>();
 
-    private HashMap<String, String> updateValues;
+    private HashMap<String, String> nameValuePairsUpdate;
 
     private Mode mode = Mode.SELECT;
 
@@ -105,21 +105,17 @@ public class Context {
 
     // TODO would be nice to have diagnostics on reserved or exists keyword
     public void add(String attribute) throws Exception {
-        if (!activeTable.addAttribute(attribute)) {
-            throw new Exception("ERROR: Cannot add attribute " + attribute + ".");
-        }
+        activeTable.addAttribute(attribute);
     }
 
     public void drop(String attribute) throws Exception {
-        if (!activeTable.dropAttribute(attribute)) {
-            throw new Exception("ERROR: Cannot drop attribute " + attribute + ".");
-        }
+        activeTable.dropAttribute(attribute);
     }
 
     // TODO would be nice to have better diagnostics on failure
     public void insert(List<String> values) throws Exception {
         if (!activeTable.insertValues(values)) {
-            throw new Exception("ERROR: Cannot insert values.");
+            throw new Exception("ERROR: Values do not match table attributes.");
         }
     }
 
@@ -130,29 +126,25 @@ public class Context {
     }
 
     // TOOD would prefer to use overloading for this stuff i.e. wildcard
-    // specification
+    // specification. Not sure passing null around is nice
     public void validateSelectAttributes() throws Exception {
-        Collection<String> tableAttributes = activeTable.getAttributes();
-
         if (activeAttributes == null) {
-            activeAttributes = new ArrayList<>();
-            for (String attribute : tableAttributes) {
-                activeAttributes.add(attribute);
-            }
+            activeAttributes = activeTable.getAttributeList();
         } else {
             for (String attribute : activeAttributes) {
-                if (!tableAttributes.contains(attribute)) {
+                if (!activeTable.checkAttributeExists(attribute)) {
                     throw new Exception("ERROR: Invalid attribute " + attribute + " specified.");
                 }
             }
         }
     }
 
-    // TODO handling no filter is a bit messy at the moment
+    // TODO not a fan of the loop for no condition tree
     public void setFilter(Node conditionTree) throws Exception {
+        activeIndices.clear();
+
         if (conditionTree == null) {
-            activeIndices.clear();
-            for (int i = 0; i < activeTable.ids.size(); i++) {
+            for (int i = 0; i < activeTable.getTableSize(); i++) {
                 activeIndices.add(i);
             }
 
@@ -167,7 +159,7 @@ public class Context {
 
     // FIXME this will have to be renamed to execute - possible use of strategy
     // pattern here
-    public String execute() {
+    public String execute() throws Exception {
         System.out.println("CONTEXT MODE:" + mode);
         switch (mode) {
             case SELECT:
@@ -185,24 +177,28 @@ public class Context {
 
     // TODO Streamify?
     public String returnResult() {
-        String result = new String();
+        return generateResultHeader() + generateDataView();
+    }
 
-        // Print headers
-        for (String attrib : activeAttributes) {
-            result += attrib + " ";
+    private String generateResultHeader() {
+        String header = new String();
+        for (String attribute : activeAttributes) {
+            header += attribute + " ";
         }
-        result += "\n";
+        header += "\n";
 
-        // print data
+        return header;
+    }
+
+    private String generateDataView() {
+        String data = new String();
         for (Integer i : activeIndices) {
-            // result += activeTable.getId(i) + " ";
-            for (String attrib : activeAttributes) {
-                result += activeTable.getColumn(attrib).getColumnValues().get(i) + " ";
+            for (String attribute : activeAttributes) {
+                data += activeTable.getColumn(attribute).getValue(i) + " ";
             }
-            result += "\n";
+            data += "\n";
         }
-
-        return result;
+        return data;
     }
 
     // FIXME no error handling at the moment
@@ -216,7 +212,7 @@ public class Context {
     public String join() {
         String searchString = new String();
         for (Integer i : activeIndices) {
-            searchString += temp.getId(i) + " ";
+            searchString += temp.getColumn("id").getValue(i) + " ";
             for (String attrib : activeAttributes) {
                 System.out.println(attrib);
                 searchString += temp.getColumn(attrib).getColumnValues().get(i) + " ";
@@ -280,17 +276,14 @@ public class Context {
     }
 
     // TODO no handling of wildcards and id
-    public void setNameValuePairs(HashMap<String, String> values) throws Exception {
-
-        for (String key : values.keySet()) {
-            Collection<String> attributes = activeTable.getAttributes();
-            if (!attributes.contains(key)) {
-                throw new Exception("ERROR: Unknown attribute " + key + " specified.");
+    public void setNameValuePairs(HashMap<String, String> nameValuePairs) throws Exception {
+        for (String attribute : nameValuePairs.keySet()) {
+            if (!activeTable.checkAttributeExists(attribute)) {
+                throw new Exception("ERROR: Unknown attribute " + attribute + " specified.");
             }
         }
 
-        this.updateValues = values;
-
+        this.nameValuePairsUpdate = nameValuePairs;
     }
 
     public void setMode(Mode mode) {
@@ -298,8 +291,8 @@ public class Context {
     }
 
     public String update() {
-        for (String key : updateValues.keySet()) {
-            String value = updateValues.get(key);
+        for (String key : nameValuePairsUpdate.keySet()) {
+            String value = nameValuePairsUpdate.get(key);
             Column col = activeTable.getColumn(key);
 
             for (Integer i : activeIndices) {
@@ -310,19 +303,13 @@ public class Context {
         return "OK";
     }
 
-    public String delete() {
+    public String delete() throws Exception {
         System.out.println(activeIndices);
 
+        // TODO not totally happy with this backwards loop
         for (int i = activeIndices.size() - 1; i >= 0; i--) {
-            System.out.println(activeTable.ids);
+            activeTable.deleteRow(i);
 
-            int index = activeIndices.get(i);
-
-            activeTable.ids.remove(index); // something funny going on here... check remove ids function
-
-            for (Column col : activeTable.getColumns()) {
-                col.deleteValue(index);
-            }
         }
         return "OK";
     }

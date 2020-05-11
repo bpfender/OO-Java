@@ -13,6 +13,7 @@ public class From implements Expression {
     public String interpret(Context context) throws Exception {
         context.setTable(table);
 
+        // TODO this should only be checked on SELECT query
         context.validateSelectAttributes();
 
         if (where == null) {
