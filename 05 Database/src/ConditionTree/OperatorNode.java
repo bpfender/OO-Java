@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 
 import Database.*;
 
+//TODO use a column search instead of get column values?
 public class OperatorNode extends Node {
     String attribute;
     String value;

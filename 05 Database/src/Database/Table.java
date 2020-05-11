@@ -9,15 +9,17 @@ import java.util.Map;
 public class Table {
     private String tableName;
 
+    private int lastInsertId = 0;
+
+    // TODO this should definitely not be public
     public ArrayList<Integer> ids = new ArrayList<>();
-    private int lastId = 0;
 
     private Map<String, Column> columns = new LinkedHashMap<>();
 
     public Table(String tableName, List<String> attributes) {
         this.tableName = tableName;
 
-        // columns.put("id", new Column());
+        columns.put("id", new Column());
 
         if (attributes != null) {
             for (String attributeName : attributes) {
@@ -46,31 +48,28 @@ public class Table {
         return columns.values();
     }
 
+    // TODO this is fucking messy at the moment. Please clean up
     public boolean insertValues(List<String> values) {
-
-        if (values.size() == columns.size()) {
+        if (values.size() + 1 == columns.size()) {
             System.out.println(columns);
-            ids.add(++lastId);
+            lastInsertId++;
+
+            List<String> idAndValues = new ArrayList<>();
+            idAndValues.add(String.valueOf(lastInsertId));
+            idAndValues.addAll(values);
+
+            ids.add(lastInsertId);
 
             // QUESTION neater way to do this?
             int index = 0;
             for (Column col : columns.values()) {
-
-                col.addValue(values.get(index));
+                col.addValue(idAndValues.get(index));
                 index++;
             }
             return true;
         }
         // No reusing of indexes;
         return false;
-    }
-
-    public void getRowByIndex(int index) {
-
-    }
-
-    public void deleteRow(int index) {
-
     }
 
     // TODO prevent adding of reserved keywords id and *

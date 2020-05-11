@@ -189,7 +189,7 @@ public class Parser {
 
         getNextToken();
         if (activeToken.getToken() != TokenType.VALUES) {
-            throw new Exception("ERROR Expected VALUES token");
+            throw new Exception("ERROR: Expected VALUES token");
         }
 
         consumeRequiredToken(TokenType.OPENBRACKET);
