@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import Database.DatabaseHandler;
 import Expression.Context;
 import Expression.Expression;
 import Parser.Parser;
@@ -15,7 +16,7 @@ public class DBServer {
     Context context = new Context();
     Expression expression;
 
-    public static void main() {
+    public static void main(String[] args) {
         new DBServer(8888);
     }
 
@@ -23,24 +24,14 @@ public class DBServer {
         try {
             ServerSocket ss = new ServerSocket(portNumber);
             System.out.println("Database server listening.");
-            while (true) {
-                acceptNextConnection(ss);
-            }
 
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-    }
-
-    private void acceptNextConnection(ServerSocket ss) {
-        try {
             Socket socket = ss.accept();
+
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            processNextCommand(in, out);
-            out.close();
-            in.close();
-            socket.close();
+            while (true) {
+                processNextCommand(in, out);
+            }
 
         } catch (IOException e) {
             System.err.println(e);
@@ -49,13 +40,19 @@ public class DBServer {
 
     private void processNextCommand(BufferedReader in, BufferedWriter out) throws IOException {
         String line = in.readLine();
-        expression = parser.parseQuery(line);
-
+        String output;
         try {
-            out.write(expression.interpret(context));
+            expression = parser.parseQuery(line);
+            output = expression.interpret(context);
         } catch (Exception e) {
-            out.write(e.getMessage());
+            output = e.getMessage();
         }
+
+        out.write(output);
+        out.newLine();
+        out.write(DBClient.EOT);
+        out.newLine();
+        out.flush();
 
     }
 

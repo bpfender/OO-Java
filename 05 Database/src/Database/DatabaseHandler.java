@@ -2,7 +2,6 @@ package Database;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,7 +17,7 @@ public class DatabaseHandler {
 
     private SimpleEntry<Database, File> activeDatabase;
 
-    private Map<String, File> databases;
+    static private Map<String, File> databases;
 
     String dbFolderPath = ".." + File.separator + "database" + File.separator;
 
@@ -26,6 +25,7 @@ public class DatabaseHandler {
 
     private DatabaseHandler() {
         if (dbHandlerFile.exists()) {
+            System.out.println("Loading DB file");
             databases = (Map<String, File>) readSerializedObject(dbHandlerFile);
         } else {
             try {
@@ -49,6 +49,7 @@ public class DatabaseHandler {
         if (dbHandler == null) {
             dbHandler = new DatabaseHandler();
         }
+        System.out.println("DATABASES: " + databases);
         return dbHandler;
     }
 
@@ -130,7 +131,7 @@ public class DatabaseHandler {
         return null;
     }
 
-    public void writeChanges() {
+    public void writeChangesToFile() {
         writeSerializedObject(activeDatabase.getValue(), activeDatabase.getKey());
     }
 

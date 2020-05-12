@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
 
 import ConditionTree.Node;
@@ -32,8 +31,6 @@ public class Context {
     private HashMap<String, String> nameValuePairsUpdate;
 
     private ArrayList<Table> joinTables = new ArrayList<>();
-
-    private Map<String, Database> databases = new HashMap<>();
 
     // TODO proper execute strategy
 

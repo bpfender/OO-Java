@@ -27,39 +27,25 @@ public class Parser {
     Token activeToken;
     LinkedList<Token> tokenQueue;
 
-    String error;
-
     // TODO this should probably just throw an error
     // TODO this functionality can probably be modified. One try catch block,
     // handling multi-line queries etc.
     // TODO still need to deal with too long queries
     // TODO error can be concatenated ERROR: +?
-    public Expression parseQuery(String query) {
+
+    public Expression parseQuery(String query) throws Exception {
         String input = query.trim();
         System.out.println("QUERY: " + query);
 
         if (!input.endsWith(";")) {
-            error = "ERROR: Semicolon missing from end of query";
-            return null;
+            throw new Exception("ERROR: Semicolon missing from end of query");
         }
         input = input.substring(0, input.length() - 1);
 
-        try {
-            tokenQueue = tokenizer.tokenize(input);
-        } catch (Exception e) {
-            error = e.getMessage();
-        }
+        tokenQueue = tokenizer.tokenize(input);
 
-        try {
-            return parseCommand();
-        } catch (Exception e) {
-            System.out.println(e);
-            return null;
-        }
-    }
+        return parseCommand();
 
-    public String getError() {
-        return error;
     }
 
     // Updates the activeToken with the next token in the queue. If the end of the
