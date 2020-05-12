@@ -33,12 +33,12 @@ public class Parser {
     // TODO still need to deal with too long queries
     // TODO error can be concatenated ERROR: +?
 
-    public Expression parseQuery(String query) throws Exception {
+    public Expression parseQuery(String query) throws RuntimeException {
         String input = query.trim();
         System.out.println("QUERY: " + query);
 
         if (!input.endsWith(";")) {
-            throw new Exception("ERROR: Semicolon missing from end of query");
+            throw new RuntimeException("ERROR: Semicolon missing from end of query");
         }
         input = input.substring(0, input.length() - 1);
 
@@ -65,7 +65,7 @@ public class Parser {
     // The main switch statement that determines which command is being parsed. All
     // parsing methods throw an exception on unexpected input, which will get passed
     // back all the way to here, allowing errors to be handled centrally
-    private Expression parseCommand() throws Exception {
+    private Expression parseCommand() throws RuntimeException {
         getNextToken();
 
         switch (activeToken.getToken()) {
@@ -88,15 +88,15 @@ public class Parser {
             case JOIN:
                 return parseJoin();
             default:
-                throw new Exception("ERROR: Unexpected input. Invalid command '" + activeToken.getValue() + "'");
+                throw new RuntimeException("ERROR: Unexpected input. Invalid command '" + activeToken.getValue() + "'");
         }
     }
 
-    private Use parseUse() throws Exception {
+    private Use parseUse() throws RuntimeException {
         return new Use(parseName());
     }
 
-    private Expression parseCreate() throws Exception {
+    private Expression parseCreate() throws RuntimeException {
         getNextToken();
 
         switch (activeToken.getToken()) {
@@ -105,11 +105,11 @@ public class Parser {
             case DATABASE:
                 return parseCreateDatabase();
             default:
-                throw new Exception("ERROR: Must specify whether to CREATE database or table");
+                throw new RuntimeException("ERROR: Must specify whether to CREATE database or table");
         }
     }
 
-    private CreateTable parseCreateTable() throws Exception {
+    private CreateTable parseCreateTable() throws RuntimeException {
         String name = parseName();
         List<String> attributes = null;
 
@@ -123,11 +123,11 @@ public class Parser {
 
     }
 
-    private CreateDatabase parseCreateDatabase() throws Exception {
+    private CreateDatabase parseCreateDatabase() throws RuntimeException {
         return new CreateDatabase(parseName());
     }
 
-    private Expression parseDrop() throws Exception {
+    private Expression parseDrop() throws RuntimeException {
         getNextToken();
 
         switch (activeToken.getToken()) {
@@ -136,18 +136,18 @@ public class Parser {
             case DATABASE:
                 return new DropDatabase(parseName());
             default:
-                throw new Exception("ERROR: Must specify what to DROP");
+                throw new RuntimeException("ERROR: Must specify what to DROP");
         }
     }
 
-    private Alter parseAlter() throws Exception {
+    private Alter parseAlter() throws RuntimeException {
         consumeRequiredToken(TokenType.TABLE);
 
         // FIXME this relies on order of evaluation, may be brittle
         return new Alter(parseName(), parseAlterationType());
     }
 
-    private Expression parseAlterationType() throws Exception {
+    private Expression parseAlterationType() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case ADD:
@@ -155,27 +155,27 @@ public class Parser {
             case DROP:
                 return new Drop(parseName());
             default:
-                throw new Exception("ERROR: Expected ADD or DROP");
+                throw new RuntimeException("ERROR: Expected ADD or DROP");
         }
     }
 
     // Helper function to consume required tokens that are expected but don't
     // actually do anything
-    private void consumeRequiredToken(TokenType type) throws Exception {
+    private void consumeRequiredToken(TokenType type) throws RuntimeException {
         getNextToken();
         if (activeToken.getToken() != type) {
-            throw new Exception("ERROR: Expected " + type);
+            throw new RuntimeException("ERROR: Expected " + type);
         }
     }
 
-    private Insert parseInsert() throws Exception {
+    private Insert parseInsert() throws RuntimeException {
         consumeRequiredToken(TokenType.INTO);
 
         String name = parseName();
 
         getNextToken();
         if (activeToken.getToken() != TokenType.VALUES) {
-            throw new Exception("ERROR: Expected VALUES token");
+            throw new RuntimeException("ERROR: Expected VALUES token");
         }
 
         consumeRequiredToken(TokenType.OPENBRACKET);
@@ -186,7 +186,7 @@ public class Parser {
     }
 
     // TODO
-    private Select parseSelect() throws Exception {
+    private Select parseSelect() throws RuntimeException {
 
         List<String> attributes = new ArrayList<>();
 
@@ -198,23 +198,23 @@ public class Parser {
                 attributes = parseList(TokenType.NAME);
                 return new Select((ArrayList<String>) attributes, parseFrom());
             default:
-                throw new Exception("ERROR Expected * or attributes");
+                throw new RuntimeException("ERROR Expected * or attributes");
         }
 
     }
 
-    private Update parseUpdate() throws Exception {
+    private Update parseUpdate() throws RuntimeException {
         String name = parseName();
         return new Update(name, parseSet());
     }
 
-    private Delete parseDelete() throws Exception {
+    private Delete parseDelete() throws RuntimeException {
         return new Delete(parseFrom());
         // TODO this doesn't handle variable where at the moment i.e. must have where-
         // ensure!
     }
 
-    private Join parseJoin() throws Exception {
+    private Join parseJoin() throws RuntimeException {
         String name1 = parseName();
         parseAnd();
         String name2 = parseName();
@@ -229,28 +229,28 @@ public class Parser {
 
     }
 
-    private void parseAnd() throws Exception {
+    private void parseAnd() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case AND:
                 break;
             default:
-                throw new Exception("ERROR Expected AND");
+                throw new RuntimeException("ERROR Expected AND");
         }
     }
 
-    private void parseOn() throws Exception {
+    private void parseOn() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case ON:
                 break;
             default:
-                throw new Exception("ERROR Expected ON");
+                throw new RuntimeException("ERROR Expected ON");
         }
 
     }
 
-    private Expression parseSet() throws Exception {
+    private Expression parseSet() throws RuntimeException {
         getNextToken();
 
         switch (activeToken.getToken()) {
@@ -258,11 +258,11 @@ public class Parser {
                 HashMap<String, String> nameValuePairs = parseNameValueList();
                 return new Set(nameValuePairs, parseWhere());
             default:
-                throw new Exception("ERROR Expected SET token");
+                throw new RuntimeException("ERROR Expected SET token");
         }
     }
 
-    private HashMap<String, String> parseNameValueList() throws Exception {
+    private HashMap<String, String> parseNameValueList() throws RuntimeException {
         HashMap<String, String> nameValuePairs = new HashMap<>();
         parseNameValuePair(nameValuePairs);
 
@@ -274,7 +274,7 @@ public class Parser {
         return nameValuePairs;
     }
 
-    private void parseNameValuePair(HashMap<String, String> nameValuePairs) throws Exception {
+    private void parseNameValuePair(HashMap<String, String> nameValuePairs) throws RuntimeException {
         String name = parseName();
 
         getNextToken();
@@ -282,7 +282,7 @@ public class Parser {
             case PAIR:
                 break;
             default:
-                throw new Exception("ERROR Expect = operator");
+                throw new RuntimeException("ERROR Expect = operator");
         }
 
         String value = parseValue();
@@ -290,7 +290,7 @@ public class Parser {
         nameValuePairs.put(name, value);
     }
 
-    private Expression parseFrom() throws Exception {
+    private Expression parseFrom() throws RuntimeException {
         getNextToken();
 
         String name;
@@ -299,13 +299,13 @@ public class Parser {
                 name = parseName();
                 break;
             default:
-                throw new Exception("ERROR Expected FROM");
+                throw new RuntimeException("ERROR Expected FROM");
 
         }
         return new From(name, parseWhere());
     }
 
-    private Expression parseWhere() throws Exception {
+    private Expression parseWhere() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case WHERE:
@@ -315,7 +315,7 @@ public class Parser {
         }
     }
 
-    private Node parseCondition() throws Exception {
+    private Node parseCondition() throws RuntimeException {
         getNextToken();
 
         switch (activeToken.getToken()) {
@@ -335,7 +335,7 @@ public class Parser {
                         condition = new OrNode(leftNode, parseCondition());
                         break;
                     default:
-                        throw new Exception("ERROR Expected AND or OR");
+                        throw new RuntimeException("ERROR Expected AND or OR");
 
                 }
                 parseCloseBracket();
@@ -345,12 +345,12 @@ public class Parser {
                 Predicate<String> operator = parseOperator();
                 return new OperatorNode(name, operator);
             default:
-                throw new Exception("ERROR In condition 1");
+                throw new RuntimeException("ERROR In condition 1");
         }
 
     }
 
-    private Predicate<String> parseOperator() throws Exception {
+    private Predicate<String> parseOperator() throws RuntimeException {
         getNextToken();
         Predicate<String> operator;
         String value;
@@ -385,23 +385,23 @@ public class Parser {
                 operator = i -> (i.contains(value));
                 break;
             default:
-                throw new Exception("ERROR Invalid comparison operator");
+                throw new RuntimeException("ERROR Invalid comparison operator");
         }
 
         return operator;
     }
 
-    private String parseValue() throws Exception {
+    private String parseValue() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case LITERAL:
                 return activeToken.getValue();
             default:
-                throw new Exception("ERROR Expected literal value");
+                throw new RuntimeException("ERROR Expected literal value");
         }
     }
 
-    private List<String> parseList(TokenType type) throws Exception {
+    private List<String> parseList(TokenType type) throws RuntimeException {
         List<String> attributes = new ArrayList<>();
 
         getNextToken();
@@ -416,39 +416,39 @@ public class Parser {
             getNextToken(); // consume attirbute
         }
 
-        throw new Exception("ERROR Unexprected value in list");
+        throw new RuntimeException("ERROR Unexprected value in list");
 
     }
 
-    private String parseName() throws Exception {
+    private String parseName() throws RuntimeException {
         getNextToken();
 
         switch (activeToken.getToken()) {
             case NAME:
                 return activeToken.getValue();
             default:
-                throw new Exception("ERROR Must specify name");
+                throw new RuntimeException("ERROR Must specify name");
 
         }
     }
 
-    private void parseOpenBracket() throws Exception {
+    private void parseOpenBracket() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case OPENBRACKET:
                 return;
             default:
-                throw new Exception("ERROR Expected opening bracket");
+                throw new RuntimeException("ERROR Expected opening bracket");
         }
     }
 
-    private void parseCloseBracket() throws Exception {
+    private void parseCloseBracket() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case CLOSEBRACKET:
                 return;
             default:
-                throw new Exception("ERROR Expected closing bracket");
+                throw new RuntimeException("ERROR Expected closing bracket");
         }
     }
 

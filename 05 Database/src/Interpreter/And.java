@@ -10,7 +10,7 @@ public class And implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         System.out.println("JOIN TABLES: " + arg1 + " " + arg2);
         context.setJoinTables(arg1, arg2);
         return null;

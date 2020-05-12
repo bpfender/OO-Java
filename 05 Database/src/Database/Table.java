@@ -53,9 +53,9 @@ public class Table implements Serializable {
     }
 
     // TODO throw exception if empty
-    public void deleteRow(int index) throws Exception {
+    public void deleteRow(int index) throws RuntimeException {
         if (records == 0) {
-            throw new Exception("ERROR: Table contains no data to delete");
+            throw new RuntimeException("ERROR: Table contains no data to delete");
         }
 
         for (Column col : columns.values()) {
@@ -89,21 +89,21 @@ public class Table implements Serializable {
 
     // TODO prevent adding of reserved keywords id and * - not needed for *, id
     // automatically excluded
-    public void addAttribute(String attribute) throws Exception {
+    public void addAttribute(String attribute) throws RuntimeException {
         if (columns.containsKey(attribute)) {
-            throw new Exception("ERROR: Cannot add attribute " + attribute + ".");
+            throw new RuntimeException("ERROR: Cannot add attribute " + attribute + ".");
         }
 
         columns.put(attribute, new Column(records));
     }
 
-    public void dropAttribute(String attribute) throws Exception {
+    public void dropAttribute(String attribute) throws RuntimeException {
         if (attribute.equals("id")) {
-            throw new Exception("ERROR: Cannot drop 'id'. Reserved column.");
+            throw new RuntimeException("ERROR: Cannot drop 'id'. Reserved column.");
         }
 
         if (columns.remove(attribute) == null) {
-            throw new Exception("ERROR: Cannot drop attribute " + attribute + ". Does not exist.");
+            throw new RuntimeException("ERROR: Cannot drop attribute " + attribute + ". Does not exist.");
 
         }
     }

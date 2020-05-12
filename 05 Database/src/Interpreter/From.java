@@ -10,7 +10,7 @@ public class From implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.setTable(table);
 
         // TODO this should only be checked on SELECT query

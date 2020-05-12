@@ -8,7 +8,7 @@ public class DropDatabase implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.dropDatabase(databaseName);
         return "OK";
     }

@@ -8,7 +8,7 @@ public class CreateDatabase implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.createDatabase(databaseName);
         return "OK";
     }

@@ -15,7 +15,7 @@ public class Select implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         // TODO work on how operating modes are set
         context.setMode(Mode.SELECT);
 

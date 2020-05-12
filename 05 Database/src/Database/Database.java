@@ -17,29 +17,29 @@ public class Database implements Serializable {
     }
 
     // FIXME creating table with no attributes
-    public void createTable(String tableName, List<String> attributes) throws Exception {
+    public void createTable(String tableName, List<String> attributes) throws RuntimeException {
         // Check that table doesn't exist already. If it does, return false.
         if (tables.containsKey(tableName)) {
-            throw new Exception("ERROR: Table " + tableName + " already exists.");
+            throw new RuntimeException("ERROR: Table " + tableName + " already exists.");
         }
 
         tables.put(tableName, new Table(tableName, attributes));
     }
 
     // Returns table, or null if it doesn't exist
-    public Table getTable(String tableName) throws Exception {
+    public Table getTable(String tableName) throws RuntimeException {
         Table table = tables.get(tableName);
         if (table == null) {
-            throw new Exception("ERROR: Unknown table " + tableName + ".");
+            throw new RuntimeException("ERROR: Unknown table " + tableName + ".");
         }
         return table;
     }
 
-    public void dropTable(String tableName) throws Exception {
+    public void dropTable(String tableName) throws RuntimeException {
         // remove() returns null if there was no mapping. As such, return false to
         // indicate table does not exist
         if (tables.remove(tableName) == null) {
-            throw new Exception("ERROR: Unknown table " + tableName + ".");
+            throw new RuntimeException("ERROR: Unknown table " + tableName + ".");
         }
     }
 }

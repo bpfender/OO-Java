@@ -12,7 +12,7 @@ public class Set implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.setNameValuePairs(values);
         return where.interpret(context);
     }

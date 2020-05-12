@@ -12,7 +12,7 @@ public class Update implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.setTable(tableName);
         context.setMode(Mode.UPDATE);
         return set.interpret(context);

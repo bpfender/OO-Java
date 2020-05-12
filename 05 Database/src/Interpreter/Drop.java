@@ -8,7 +8,7 @@ public class Drop implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.drop(attribute);
         return "OK";
     }

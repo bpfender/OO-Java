@@ -8,7 +8,7 @@ public class Add implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.add(attribute);
         return "OK";
     }

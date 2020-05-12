@@ -11,6 +11,10 @@ import java.util.AbstractMap.SimpleEntry;
 
 // SINGLETON pattern
 
+//https://dzone.com/articles/how-three-fundamental-data-structures-impact-stora
+//https://www.tutorialcup.com/dbms/selection-algorithm.htm
+//https://hpi.de/fileadmin/user_upload/fachgebiete/plattner/teaching/DataStructures/2011/In-Memory_Data_Structures.pdf
+
 public class DatabaseHandler {
     private static DatabaseHandler dbHandler;
 
@@ -52,9 +56,9 @@ public class DatabaseHandler {
         return dbHandler;
     }
 
-    public void createDatabase(String databaseName) throws Exception {
+    public void createDatabase(String databaseName) throws RuntimeException {
         if (checkDatabaseExists(databaseName)) {
-            throw new Exception("ERROR: Database " + databaseName + " already exists.");
+            throw new RuntimeException("ERROR: Database " + databaseName + " already exists.");
         }
 
         Database database = new Database(databaseName);
@@ -66,9 +70,9 @@ public class DatabaseHandler {
         writeSerializedObject(databaseFile, database);
     }
 
-    public Database useDatabase(String databaseName) throws Exception {
+    public Database useDatabase(String databaseName) throws RuntimeException {
         if (!checkDatabaseExists(databaseName)) {
-            throw new Exception("ERROR: Unknown database " + databaseName + ".");
+            throw new RuntimeException("ERROR: Unknown database " + databaseName + ".");
         }
 
         File databaseFile = databases.get(databaseName);
@@ -78,9 +82,9 @@ public class DatabaseHandler {
         return database;
     }
 
-    public Database dropDatabase(String databaseName) throws Exception {
+    public Database dropDatabase(String databaseName) throws RuntimeException {
         if (!checkDatabaseExists(databaseName)) {
-            throw new Exception("ERROR: Unknown database " + databaseName + ".");
+            throw new RuntimeException("ERROR: Unknown database " + databaseName + ".");
         }
 
         File databaseFile = databases.remove(databaseName);

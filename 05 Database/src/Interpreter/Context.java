@@ -1,59 +1,53 @@
 package Interpreter;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.List;
-import java.util.AbstractMap.SimpleEntry;
 
 import ConditionTree.Node;
-import Database.*;
+import Database.Column;
+import Database.Database;
+import Database.DatabaseHandler;
+import Database.Table;
 
-// Could potentially have hashmap associating name with file path?
-// FIXME currently non-persistent
 //FIXME clearing values properly
 public class Context {
-    // Mode is used to determine what action the execute command should take
-    protected enum Mode {
-        USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
-    };
-
-    private Mode mode;
-
     // Active table and database are loaded based on context of query
     private Database activeDatabase;
     private Table activeTable;
 
     // Active attributes and indicies define which data values to work with
     private ArrayList<String> activeAttributes;
-    private ArrayList<Integer> activeIndices = new ArrayList<>();
+    private ArrayList<Integer> activeIndices;
 
     private HashMap<String, String> nameValuePairsUpdate;
 
     private ArrayList<Table> joinTables = new ArrayList<>();
 
     // TODO proper execute strategy
+    // Mode is used to determine what action the execute command should take
+    protected enum Mode {
+        USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
+    };
 
-    public Context() {
+    private Mode commandMode;
+
+    // Calls the database handler to retrieve database if it exists
+    public void setActiveDatabase(String databaseName) throws RuntimeException {
+        activeDatabase = DatabaseHandler.getInstance().useDatabase(databaseName);
     }
 
-    // TODO this will need to be moved to a file handler for serialization
-    public void createDatabase(String databaseName) throws Exception {
+    public void createDatabase(String databaseName) throws RuntimeException {
         DatabaseHandler.getInstance().createDatabase(databaseName);
     }
 
-    public void createTable(String tableName, List<String> attributeList) throws Exception {
+    public void createTable(String tableName, List<String> attributeList) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeDatabase.createTable(tableName, attributeList);
     }
 
-    // TODO this will need to be moved to a file handler for serialization
-    public void useDatabase(String databaseName) throws Exception {
-        activeDatabase = DatabaseHandler.getInstance().useDatabase(databaseName);
-    }
-
-    // TODO this will need to be moved to a file handler for serialization
-    public void dropDatabase(String databaseName) throws Exception {
+    public void dropDatabase(String databaseName) throws RuntimeException {
         Database tmp = DatabaseHandler.getInstance().dropDatabase(databaseName);
 
         // TODO is this the neatest way of doing it?
@@ -65,7 +59,7 @@ public class Context {
         }
     }
 
-    public void dropTable(String tableName) throws Exception {
+    public void dropTable(String tableName) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeDatabase.dropTable(tableName);
         // TODO is this the most elegant way of achieving this?
@@ -73,49 +67,49 @@ public class Context {
         activeTable = null;
     }
 
-    public void setTable(String tableName) throws Exception {
+    public void setTable(String tableName) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeTable = activeDatabase.getTable(tableName);
     }
 
     // TODO would be nice to have diagnostics on reserved or exists keyword
-    public void add(String attribute) throws Exception {
+    public void add(String attribute) throws RuntimeException {
         activeTable.addAttribute(attribute);
     }
 
-    public void drop(String attribute) throws Exception {
+    public void drop(String attribute) throws RuntimeException {
         activeTable.dropAttribute(attribute);
     }
 
     // TODO would be nice to have better diagnostics on failure
-    public void insert(List<String> values) throws Exception {
+    public void insert(List<String> values) throws RuntimeException {
         if (!activeTable.insertValues(values)) {
-            throw new Exception("ERROR: Values do not match table attributes.");
+            throw new RuntimeException("ERROR: Values do not match table attributes.");
         }
     }
 
     // TODO how to handle wildcard?
-    public void select(ArrayList<String> attributes) throws Exception {
+    public void select(ArrayList<String> attributes) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeAttributes = attributes;
     }
 
     // TOOD would prefer to use overloading for this stuff i.e. wildcard
     // specification. Not sure passing null around is nice
-    public void validateSelectAttributes() throws Exception {
+    public void validateSelectAttributes() throws RuntimeException {
         if (activeAttributes == null) {
             activeAttributes = activeTable.getAttributeList();
         } else {
             for (String attribute : activeAttributes) {
                 if (!activeTable.checkAttributeExists(attribute)) {
-                    throw new Exception("ERROR: Invalid attribute " + attribute + " specified.");
+                    throw new RuntimeException("ERROR: Invalid attribute " + attribute + " specified.");
                 }
             }
         }
     }
 
     // TODO not a fan of the loop for no condition tree
-    public void setFilter(Node conditionTree) throws Exception {
+    public void setFilter(Node conditionTree) throws RuntimeException {
         activeIndices.clear();
 
         if (conditionTree == null) {
@@ -127,16 +121,16 @@ public class Context {
         } else {
             activeIndices = conditionTree.returnIndices(activeTable);
             if (activeIndices == null) {
-                throw new Exception("ERROR: Invalid attribute specified in WHERE clause.");
+                throw new RuntimeException("ERROR: Invalid attribute specified in WHERE clause.");
             }
         }
     }
 
     // FIXME this will have to be renamed to execute - possible use of strategy
     // pattern here
-    public String execute() throws Exception {
-        System.out.println("CONTEXT MODE:" + mode);
-        switch (mode) {
+    public String execute() throws RuntimeException {
+        System.out.println("CONTEXT MODE:" + commandMode);
+        switch (commandMode) {
             case SELECT:
                 return returnResult();
             case UPDATE:
@@ -176,7 +170,7 @@ public class Context {
         return data;
     }
 
-    public void setJoinTables(String table1, String table2) throws Exception {
+    public void setJoinTables(String table1, String table2) throws RuntimeException {
         joinTables.clear();
         joinTables.add(activeDatabase.getTable(table1));
         joinTables.add(activeDatabase.getTable(table2));
@@ -188,7 +182,7 @@ public class Context {
     }
 
     // TODO currently no error checknig
-    public String setJoinOn(String column1, String column2) throws Exception {
+    public String setJoinOn(String column1, String column2) throws RuntimeException {
         System.out.println("setJoinOn()");
 
         ArrayList<String> col1 = joinTables.get(0).getColumn(column1).getColumnValues();
@@ -259,18 +253,18 @@ public class Context {
     }
 
     // TODO no handling of wildcards and id
-    public void setNameValuePairs(HashMap<String, String> nameValuePairs) throws Exception {
+    public void setNameValuePairs(HashMap<String, String> nameValuePairs) throws RuntimeException {
         for (String attribute : nameValuePairs.keySet()) {
             if (!activeTable.checkAttributeExists(attribute)) {
-                throw new Exception("ERROR: Unknown attribute " + attribute + " specified.");
+                throw new RuntimeException("ERROR: Unknown attribute " + attribute + " specified.");
             }
         }
 
         this.nameValuePairsUpdate = nameValuePairs;
     }
 
-    public void setMode(Mode mode) {
-        this.mode = mode;
+    public void setMode(Mode commandMode) {
+        this.commandMode = commandMode;
     }
 
     public String update() {
@@ -286,7 +280,7 @@ public class Context {
         return "OK";
     }
 
-    public String delete() throws Exception {
+    public String delete() throws RuntimeException {
         System.out.println(activeIndices);
 
         // TODO not totally happy with this backwards loop
@@ -298,9 +292,9 @@ public class Context {
         return "OK";
     }
 
-    private void checkIfActiveDatabaseSet() throws Exception {
+    private void checkIfActiveDatabaseSet() throws RuntimeException {
         if (activeDatabase == null) {
-            throw new Exception("ERROR: No database specified.");
+            throw new RuntimeException("ERROR: No database specified.");
         }
     }
 

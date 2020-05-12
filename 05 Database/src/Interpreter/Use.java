@@ -1,5 +1,7 @@
 package Interpreter;
 
+// Use implements USE <database> functionality to select the active database through the
+// DatabaseHandler
 public class Use implements Expression {
     private String databaseName;
 
@@ -8,8 +10,8 @@ public class Use implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
-        context.useDatabase(databaseName);
+    public String interpret(Context context) throws RuntimeException {
+        context.setActiveDatabase(databaseName);
         return "OK";
     }
 

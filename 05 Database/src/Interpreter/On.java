@@ -10,7 +10,7 @@ public class On implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         System.out.println("JOINS: " + attribute1 + " " + attribute2);
         context.setJoinOn(attribute1, attribute2);
         return null;

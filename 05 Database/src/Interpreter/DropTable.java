@@ -9,7 +9,7 @@ public class DropTable implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.dropTable(tableName);
         return "OK";
     }

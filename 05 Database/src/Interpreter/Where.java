@@ -10,7 +10,7 @@ public class Where implements Expression {
     }
 
     @Override
-    public String interpret(Context context) throws Exception {
+    public String interpret(Context context) throws RuntimeException {
         context.setFilter(conditions);
         return context.execute();
     }
