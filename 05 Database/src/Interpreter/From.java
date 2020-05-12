@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class From implements Expression {
     private String table;

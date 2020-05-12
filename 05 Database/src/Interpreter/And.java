@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class And implements Expression {
     private String arg1;

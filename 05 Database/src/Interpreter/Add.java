@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class Add implements Expression {
     private String attribute;

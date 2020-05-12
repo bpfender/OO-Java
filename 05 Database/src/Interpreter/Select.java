@@ -1,8 +1,8 @@
-package Expression;
+package Interpreter;
 
 import java.util.ArrayList;
 
-import Expression.Context.Mode;
+import Interpreter.Context.Mode;
 
 public class Select implements Expression {
     private ArrayList<String> attributes;

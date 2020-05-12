@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class DropDatabase implements Expression {
     String databaseName;

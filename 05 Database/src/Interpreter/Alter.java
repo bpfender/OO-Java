@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class Alter implements Expression {
     private String tableName;

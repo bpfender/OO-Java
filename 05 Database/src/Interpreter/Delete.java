@@ -1,6 +1,6 @@
-package Expression;
+package Interpreter;
 
-import Expression.Context.Mode;
+import Interpreter.Context.Mode;
 
 public class Delete implements Expression {
     Expression from;

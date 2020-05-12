@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class CreateDatabase implements Expression {
     private String databaseName;

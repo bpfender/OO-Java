@@ -1,7 +1,7 @@
-package Expression;
+package Interpreter;
 
+// Various references used for the design of this system
 //https://lukaszwrobel.pl/blog/interpreter-design-pattern/
-
 //https://www.baeldung.com/java-interpreter-pattern
 //https://www.oodesign.com/interpreter-pattern.html
 //http://ns.inria.fr/ast/sql/index.html

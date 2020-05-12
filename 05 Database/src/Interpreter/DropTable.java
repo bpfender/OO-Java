@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class DropTable implements Expression {
     String tableName;

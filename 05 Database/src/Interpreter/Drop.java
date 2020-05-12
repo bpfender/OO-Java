@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class Drop implements Expression {
     String attribute;

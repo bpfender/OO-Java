@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class On implements Expression {
     private String attribute1;

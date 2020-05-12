@@ -13,4 +13,4 @@ run: clean build
 	java -classpath :. DBServer
 
 clean:
-	rm *.class ConditionTree/*.class Database/*.class Expression/*.class Parser/*.class
+	rm *.class ConditionTree/*.class Database/*.class Interpreter/*.class Parser/*.class

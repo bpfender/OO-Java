@@ -1,6 +1,6 @@
 import Database.DatabaseHandler;
-import Expression.Context;
-import Expression.Expression;
+import Interpreter.Context;
+import Interpreter.Expression;
 import Parser.Parser;
 
 public class Test {

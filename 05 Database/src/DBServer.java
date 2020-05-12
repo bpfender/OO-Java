@@ -7,8 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import Database.DatabaseHandler;
-import Expression.Context;
-import Expression.Expression;
+import Interpreter.Context;
+import Interpreter.Expression;
 import Parser.Parser;
 
 public class DBServer {

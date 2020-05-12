@@ -1,4 +1,4 @@
-package Expression;
+package Interpreter;
 
 public class Use implements Expression {
     private String databaseName;
