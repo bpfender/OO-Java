@@ -182,6 +182,7 @@ public class Context {
         joinTables.add(activeDatabase.getTable(table2));
     }
 
+    // TODO join doesn't currently remove ids
     public String join() {
         return generateResultHeader() + generateDataView();
     }

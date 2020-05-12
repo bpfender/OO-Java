@@ -48,12 +48,12 @@ public class DBServer {
             output = e.getMessage();
         }
 
-        out.write(output);
-        out.newLine();
-        out.write(DBClient.EOT);
-        out.newLine();
+        out.write(output + "\n" + DBClient.EOT + "\n");
         out.flush();
 
+        // TODO would like some more intelligence with this.
+
+        DatabaseHandler.getInstance().writeChangesToFile();
     }
 
 }

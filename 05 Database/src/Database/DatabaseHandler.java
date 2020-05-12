@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
 
 // SINGLETON pattern
@@ -17,7 +16,7 @@ public class DatabaseHandler {
 
     private SimpleEntry<Database, File> activeDatabase;
 
-    static private Map<String, File> databases;
+    static private HashMap<String, File> databases;
 
     String dbFolderPath = ".." + File.separator + "database" + File.separator;
 
@@ -26,7 +25,7 @@ public class DatabaseHandler {
     private DatabaseHandler() {
         if (dbHandlerFile.exists()) {
             System.out.println("Loading DB file");
-            databases = (Map<String, File>) readSerializedObject(dbHandlerFile);
+            databases = (HashMap<String, File>) readSerializedObject(dbHandlerFile);
         } else {
             try {
                 databases = new HashMap<>();
@@ -63,6 +62,7 @@ public class DatabaseHandler {
 
         databases.put(databaseName, databaseFile);
 
+        writeSerializedObject(dbHandlerFile, databases);
         writeSerializedObject(databaseFile, database);
     }
 
@@ -87,6 +87,8 @@ public class DatabaseHandler {
         // TODO error checking on delete?
         databaseFile.delete();
 
+        writeSerializedObject(dbHandlerFile, databases);
+
         if (databaseFile == activeDatabase.getValue()) {
             return activeDatabase.getKey();
         }
@@ -105,7 +107,7 @@ public class DatabaseHandler {
             out.writeObject(object);
             out.flush();
             out.close();
-
+            fout.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -121,7 +123,7 @@ public class DatabaseHandler {
 
             serialObject = in.readObject();
             in.close();
-
+            fin.close();
             return serialObject;
         } catch (IOException | ClassNotFoundException e) {
             System.out.println(e.getMessage());

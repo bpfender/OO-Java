@@ -1,12 +1,13 @@
 package Database;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Table {
+public class Table implements Serializable {
     private String tableName;
 
     private int records = 0;

@@ -1,8 +1,9 @@
 package Database;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-abstract class AbstractColumn<T> {
+abstract class AbstractColumn<T> implements Serializable {
     private String attributeName;
     // TODO does this have to be protected?
     protected ArrayList<T> column;
