@@ -35,8 +35,6 @@ public class Context {
 
     private Map<String, Database> databases = new HashMap<>();
 
-    Table temp;
-
     // TODO proper execute strategy
 
     public Context() {
@@ -198,22 +196,11 @@ public class Context {
     }
 
     public String join() {
-        String searchString = new String();
-        for (Integer i : activeIndices) {
-            searchString += temp.getColumn("id").getValue(i) + " ";
-            for (String attrib : activeAttributes) {
-                System.out.println(attrib);
-                searchString += temp.getColumn(attrib).getColumnValues().get(i) + " ";
-
-            }
-            searchString += "\n";
-        }
-
-        return searchString;
+        return generateResultHeader() + generateDataView();
     }
 
     // TODO currently no error checknig
-    public String setJoinOn(String column1, String column2) {
+    public String setJoinOn(String column1, String column2) throws Exception {
         System.out.println("setJoinOn()");
 
         ArrayList<String> col1 = joinTables.get(0).getColumn(column1).getColumnValues();
@@ -223,8 +210,12 @@ public class Context {
         ArrayList<Integer> indices2 = new ArrayList<>();
         ArrayList<SimpleEntry<Integer, Integer>> indices = new ArrayList<>();
 
+        System.out.println("COL1 " + col1);
+        System.out.println("COL2 " + col2);
+
         int i = 0, j = 0;
         for (String val1 : col1) {
+            j = 0;
             System.out.print("Val1: " + val1);
             for (String val2 : col2) {
                 System.out.println(" Val2: " + val2);
@@ -242,7 +233,7 @@ public class Context {
 
         System.out.println(indices);
 
-        List<String> tempAttribs = new ArrayList<>();
+        ArrayList<String> tempAttribs = new ArrayList<>();
 
         for (String attrib : joinTables.get(0).getAttributes()) {
             tempAttribs.add(joinTables.get(0).getTableName() + "." + attrib);
@@ -253,8 +244,9 @@ public class Context {
 
         System.out.println(tempAttribs);
 
-        temp = new Table("temp", tempAttribs);
+        activeTable = new Table("temp", tempAttribs);
         List<String> valueList = new ArrayList<>();
+
         for (SimpleEntry<Integer, Integer> entry : indices) {
             valueList.clear();
             for (Column col : joinTables.get(0).getColumns()) {
@@ -264,8 +256,15 @@ public class Context {
             for (Column col : joinTables.get(1).getColumns()) {
                 valueList.add(col.getColumnValues().get(entry.getValue()));
             }
-            temp.insertValues(valueList);
+            System.out.println("VALUE LIST: " + valueList);
+
+            activeTable.insertValues(valueList);
         }
+
+        // TODO a bit messy at the moment
+        setFilter(null);
+        select(null);
+        validateSelectAttributes();
 
         return null;
 

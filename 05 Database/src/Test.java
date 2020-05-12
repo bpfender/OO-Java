@@ -576,7 +576,12 @@ public class Test {
             System.out.println(parser.getError());
         } else {
             System.out.println("PARSE SUCCESS");
-
+            try {
+                String result = expression.interpret(context);
+                System.out.println(result);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
 
         expression = parser.parseQuery("SELECT * FROM actors WHERE awards < 5;");
@@ -808,6 +813,32 @@ public class Test {
         }
 
         expression = parser.parseQuery("JOIN actors AND roles ON id AND actor_id;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            try {
+                String result = expression.interpret(context);
+                System.out.println(result);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        expression = parser.parseQuery(" JOIN movies AND roles ON id AND movie_id;");
+        if (expression == null) {
+            System.out.println(parser.getError());
+        } else {
+            System.out.println("PARSE SUCCESS");
+            try {
+                String result = expression.interpret(context);
+                System.out.println(result);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        expression = parser.parseQuery("SELECT * FROM roles;");
         if (expression == null) {
             System.out.println(parser.getError());
         } else {
