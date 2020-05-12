@@ -42,12 +42,7 @@ public class Context {
 
     // TODO this will need to be moved to a file handler for serialization
     public void createDatabase(String databaseName) throws Exception {
-
-        if (databases.containsKey(databaseName)) {
-            throw new Exception("ERROR: Database " + databaseName + " already exists.");
-        }
-
-        databases.put(databaseName, new Database(databaseName));
+        DatabaseHandler.getInstance().createDatabase(databaseName);
     }
 
     public void createTable(String tableName, List<String> attributeList) throws Exception {
@@ -57,18 +52,12 @@ public class Context {
 
     // TODO this will need to be moved to a file handler for serialization
     public void useDatabase(String databaseName) throws Exception {
-        if ((activeDatabase = databases.get(databaseName)) == null) {
-            throw new Exception("ERROR: Unknown database " + databaseName + ".");
-        }
+        activeDatabase = DatabaseHandler.getInstance().useDatabase(databaseName);
     }
 
     // TODO this will need to be moved to a file handler for serialization
     public void dropDatabase(String databaseName) throws Exception {
-        Database tmp = databases.remove(databaseName);
-
-        if (tmp == null) {
-            throw new Exception("ERROR: Unknown database " + databaseName + ".");
-        }
+        Database tmp = DatabaseHandler.getInstance().dropDatabase(databaseName);
 
         // TODO is this the neatest way of doing it?
         // If the dropped database was in use, make sure that reference to it is

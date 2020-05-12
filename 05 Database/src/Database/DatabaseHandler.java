@@ -77,7 +77,7 @@ public class DatabaseHandler {
         return database;
     }
 
-    public void dropDatabase(String databaseName) throws Exception {
+    public Database dropDatabase(String databaseName) throws Exception {
         if (!checkDatabaseExists(databaseName)) {
             throw new Exception("ERROR: Unknown database " + databaseName + ".");
         }
@@ -85,6 +85,12 @@ public class DatabaseHandler {
         File databaseFile = databases.remove(databaseName);
         // TODO error checking on delete?
         databaseFile.delete();
+
+        if (databaseFile == activeDatabase.getValue()) {
+            return activeDatabase.getKey();
+        }
+        return null;
+
     }
 
     private boolean checkDatabaseExists(String databaseName) {
@@ -109,7 +115,7 @@ public class DatabaseHandler {
         Object serialObject;
 
         try {
-            FileInputStream fin = new FileInputStream(dbHandlerFile);
+            FileInputStream fin = new FileInputStream(file);
             ObjectInputStream in = new ObjectInputStream(fin);
 
             serialObject = in.readObject();
