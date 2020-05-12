@@ -1,3 +1,4 @@
+import Database.DatabaseHandler;
 import Expression.Context;
 import Expression.Expression;
 import Parser.Parser;
@@ -851,7 +852,8 @@ public class Test {
             }
         }
 
-        System.exit(1);
+        DatabaseHandler dbhandler = DatabaseHandler.getInstance();
 
     }
+
 }

@@ -1,12 +1,13 @@
 package Database;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 // Database class contains map of tables and provides functionality to create, retrieve and 
 // delete tables
-public class Database {
+public class Database implements Serializable {
     private String databaseName;
 
     private Map<String, Table> tables = new HashMap<String, Table>();

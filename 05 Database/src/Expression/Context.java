@@ -42,6 +42,7 @@ public class Context {
 
     // TODO this will need to be moved to a file handler for serialization
     public void createDatabase(String databaseName) throws Exception {
+
         if (databases.containsKey(databaseName)) {
             throw new Exception("ERROR: Database " + databaseName + " already exists.");
         }
