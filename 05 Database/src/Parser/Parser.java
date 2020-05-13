@@ -318,7 +318,7 @@ public class Parser {
             case END:
                 return null;
             default:
-                throw new RuntimeException("ERROR: Unexpected token after WHERE");
+                throw new RuntimeException("ERROR: Unexpected token");
         }
     }
 
