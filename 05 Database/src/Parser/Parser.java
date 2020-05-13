@@ -250,7 +250,7 @@ public class Parser {
 
     }
 
-    private Expression parseSet() throws RuntimeException {
+    private Set parseSet() throws RuntimeException {
         getNextToken();
 
         switch (activeToken.getToken()) {
@@ -290,6 +290,7 @@ public class Parser {
         nameValuePairs.put(name, value);
     }
 
+    // NO validation on from where. sometimes it's needed sometimes it isnt
     private From parseFrom() throws RuntimeException {
         getNextToken();
 

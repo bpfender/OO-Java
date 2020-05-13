@@ -13,7 +13,6 @@ public class From implements Expression {
     public String interpret(Context context) throws RuntimeException {
         context.setActiveTable(table);
 
-        // TODO this should only be checked on SELECT query
         context.validateSelectAttributes();
 
         if (where == null) {

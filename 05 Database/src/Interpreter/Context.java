@@ -118,16 +118,17 @@ public class Context {
         }
     }
 
-    // TODO not a fan of the loop for no condition tree
+    // Set filter is passed a conditionTree (built by th3e parser) which defines the
+    // WHERE filter. The values can only be validated at this point after the
+    // activeTable has been set. If there is no filter, the function is passed a
+    // null, indicating that all records should be returned
     public void setFilter(Node conditionTree) throws RuntimeException {
-        activeIndices.clear();
-
         if (conditionTree == null) {
+            activeIndices = new ArrayList<>();
             for (int i = 0; i < activeTable.getTableSize(); i++) {
                 activeIndices.add(i);
+                System.out.println("LOOP");
             }
-
-            // TODO invalid attribute handling in condition tree is interesting...
         } else {
             activeIndices = conditionTree.returnIndices(activeTable);
             if (activeIndices == null) {
@@ -136,30 +137,52 @@ public class Context {
         }
     }
 
-    // FIXME this will have to be renamed to execute - possible use of strategy
-    // pattern here
+    // Validates the update values to ensure they are specifying valid attributes.
+    // Excludes id, because this shouldn't be modified
+    public void setNameValuePairs(HashMap<String, String> nameValuePairs) throws RuntimeException {
+        for (String attribute : nameValuePairs.keySet()) {
+            if (attribute.equals("id")) {
+                throw new RuntimeException("ERROR: Cannot modify reserved attribute id.");
+            }
+            if (!activeTable.checkAttributeExists(attribute)) {
+                throw new RuntimeException("ERROR: Unknown attribute " + attribute + " specified.");
+            }
+        }
+
+        this.nameValuePairsUpdate = nameValuePairs;
+    }
+
+    // Commands that filter and select things from tables share the setFilter(),
+    // setSelectAttributes() functions etc. In order to execture the right action,
+    // the first expression in the chain determines the mode, before execute is
+    // called at the end of the chain. Depending on the mode set, execute does
+    // slightly different things
     public String execute() throws RuntimeException {
-        System.out.println("CONTEXT MODE:" + commandMode);
+        System.out.println("execute()");
         switch (commandMode) {
             case SELECT:
-                return returnResult();
+                return executeSelect();
             case UPDATE:
-                return update();
+                return executeUpdate();
             case DELETE:
-                return delete();
+                return executeDelete();
             case JOIN:
-                return join();
+                return executeJoin();
             default:
                 return "OK";
         }
     }
 
-    // TODO Streamify?
-    public String returnResult() {
-        return generateResultHeader() + generateDataView();
+    public String executeSelect() {
+        System.out.println("SELECT");
+        System.out.println(activeAttributes);
+        System.out.println(activeIndices);
+
+        return generateAttributesView() + generateDataView();
     }
 
-    private String generateResultHeader() {
+    // Generates string of attributes in table view
+    private String generateAttributesView() {
         String header = new String();
         for (String attribute : activeAttributes) {
             header += attribute + " ";
@@ -169,6 +192,7 @@ public class Context {
         return header;
     }
 
+    // Generate string of selected data in view
     private String generateDataView() {
         String data = new String();
         for (Integer i : activeIndices) {
@@ -180,15 +204,15 @@ public class Context {
         return data;
     }
 
-    public void setJoinTables(String table1, String table2) throws RuntimeException {
+    public void setJoinTables(String tableName1, String tableName2) throws RuntimeException {
         joinTables.clear();
-        joinTables.add(activeDatabase.getTable(table1));
-        joinTables.add(activeDatabase.getTable(table2));
+        joinTables.add(activeDatabase.getTable(tableName1));
+        joinTables.add(activeDatabase.getTable(tableName2));
     }
 
     // TODO join doesn't currently remove ids
-    public String join() {
-        return generateResultHeader() + generateDataView();
+    public String executeJoin() {
+        return generateAttributesView() + generateDataView();
     }
 
     // TODO currently no error checknig
@@ -262,22 +286,11 @@ public class Context {
 
     }
 
-    // TODO no handling of wildcards and id
-    public void setNameValuePairs(HashMap<String, String> nameValuePairs) throws RuntimeException {
-        for (String attribute : nameValuePairs.keySet()) {
-            if (!activeTable.checkAttributeExists(attribute)) {
-                throw new RuntimeException("ERROR: Unknown attribute " + attribute + " specified.");
-            }
-        }
-
-        this.nameValuePairsUpdate = nameValuePairs;
-    }
-
     public void setMode(Mode commandMode) {
         this.commandMode = commandMode;
     }
 
-    public String update() {
+    public String executeUpdate() {
         for (String key : nameValuePairsUpdate.keySet()) {
             String value = nameValuePairsUpdate.get(key);
             Column col = activeTable.getColumn(key);
@@ -290,7 +303,7 @@ public class Context {
         return "OK";
     }
 
-    public String delete() throws RuntimeException {
+    public String executeDelete() throws RuntimeException {
         System.out.println(activeIndices);
 
         // TODO not totally happy with this backwards loop
