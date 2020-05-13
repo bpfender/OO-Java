@@ -4,7 +4,6 @@ import java.util.List;
 
 import Interpreter.Context.Mode;
 
-// TODO add extra step for VALUES token?
 public class Insert implements Expression {
     private String tableName;
     private List<String> values;

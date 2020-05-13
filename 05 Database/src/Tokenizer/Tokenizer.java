@@ -97,7 +97,7 @@ public class Tokenizer {
     // the string is empty. The begining of the string is scanned, if a matching
     // token is found, the token and value are added to the tokenQueue and that part
     // of the input is removed. This is repeated until the input is consumed. If no
-    // token is matched, an error is thrown
+    // token is matched, an ERROR: is thrown
     public LinkedList<Token> tokenize(String input) throws RuntimeException {
         tokenQueue.clear();
         // TODO Streamify?
@@ -126,7 +126,7 @@ public class Tokenizer {
             }
 
             if (!tokenMatch) {
-                throw new RuntimeException("ERROR Invalid input in region '" + query + "'");
+                throw new RuntimeException("ERROR: Invalid input in region '" + query + "'");
             }
         }
 

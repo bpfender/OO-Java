@@ -34,8 +34,10 @@ public class OperatorNode extends Node {
 
             return indices;
 
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("ERROR: Attribute " + attribute + " cannot be converted to number.");
         } catch (RuntimeException e) {
-            throw new RuntimeException("ERROR: Invalid attribute " + attribute + "in WHERE clause.");
+            throw new RuntimeException("ERROR: Invalid attribute " + attribute + " in WHERE clause.");
         }
 
     }

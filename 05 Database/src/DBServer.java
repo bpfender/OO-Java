@@ -52,7 +52,6 @@ public class DBServer {
         out.flush();
 
         // TODO would like some more intelligence with this.
-
         DatabaseHandler.getInstance().writeChangesToFile();
     }
 

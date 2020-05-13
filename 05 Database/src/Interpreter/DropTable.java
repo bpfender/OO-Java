@@ -7,7 +7,6 @@ public class DropTable implements Expression {
 
     public DropTable(String tableName) {
         this.tableName = tableName;
-        // TODO error checking of expression type passed in?
     }
 
     @Override

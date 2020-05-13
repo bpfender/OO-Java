@@ -12,7 +12,7 @@ import Database.DatabaseHandler;
 import Database.Table;
 
 // Context provides functionality to execute queries. Any errors are handled by 
-// throwing exceptions with the relevant error messages
+// throwing exceptions with the relevant ERROR: messages
 public class Context {
     // Active table and database are loaded based on context of query
     private Database activeDatabase;

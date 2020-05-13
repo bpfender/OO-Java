@@ -603,6 +603,104 @@ public class Test {
             System.out.println(e.getMessage());
         }
 
-        DatabaseHandler dbhandler = DatabaseHandler.getInstance();
+        try {
+            expression = parser.parseQuery("SELECT * FROM actors");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT * FROM crew;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT spouse FROM actors;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT * FROM actors);");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT * FROM actors WHERE name == 'Hugh Grant;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT * FROM actors WHERE name > 10;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery(" SELECT name age FROM actors;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT * FROM actors awards > 10;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT * FROM actors WHERE name LIKE 10;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("SELECT * FROM actors WHERE awards > 10;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            expression = parser.parseQuery("USE ebay;");
+
+            String result = expression.interpret(context);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }

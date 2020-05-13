@@ -8,7 +8,6 @@ public class Select implements Expression {
     private ArrayList<String> attributes;
     private From from;
 
-    // TODO overloading to select between * and attributes?
     public Select(ArrayList<String> attributes, From from) {
         this.attributes = attributes;
         this.from = from;

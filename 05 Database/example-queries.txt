@@ -46,11 +46,11 @@ id  name   mark
 1   Steve  65
 
 Entered query:   SELECT * FROM marks
-Server response: ERROR Missing ;
+Server response: ERROR: Missing ;
 
 Entered query:   SELECT * FROM grades;
-Server response: ERROR Unknown table 'grades'
+Server response: ERROR: Unknown table 'grades'
 
 Entered query:   DELETE INTO marks WHERE name == 'Steve';
-Server response: ERROR Unexpected token 'INTO'
+Server response: ERROR: Unexpected token 'INTO'
 
