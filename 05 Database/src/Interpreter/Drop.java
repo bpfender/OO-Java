@@ -1,7 +1,5 @@
 package Interpreter;
 
-import Interpreter.Context.Mode;
-
 public class Drop implements Expression {
     String attribute;
 

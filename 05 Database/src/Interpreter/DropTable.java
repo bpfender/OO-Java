@@ -1,5 +1,7 @@
 package Interpreter;
 
+import Interpreter.Context.Mode;
+
 public class DropTable implements Expression {
     String tableName;
 
@@ -10,8 +12,9 @@ public class DropTable implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
+        context.setMode(Mode.DROP);
         context.dropTable(tableName);
-        return "OK";
+        return context.execute();
     }
 
 }

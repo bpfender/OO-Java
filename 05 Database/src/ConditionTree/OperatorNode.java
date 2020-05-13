@@ -3,41 +3,40 @@ package ConditionTree;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
-import Database.*;
+import Database.Column;
+import Database.Table;
 
-//TODO throw detailed exceptions
-//TODO use a column search instead of get column values?
+// Operator node is terminal node. It takes in a predicate which is selected by the parser and
+// corresponds to the comparison type,as well the attribute that the comparsion is performed on
 public class OperatorNode extends Node {
     String attribute;
-    String value;
     Predicate<String> comparison;
     ArrayList<Integer> indices = new ArrayList<>();
 
     public OperatorNode(String attribute, Predicate<String> comparison) {
-        super(null, null);
+        super(null, null); // No child nodes, so left and right set to null
         this.attribute = attribute;
-        // this.value = value;
         this.comparison = comparison;
     }
 
     @Override
-    public ArrayList<Integer> returnIndices(Table table) {
-        Column column = table.getColumn(attribute);
+    public ArrayList<Integer> returnIndices(Table table) throws RuntimeException {
+        // Catches exception from get column to validate attribute. Throws different
+        // return for more detailed diagnostics
+        try {
+            Column column = table.getColumn(attribute);
 
-        if (column == null) {
-            return null;
-        }
-
-        ArrayList<String> values = column.getColumnValues();
-
-        for (int i = 0; i < values.size(); i++) {
-            System.out.println("DIAG" + i);
-            if (comparison.test(values.get(i))) {
-                indices.add(i);
+            for (int i = 0; i < table.getTableSize(); i++) {
+                if (comparison.test(column.getValue(i))) {
+                    indices.add(i);
+                }
             }
-        }
 
-        return indices;
+            return indices;
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException("ERROR: Invalid attribute " + attribute + "in WHERE clause.");
+        }
 
     }
 

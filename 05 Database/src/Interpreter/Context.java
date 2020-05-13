@@ -67,9 +67,6 @@ public class Context {
     public void dropTable(String tableName) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeDatabase.dropTable(tableName);
-
-        // FIXME could be set to null in final execute method
-        activeTable = null;
     }
 
     // Sets activeTable if it exists in current database. This will always be called
@@ -126,9 +123,6 @@ public class Context {
             }
         } else {
             activeIndices = conditionTree.returnIndices(activeTable);
-            if (activeIndices == null) {
-                throw new RuntimeException("ERROR: Invalid attribute specified in WHERE clause.");
-            }
         }
     }
 
@@ -190,8 +184,6 @@ public class Context {
 
     // Executes delete as everything has been validated
     public String executeDelete() throws RuntimeException {
-        System.out.println(activeIndices);
-
         // Loops backwards to avoid any shifting of indices issues
         for (int i = activeIndices.size() - 1; i >= 0; i--) {
             activeTable.deleteRow(activeIndices.get(i));
@@ -239,8 +231,6 @@ public class Context {
         ArrayList<String> joinAttributes = generateJoinTableAttributes();
         ArrayList<SimpleEntry<Integer, Integer>> indices = calculateJoinIndices(attributeTable1, attributeTable2);
 
-        System.out.println(joinAttributes);
-
         activeTable = new Table("join", joinAttributes);
 
         for (SimpleEntry<Integer, Integer> entry : indices) {
@@ -265,22 +255,21 @@ public class Context {
     private ArrayList<SimpleEntry<Integer, Integer>> calculateJoinIndices(String attributeTable1,
             String attributeTable2) throws RuntimeException {
 
-        ArrayList<String> table1JoinVals = joinTables.get(0).getColumn(attributeTable1).getColumnValues();
-        ArrayList<String> table2JoinVals = joinTables.get(1).getColumn(attributeTable2).getColumnValues();
+        Table table1 = joinTables.get(0);
+        Table table2 = joinTables.get(1);
+        Column column1 = table1.getColumn(attributeTable1);
+        Column column2 = table2.getColumn(attributeTable2);
 
         ArrayList<SimpleEntry<Integer, Integer>> indices = new ArrayList<>();
 
-        int i = 0, j = 0;
-        for (String val1 : table1JoinVals) {
-            j = 0;
-            for (String val2 : table2JoinVals) {
-                if (val1.equals(val2)) {
-                    indices.add(new SimpleEntry<Integer, Integer>(i, j));
+        for (int i = 0; i < table1.getTableSize(); i++) {
+            for (int j = 0; j < table2.getTableSize(); j++) {
+                if (column1.getValue(i).equals(column2.getValue(j))) {
+                    indices.add(new SimpleEntry<>(i, j));
                 }
-                j++;
             }
-            i++;
         }
+
         return indices;
     }
 
