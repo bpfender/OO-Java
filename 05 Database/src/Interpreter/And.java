@@ -1,18 +1,17 @@
 package Interpreter;
 
 public class And implements Expression {
-    private String arg1;
-    private String arg2;
+    private String tableName1;
+    private String tableName2;
 
-    public And(String arg1, String arg2) {
-        this.arg1 = arg1;
-        this.arg2 = arg2;
+    public And(String tableName1, String tableName2) {
+        this.tableName1 = tableName1;
+        this.tableName2 = tableName2;
     }
 
     @Override
     public String interpret(Context context) throws RuntimeException {
-        System.out.println("JOIN TABLES: " + arg1 + " " + arg2);
-        context.setJoinTables(arg1, arg2);
+        context.setJoinTables(tableName1, tableName2);
         return null;
     }
 

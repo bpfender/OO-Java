@@ -30,8 +30,12 @@ public class Table implements Serializable {
         return records;
     }
 
-    public Column getColumn(String attribute) {
-        return columns.get(attribute);
+    public Column getColumn(String attribute) throws RuntimeException {
+        Column column = columns.get(attribute);
+        if (column == null) {
+            throw new RuntimeException("ERROR: Invalid attribute " + attribute + " specified.");
+        }
+        return column;
     }
 
     public Collection<String> getAttributes() {
@@ -42,13 +46,21 @@ public class Table implements Serializable {
         return columns.values();
     }
 
-    public boolean checkAttributeExists(String attribute) {
-        return columns.containsKey(attribute);
+    public void checkAttributeExists(String attribute) throws RuntimeException {
+        if (!columns.containsKey(attribute)) {
+            throw new RuntimeException("ERROR: Invalid attribute " + attribute + " specified.");
+        }
     }
 
     public ArrayList<String> getAttributeList() {
         ArrayList<String> attributeList = new ArrayList<>();
         attributeList.addAll(columns.keySet());
+        return attributeList;
+    }
+
+    public ArrayList<String> getAttributeListWithoutId() {
+        ArrayList<String> attributeList = getAttributeList();
+        attributeList.remove("id");
         return attributeList;
     }
 

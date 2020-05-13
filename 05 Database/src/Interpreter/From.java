@@ -13,8 +13,6 @@ public class From implements Expression {
     public String interpret(Context context) throws RuntimeException {
         context.setActiveTable(table);
 
-        context.validateSelectAttributes();
-
         if (where == null) {
             context.setFilter(null);
             return context.execute();

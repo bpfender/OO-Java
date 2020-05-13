@@ -16,8 +16,6 @@ public class Select implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
-        System.out.println("SELECT");
-        System.out.println(attributes);
         context.setMode(Mode.SELECT);
         context.setSelectAttributes(attributes);
         return from.interpret(context);

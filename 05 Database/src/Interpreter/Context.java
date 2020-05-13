@@ -111,9 +111,7 @@ public class Context {
             activeAttributes = activeTable.getAttributeList();
         } else {
             for (String attribute : activeAttributes) {
-                if (!activeTable.checkAttributeExists(attribute)) {
-                    throw new RuntimeException("ERROR: Invalid attribute " + attribute + " specified.");
-                }
+                activeTable.checkAttributeExists(attribute);
             }
         }
     }
@@ -127,7 +125,6 @@ public class Context {
             activeIndices = new ArrayList<>();
             for (int i = 0; i < activeTable.getTableSize(); i++) {
                 activeIndices.add(i);
-                System.out.println("LOOP");
             }
         } else {
             activeIndices = conditionTree.returnIndices(activeTable);
@@ -144,9 +141,7 @@ public class Context {
             if (attribute.equals("id")) {
                 throw new RuntimeException("ERROR: Cannot modify reserved attribute id.");
             }
-            if (!activeTable.checkAttributeExists(attribute)) {
-                throw new RuntimeException("ERROR: Unknown attribute " + attribute + " specified.");
-            }
+            activeTable.checkAttributeExists(attribute);
         }
 
         this.nameValuePairsUpdate = nameValuePairs;
@@ -158,27 +153,52 @@ public class Context {
     // called at the end of the chain. Depending on the mode set, execute does
     // slightly different things
     public String execute() throws RuntimeException {
-        System.out.println("execute()");
         switch (commandMode) {
             case SELECT:
-                return executeSelect();
+            case JOIN:
+                return executeGenerateView();
             case UPDATE:
                 return executeUpdate();
             case DELETE:
                 return executeDelete();
-            case JOIN:
-                return executeJoin();
             default:
-                return "OK";
+                throw new RuntimeException("ERROR: Undefined error occurred");
         }
     }
 
-    public String executeSelect() {
-        System.out.println("SELECT");
-        System.out.println(activeAttributes);
+    // Validates that selected attributes corresoond to the activeTable set and
+    // returns view generated. This is called by both join and select as both return
+    // table views.
+    public String executeGenerateView() {
+        validateSelectAttributes();
+        return generateAttributesView() + generateDataView();
+    }
+
+    // With everything having been validated, simply executes the update to the
+    // table.
+    public String executeUpdate() {
+        for (String attribute : nameValuePairsUpdate.keySet()) {
+            String value = nameValuePairsUpdate.get(attribute);
+
+            Column col = activeTable.getColumn(attribute);
+
+            for (Integer i : activeIndices) {
+                col.updateValue(i, value);
+            }
+        }
+
+        return "OK";
+    }
+
+    // Executes delete as everything has been validated
+    public String executeDelete() throws RuntimeException {
         System.out.println(activeIndices);
 
-        return generateAttributesView() + generateDataView();
+        // Loops backwards to avoid any shifting of indices issues
+        for (int i = activeIndices.size() - 1; i >= 0; i--) {
+            activeTable.deleteRow(activeIndices.get(i));
+        }
+        return "OK";
     }
 
     // Generates string of attributes in table view
@@ -204,115 +224,90 @@ public class Context {
         return data;
     }
 
+    // Loads the two tables to be joined into an array to be worked on during
+    // further processing.
     public void setJoinTables(String tableName1, String tableName2) throws RuntimeException {
         joinTables.clear();
         joinTables.add(activeDatabase.getTable(tableName1));
         joinTables.add(activeDatabase.getTable(tableName2));
     }
 
-    // TODO join doesn't currently remove ids
-    public String executeJoin() {
-        return generateAttributesView() + generateDataView();
+    // setJoinOn uses the two join columns from the join tables to determine the
+    // indices that should be extracted from each table. Any errors are thrown via
+    // exceptions automatically. A temporary table is created in context's
+    // activeTable, where the join table is generated. Filters and attributes are
+    // set so that the whole table is returned at the end of the query.
+    public void generateJoinTable(String attributeTable1, String attributeTable2) throws RuntimeException {
+        ArrayList<String> joinAttributes = generateJoinTableAttributes();
+        ArrayList<SimpleEntry<Integer, Integer>> indices = calculateJoinIndices(attributeTable1, attributeTable2);
+
+        System.out.println(joinAttributes);
+
+        activeTable = new Table("join", joinAttributes);
+
+        for (SimpleEntry<Integer, Integer> entry : indices) {
+            List<String> valueList = new ArrayList<>();
+
+            for (String attribute : joinTables.get(0).getAttributeListWithoutId()) {
+                valueList.add(joinTables.get(0).getColumn(attribute).getValue(entry.getKey()));
+            }
+
+            for (String attribute : joinTables.get(1).getAttributeListWithoutId()) {
+                valueList.add(joinTables.get(1).getColumn(attribute).getValue(entry.getValue()));
+            }
+            activeTable.insertValues(valueList);
+
+        }
+
+        setFilter(null);
+        setSelectAttributes(null);
     }
 
-    // TODO currently no error checknig
-    public String setJoinOn(String column1, String column2) throws RuntimeException {
-        System.out.println("setJoinOn()");
+    // Generates a mapping of each row in table1 that matches a row in table 2
+    private ArrayList<SimpleEntry<Integer, Integer>> calculateJoinIndices(String attributeTable1,
+            String attributeTable2) throws RuntimeException {
 
-        ArrayList<String> col1 = joinTables.get(0).getColumn(column1).getColumnValues();
-        ArrayList<String> col2 = joinTables.get(1).getColumn(column2).getColumnValues();
+        ArrayList<String> table1JoinVals = joinTables.get(0).getColumn(attributeTable1).getColumnValues();
+        ArrayList<String> table2JoinVals = joinTables.get(1).getColumn(attributeTable2).getColumnValues();
 
-        ArrayList<Integer> indices1 = new ArrayList<>();
-        ArrayList<Integer> indices2 = new ArrayList<>();
         ArrayList<SimpleEntry<Integer, Integer>> indices = new ArrayList<>();
 
-        System.out.println("COL1 " + col1);
-        System.out.println("COL2 " + col2);
-
         int i = 0, j = 0;
-        for (String val1 : col1) {
+        for (String val1 : table1JoinVals) {
             j = 0;
-            System.out.print("Val1: " + val1);
-            for (String val2 : col2) {
-                System.out.println(" Val2: " + val2);
+            for (String val2 : table2JoinVals) {
                 if (val1.equals(val2)) {
-                    System.out.println("JOIN MATCH i: " + i + " j: " + j);
-                    indices1.add(i);
-                    indices2.add(j);
                     indices.add(new SimpleEntry<Integer, Integer>(i, j));
                 }
-
                 j++;
             }
             i++;
         }
+        return indices;
+    }
 
-        System.out.println(indices);
+    // Generates attributes list for join table
+    private ArrayList<String> generateJoinTableAttributes() {
+        ArrayList<String> joinAttributes;
+        joinAttributes = getConcatenatedTableAttributes(joinTables.get(0));
+        joinAttributes.addAll(getConcatenatedTableAttributes(joinTables.get(1)));
 
-        ArrayList<String> tempAttribs = new ArrayList<>();
+        return joinAttributes;
+    }
 
-        for (String attrib : joinTables.get(0).getAttributes()) {
-            tempAttribs.add(joinTables.get(0).getTableName() + "." + attrib);
+    // Concatenates attributes into form <tablename>.<attributename>. Excludes id
+    // from concatenation as new id is generated for join table
+    private ArrayList<String> getConcatenatedTableAttributes(Table table) {
+        ArrayList<String> tempAttrib = new ArrayList<>();
+
+        for (String attrib : table.getAttributeListWithoutId()) {
+            tempAttrib.add(table.getTableName() + "." + attrib);
         }
-        for (String attrib : joinTables.get(1).getAttributes()) {
-            tempAttribs.add(joinTables.get(1).getTableName() + "." + attrib);
-        }
-
-        System.out.println(tempAttribs);
-
-        activeTable = new Table("temp", tempAttribs);
-        List<String> valueList = new ArrayList<>();
-
-        for (SimpleEntry<Integer, Integer> entry : indices) {
-            valueList.clear();
-            for (Column col : joinTables.get(0).getColumns()) {
-                valueList.add(col.getColumnValues().get(entry.getKey()));
-            }
-
-            for (Column col : joinTables.get(1).getColumns()) {
-                valueList.add(col.getColumnValues().get(entry.getValue()));
-            }
-            System.out.println("VALUE LIST: " + valueList);
-
-            activeTable.insertValues(valueList);
-        }
-
-        // TODO a bit messy at the moment
-        setFilter(null);
-        setSelectAttributes(null);
-        validateSelectAttributes();
-
-        return null;
-
+        return tempAttrib;
     }
 
     public void setMode(Mode commandMode) {
         this.commandMode = commandMode;
-    }
-
-    public String executeUpdate() {
-        for (String key : nameValuePairsUpdate.keySet()) {
-            String value = nameValuePairsUpdate.get(key);
-            Column col = activeTable.getColumn(key);
-
-            for (Integer i : activeIndices) {
-                col.updateValue(i, value);
-            }
-        }
-
-        return "OK";
-    }
-
-    public String executeDelete() throws RuntimeException {
-        System.out.println(activeIndices);
-
-        // TODO not totally happy with this backwards loop
-        for (int i = activeIndices.size() - 1; i >= 0; i--) {
-            // TODO can this be cleaned up with finding active indices?
-            activeTable.deleteRow(activeIndices.get(i));
-
-        }
-        return "OK";
     }
 
     private void checkIfActiveDatabaseSet() throws RuntimeException {
