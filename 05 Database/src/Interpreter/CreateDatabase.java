@@ -1,5 +1,7 @@
 package Interpreter;
 
+import Interpreter.Context.Mode;
+
 public class CreateDatabase implements Expression {
     private String databaseName;
 
@@ -9,8 +11,9 @@ public class CreateDatabase implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
+        context.setMode(Mode.CREATE);
         context.createDatabase(databaseName);
-        return "OK";
+        return context.execute();
     }
 
 }

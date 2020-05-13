@@ -11,9 +11,6 @@ import Database.Database;
 import Database.DatabaseHandler;
 import Database.Table;
 
-//FIXME clearing values properly
-//FIXME Null inputs
-
 // Context provides functionality to execute queries. Any errors are handled by 
 // throwing exceptions with the relevant error messages
 public class Context {
@@ -29,7 +26,8 @@ public class Context {
 
     private ArrayList<Table> joinTables = new ArrayList<>();
 
-    // TODO proper execute strategy
+    // This could probabyl also have been implemented as a Strategy pattern, but I
+    // ran out of timwe
     // Mode is used to determine what action the execute command should take
     protected enum Mode {
         USE, CREATE, DROP, ALTER, INSERT, SELECT, UPDATE, DELETE, JOIN
@@ -162,7 +160,7 @@ public class Context {
             case DELETE:
                 return executeDelete();
             default:
-                throw new RuntimeException("ERROR: Undefined error occurred");
+                return "OK";
         }
     }
 

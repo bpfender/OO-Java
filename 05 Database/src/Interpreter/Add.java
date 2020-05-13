@@ -10,6 +10,6 @@ public class Add implements Expression {
     @Override
     public String interpret(Context context) throws RuntimeException {
         context.addActiveTableAttribute(attribute);
-        return "OK";
+        return context.execute();
     }
 }

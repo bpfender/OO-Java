@@ -2,6 +2,8 @@ package Interpreter;
 
 import java.util.List;
 
+import Interpreter.Context.Mode;
+
 public class CreateTable implements Expression {
     private String tableName;
     private List<String> attributeList;
@@ -13,8 +15,9 @@ public class CreateTable implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
+        context.setMode(Mode.CREATE);
         context.createTable(tableName, attributeList);
-        return "OK";
+        return context.execute();
     }
 
 }

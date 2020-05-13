@@ -1,5 +1,7 @@
 package Interpreter;
 
+import Interpreter.Context.Mode;
+
 public class Drop implements Expression {
     String attribute;
 
@@ -10,7 +12,7 @@ public class Drop implements Expression {
     @Override
     public String interpret(Context context) throws RuntimeException {
         context.dropActiveTableAttribute(attribute);
-        return "OK";
+        return context.execute();
     }
 
 }

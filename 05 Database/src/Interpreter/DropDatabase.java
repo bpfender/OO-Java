@@ -1,5 +1,7 @@
 package Interpreter;
 
+import Interpreter.Context.Mode;
+
 public class DropDatabase implements Expression {
     String databaseName;
 
@@ -9,8 +11,9 @@ public class DropDatabase implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
+        context.setMode(Mode.DROP);
         context.dropDatabase(databaseName);
-        return "OK";
+        return context.execute();
     }
 
 }

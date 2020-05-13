@@ -2,6 +2,8 @@ package Interpreter;
 
 import java.util.List;
 
+import Interpreter.Context.Mode;
+
 // TODO add extra step for VALUES token?
 public class Insert implements Expression {
     private String tableName;
@@ -14,9 +16,10 @@ public class Insert implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
+        context.setMode(Mode.INSERT);
         context.setActiveTable(tableName);
         context.insertIntoActiveTable(values);
-        return "OK";
+        return context.execute();
     }
 
 }
