@@ -12,6 +12,10 @@ import Database.DatabaseHandler;
 import Database.Table;
 
 //FIXME clearing values properly
+//FIXME Null inputs
+
+// Context provides functionality to execute queries. Any errors are handled by 
+// throwing exceptions with the relevant error messages
 public class Context {
     // Active table and database are loaded based on context of query
     private Database activeDatabase;
@@ -38,64 +42,70 @@ public class Context {
         activeDatabase = DatabaseHandler.getInstance().useDatabase(databaseName);
     }
 
+    // Calls the database handler to create the database if it exists
     public void createDatabase(String databaseName) throws RuntimeException {
         DatabaseHandler.getInstance().createDatabase(databaseName);
     }
 
+    // First checks that activeDatabase is set. If it is create table if it doesn't
+    // yet exist
     public void createTable(String tableName, List<String> attributeList) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeDatabase.createTable(tableName, attributeList);
     }
 
+    // Drops database if it exists. If is currently set as context's activeDB, then
+    // both it and the activeTable are set to null
     public void dropDatabase(String databaseName) throws RuntimeException {
         Database tmp = DatabaseHandler.getInstance().dropDatabase(databaseName);
 
-        // TODO is this the neatest way of doing it?
-        // If the dropped database was in use, make sure that reference to it is
-        // removed.
         if (tmp == activeDatabase) {
             activeDatabase = null;
             activeTable = null;
         }
     }
 
+    // Drops table if activeDB is set and table exists.
     public void dropTable(String tableName) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeDatabase.dropTable(tableName);
-        // TODO is this the most elegant way of achieving this?
-        // Remove all references to make sure it gets cleared from memory
+
+        // FIXME could be set to null in final execute method
         activeTable = null;
     }
 
-    public void setTable(String tableName) throws RuntimeException {
+    // Sets activeTable if it exists in current database. This will always be called
+    // where table query is involved, meaning that other functions don't have to
+    // validate whether activeTable is set if it should be
+    public void setActiveTable(String tableName) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeTable = activeDatabase.getTable(tableName);
     }
 
-    // TODO would be nice to have diagnostics on reserved or exists keyword
-    public void add(String attribute) throws RuntimeException {
+    public void addActiveTableAttribute(String attribute) throws RuntimeException {
         activeTable.addAttribute(attribute);
     }
 
-    public void drop(String attribute) throws RuntimeException {
+    public void dropActiveTableAttribute(String attribute) throws RuntimeException {
         activeTable.dropAttribute(attribute);
     }
 
-    // TODO would be nice to have better diagnostics on failure
-    public void insert(List<String> values) throws RuntimeException {
-        if (!activeTable.insertValues(values)) {
-            throw new RuntimeException("ERROR: Values do not match table attributes.");
-        }
+    public void insertIntoActiveTable(List<String> values) throws RuntimeException {
+        activeTable.insertValues(values);
     }
 
-    // TODO how to handle wildcard?
-    public void select(ArrayList<String> attributes) throws RuntimeException {
+    // Select attributes will receive null for a wildcard or a list of attributes.
+    // Formatting this input is handled by the parser and verifying the attributes
+    // set is done by validateSelectAttributes(). This function just loads the
+    // attributes into the context.
+    public void setSelectAttributes(ArrayList<String> attributes) throws RuntimeException {
         checkIfActiveDatabaseSet();
         activeAttributes = attributes;
     }
 
-    // TOOD would prefer to use overloading for this stuff i.e. wildcard
-    // specification. Not sure passing null around is nice
+    // Validates whether specified attributes match the active table. If the input
+    // was a wildcard (null value for activeAttributes) activeAttributes is
+    // populated with all attributes
     public void validateSelectAttributes() throws RuntimeException {
         if (activeAttributes == null) {
             activeAttributes = activeTable.getAttributeList();
@@ -140,7 +150,7 @@ public class Context {
             case JOIN:
                 return join();
             default:
-                return "CURRENTLY A RANDOM OK";
+                return "OK";
         }
     }
 
@@ -245,7 +255,7 @@ public class Context {
 
         // TODO a bit messy at the moment
         setFilter(null);
-        select(null);
+        setSelectAttributes(null);
         validateSelectAttributes();
 
         return null;

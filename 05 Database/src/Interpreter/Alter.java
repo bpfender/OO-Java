@@ -16,7 +16,7 @@ public class Alter implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
-        context.setTable(tableName);
+        context.setActiveTable(tableName);
         return expression.interpret(context);
     }
 

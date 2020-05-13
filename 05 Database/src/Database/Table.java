@@ -65,7 +65,7 @@ public class Table implements Serializable {
     }
 
     // TODO this is fucking messy at the moment. Please clean up
-    public boolean insertValues(List<String> values) {
+    public void insertValues(List<String> values) throws RuntimeException {
         if (values.size() + 1 == columns.size()) {
             System.out.println(columns);
             lastInsertId++;
@@ -82,9 +82,9 @@ public class Table implements Serializable {
             }
 
             records++;
-            return true;
+            return;
         }
-        return false;
+        throw new RuntimeException("ERROR: Values do not match table attributes.");
     }
 
     // TODO prevent adding of reserved keywords id and * - not needed for *, id

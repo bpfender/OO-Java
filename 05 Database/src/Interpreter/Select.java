@@ -9,17 +9,16 @@ public class Select implements Expression {
     private Expression from;
 
     // TODO overloading to select between * and attributes?
-    public Select(ArrayList<String> attributes, Expression from) {
+    public Select(ArrayList<String> attributes, From from) {
         this.attributes = attributes;
         this.from = from;
     }
 
     @Override
     public String interpret(Context context) throws RuntimeException {
-        // TODO work on how operating modes are set
         context.setMode(Mode.SELECT);
 
-        context.select(attributes);
+        context.setSelectAttributes(attributes);
         return from.interpret(context);
 
     }

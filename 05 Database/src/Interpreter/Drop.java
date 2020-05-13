@@ -9,7 +9,7 @@ public class Drop implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
-        context.drop(attribute);
+        context.dropActiveTableAttribute(attribute);
         return "OK";
     }
 

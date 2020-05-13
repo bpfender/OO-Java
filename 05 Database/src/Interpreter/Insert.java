@@ -14,8 +14,8 @@ public class Insert implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
-        context.setTable(tableName);
-        context.insert(values);
+        context.setActiveTable(tableName);
+        context.insertIntoActiveTable(values);
         return "OK";
     }
 

@@ -290,7 +290,7 @@ public class Parser {
         nameValuePairs.put(name, value);
     }
 
-    private Expression parseFrom() throws RuntimeException {
+    private From parseFrom() throws RuntimeException {
         getNextToken();
 
         String name;
@@ -305,7 +305,7 @@ public class Parser {
         return new From(name, parseWhere());
     }
 
-    private Expression parseWhere() throws RuntimeException {
+    private Where parseWhere() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case WHERE:

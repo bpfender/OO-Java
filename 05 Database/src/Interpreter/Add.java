@@ -9,7 +9,7 @@ public class Add implements Expression {
 
     @Override
     public String interpret(Context context) throws RuntimeException {
-        context.add(attribute);
+        context.addActiveTableAttribute(attribute);
         return "OK";
     }
 }
