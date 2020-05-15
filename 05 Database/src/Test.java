@@ -17,7 +17,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -26,7 +26,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -36,7 +36,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -45,7 +45,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -54,7 +54,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -63,7 +63,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -72,7 +72,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -81,7 +81,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -90,7 +90,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -99,7 +99,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -108,7 +108,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -117,7 +117,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -126,7 +126,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -135,7 +135,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -144,7 +144,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -153,7 +153,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -162,7 +162,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -171,7 +171,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -180,7 +180,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -189,7 +189,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -198,7 +198,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -207,7 +207,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -216,7 +216,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -225,7 +225,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -234,7 +234,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -243,7 +243,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -252,7 +252,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -261,7 +261,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -270,7 +270,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -279,7 +279,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -288,7 +288,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -297,7 +297,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -306,7 +306,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -315,7 +315,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -324,7 +324,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -333,7 +333,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -342,7 +342,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -351,7 +351,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -360,7 +360,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -369,7 +369,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -378,7 +378,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -387,7 +387,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -396,7 +396,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -405,7 +405,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -414,7 +414,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -423,7 +423,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -432,7 +432,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -441,7 +441,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -450,7 +450,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -459,7 +459,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -468,7 +468,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -476,7 +476,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -484,7 +484,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -493,7 +493,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -501,7 +501,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -510,7 +510,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -519,7 +519,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -528,7 +528,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -537,7 +537,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -546,7 +546,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -555,7 +555,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -564,7 +564,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -573,7 +573,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -582,7 +582,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -591,7 +591,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -600,7 +600,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -609,7 +609,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -618,7 +618,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -627,7 +627,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -636,7 +636,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -645,7 +645,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -654,7 +654,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -663,7 +663,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -672,7 +672,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -681,7 +681,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -690,7 +690,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         try {
@@ -699,7 +699,7 @@ public class Test {
             String result = expression.interpret(context);
             System.out.println(result);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
         }
 
     }

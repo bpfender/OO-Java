@@ -80,7 +80,7 @@ public class DatabaseHandler {
     // Creates new database and saves it to file
     public void createDatabase(String databaseName) throws RuntimeException {
         if (checkDatabaseExists(databaseName)) {
-            throw new RuntimeException("ERROR: Database " + databaseName + " already exists.");
+            throw new RuntimeException("Database " + databaseName + " already exists.");
         }
 
         Database database = new Database();
@@ -96,7 +96,7 @@ public class DatabaseHandler {
     // Load database from file if it exists and return Database object
     public Database useDatabase(String databaseName) throws RuntimeException {
         if (!checkDatabaseExists(databaseName)) {
-            throw new RuntimeException("ERROR: Unknown database " + databaseName + ".");
+            throw new RuntimeException("Unknown database " + databaseName + ".");
         }
 
         File databaseFile = databases.get(databaseName);
@@ -107,14 +107,14 @@ public class DatabaseHandler {
             return database;
 
         } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException("ERROR: Could not read file " + databaseName + " from disk.");
+            throw new RuntimeException("Could not read file " + databaseName + " from disk.");
         }
     }
 
     // Remove database reference, update info.storage file and delete database file
     public Database dropDatabase(String databaseName) throws RuntimeException {
         if (!checkDatabaseExists(databaseName)) {
-            throw new RuntimeException("ERROR: Unknown database " + databaseName + ".");
+            throw new RuntimeException("Unknown database " + databaseName + ".");
         }
 
         File databaseFile = databases.remove(databaseName);
@@ -157,7 +157,7 @@ public class DatabaseHandler {
     }
 
     // This throws the exception as failed reads will be handlesdd differenlu. If
-    // the main database file can't be open, an ERROR: is just thrown, otherwise a
+    // the main database file can't be open, an is just thrown, otherwise a
     // warning is return that the database file can't be read
     private Object readSerializedObject(File file) throws IOException, ClassNotFoundException {
         Object serialObject;

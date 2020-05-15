@@ -45,7 +45,7 @@ public class DBServer {
             expression = parser.parseQuery(line);
             output = expression.interpret(context);
         } catch (Exception e) {
-            output = e.getMessage();
+            output = "ERROR: " + e.getMessage();
         }
 
         out.write(output + "\n" + DBClient.EOT + "\n");

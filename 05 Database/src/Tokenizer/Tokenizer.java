@@ -9,18 +9,21 @@ public class Tokenizer {
 
     // TokenInfo is declared as a private class because it will only ever be used by
     // the Tokenizer class. It is used to store the regex pattern and the
-    // corresponding token type, which is in turn used to build the Token stack.
+    // corresponding token type, which is in turn used to build the Token queue.
     private class TokenInfo {
         protected Pattern regex;
         protected TokenType type;
 
-        public TokenInfo(Pattern regex, TokenType type) {
+        protected TokenInfo(Pattern regex, TokenType type) {
             this.regex = regex;
             this.type = type;
         }
 
     }
 
+    // Stores the searchable list of tokenselectors, allowign the next part of the
+    // query to be checked against the pattern matcher and the corresponding token
+    // type to be returned.
     private ArrayList<TokenInfo> tokenSelectors = new ArrayList<>();
 
     // The tokens queue is used to build the list of tokens during tokenization and
@@ -32,7 +35,8 @@ public class Tokenizer {
     // reserved keywords are matched first, followed by operators, then punctuation
     // and finally literal values. Regexes exclude whitespace automatically. For
     // words, there must be at elast one space to seperate it from the next token,
-    // operators are able to deal with no spaces
+    // operators are able to deal with no spaces.This could be refined slightly but
+    // demonstrates functionality effectively.
     public Tokenizer() {
         // Command Tokens (reserved keywords)
         addRegex("^(use\\s+)", TokenType.USE);
@@ -59,7 +63,7 @@ public class Tokenizer {
         addRegex("^(into\\s+)", TokenType.INTO);
 
         // Operators (order is important, multiple character operators are checked
-        // first)
+        // first) (zero or more spaces required)
         addRegex("^(\\s*==\\s*)", TokenType.EQUAL);
         addRegex("^(\\s*>=\\s*)", TokenType.GREATEREQUAL);
         addRegex("^(\\s*<=\\s*)", TokenType.LESSEQUAL);
@@ -68,7 +72,7 @@ public class Tokenizer {
         addRegex("^(\\s*<\\s*)", TokenType.LESS);
         addRegex("^(\\s*LIKE\\s+)", TokenType.LIKE);
 
-        // Punctuation
+        // Punctuation (zero of more spaces required)
         addRegex("^(\\s*\\(\\s*)", TokenType.OPENBRACKET);
         addRegex("^(\\s*\\)\\s*)", TokenType.CLOSEBRACKET);
         addRegex("^(\\s*,\\s*)", TokenType.COMMA);
@@ -83,13 +87,6 @@ public class Tokenizer {
         addRegex("^(\\s*[a-zA-Z_]+\\s*)", TokenType.NAME); // disallows digits in name
     }
 
-    // Compiles a case insensitive pattern matcher, which gets added to a new
-    // TokenInfo class and in turn added to the tokenSelectors list. This allows
-    // later matching of the string against the pattern
-    private void addRegex(String regex, TokenType type) {
-        tokenSelectors.add(new TokenInfo(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), type));
-    }
-
     // Source:
     // http://cogitolearning.co.uk/2013/04/writing-a-parser-in-java-the-tokenizer/
     // Tokenize first ensures that the tokenQueue is cleared of previous tokens. A
@@ -97,13 +94,12 @@ public class Tokenizer {
     // the string is empty. The begining of the string is scanned, if a matching
     // token is found, the token and value are added to the tokenQueue and that part
     // of the input is removed. This is repeated until the input is consumed. If no
-    // token is matched, an ERROR: is thrown
+    // token is matched, an is thrown
     public LinkedList<Token> tokenize(String input) throws RuntimeException {
+        // Tokenizer does not get reinitialised, so previous tokenQueue needs to be
+        // cleared
         tokenQueue.clear();
-        // TODO Streamify?
-        // TODO is this actually needed
-        // TODO .isBlank vs .isEmpty?
-        // TODO Remove nesting
+
         String query = input.trim();
         while (!query.isBlank()) {
             boolean tokenMatch = false;
@@ -131,6 +127,14 @@ public class Tokenizer {
         }
 
         return tokenQueue;
+
+    }
+
+    // Compiles a case insensitive pattern matcher, which gets added to a new
+    // TokenInfo class and in turn added to the tokenSelectors list. This allows
+    // later matching of the string against the pattern
+    private void addRegex(String regex, TokenType type) {
+        tokenSelectors.add(new TokenInfo(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), type));
     }
 
 }

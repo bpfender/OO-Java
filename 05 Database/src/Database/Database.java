@@ -16,7 +16,7 @@ public class Database implements Serializable {
 
     public void createTable(String tableName, List<String> attributes) throws RuntimeException {
         if (tables.containsKey(tableName)) {
-            throw new RuntimeException("ERROR: Table " + tableName + " already exists.");
+            throw new RuntimeException("Table " + tableName + " already exists.");
         }
 
         tables.put(tableName, new Table(tableName, attributes));
@@ -25,14 +25,14 @@ public class Database implements Serializable {
     public Table getTable(String tableName) throws RuntimeException {
         Table table = tables.get(tableName);
         if (table == null) {
-            throw new RuntimeException("ERROR: Unknown table " + tableName + ".");
+            throw new RuntimeException("Unknown table " + tableName + ".");
         }
         return table;
     }
 
     public void dropTable(String tableName) throws RuntimeException {
         if (tables.remove(tableName) == null) {
-            throw new RuntimeException("ERROR: Unknown table " + tableName + ".");
+            throw new RuntimeException("Unknown table " + tableName + ".");
         }
     }
 }

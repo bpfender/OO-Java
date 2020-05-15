@@ -12,7 +12,7 @@ import Database.DatabaseHandler;
 import Database.Table;
 
 // Context provides functionality to execute queries. Any errors are handled by 
-// throwing exceptions with the relevant ERROR: messages
+// throwing exceptions with the relevant messages
 public class Context {
     // Active table and database are loaded based on context of query
     private Database activeDatabase;
@@ -131,7 +131,7 @@ public class Context {
     public void setNameValuePairs(HashMap<String, String> nameValuePairs) throws RuntimeException {
         for (String attribute : nameValuePairs.keySet()) {
             if (attribute.equals("id")) {
-                throw new RuntimeException("ERROR: Cannot modify reserved attribute id.");
+                throw new RuntimeException("Cannot modify reserved attribute id.");
             }
             activeTable.checkAttributeExists(attribute);
         }
@@ -299,7 +299,7 @@ public class Context {
 
     private void checkIfActiveDatabaseSet() throws RuntimeException {
         if (activeDatabase == null) {
-            throw new RuntimeException("ERROR: No database specified.");
+            throw new RuntimeException("No database specified.");
         }
     }
 

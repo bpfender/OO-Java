@@ -44,14 +44,14 @@ public class Table implements Serializable {
     public Column getColumn(String attribute) throws RuntimeException {
         Column column = columns.get(attribute);
         if (column == null) {
-            throw new RuntimeException("ERROR: Invalid attribute " + attribute + " specified.");
+            throw new RuntimeException("Invalid attribute " + attribute + " specified.");
         }
         return column;
     }
 
     public void checkAttributeExists(String attribute) throws RuntimeException {
         if (!columns.containsKey(attribute)) {
-            throw new RuntimeException("ERROR: Invalid attribute " + attribute + " specified.");
+            throw new RuntimeException("Invalid attribute " + attribute + " specified.");
         }
     }
 
@@ -69,7 +69,7 @@ public class Table implements Serializable {
 
     public void deleteRow(int index) throws RuntimeException {
         if (records == 0) {
-            throw new RuntimeException("ERROR: Table contains no data to delete");
+            throw new RuntimeException("Table contains no data to delete");
         }
 
         for (Column col : columns.values()) {
@@ -81,7 +81,7 @@ public class Table implements Serializable {
     public void insertValues(List<String> values) throws RuntimeException {
         // Values won't contain id, so +1 to account for id column stored in table
         if (values.size() + 1 != columns.size()) {
-            throw new RuntimeException("ERROR: Values do not match table attributes.");
+            throw new RuntimeException("Values do not match table attributes.");
         }
         lastInsertId++;
 
@@ -103,10 +103,10 @@ public class Table implements Serializable {
         // Not strictly needed, as hashmap will reject addition anyway as idc is added
         // as a column on initialisation. However, provides some additional diagnostics
         if (attribute.equals("id")) {
-            throw new RuntimeException("ERROR: Cannot add id. Reserved attribute.");
+            throw new RuntimeException("Cannot add id. Reserved attribute.");
         }
         if (columns.containsKey(attribute)) {
-            throw new RuntimeException("ERROR: Cannot add attribute " + attribute + ".");
+            throw new RuntimeException("Cannot add attribute " + attribute + ".");
         }
 
         columns.put(attribute, new Column(records));
@@ -114,10 +114,10 @@ public class Table implements Serializable {
 
     public void dropAttribute(String attribute) throws RuntimeException {
         if (attribute.equals("id")) {
-            throw new RuntimeException("ERROR: Cannot drop 'id'. Reserved column.");
+            throw new RuntimeException("Cannot drop 'id'. Reserved column.");
         }
         if (columns.remove(attribute) == null) {
-            throw new RuntimeException("ERROR: Cannot drop attribute " + attribute + ". Does not exist.");
+            throw new RuntimeException("Cannot drop attribute " + attribute + ". Does not exist.");
         }
     }
 

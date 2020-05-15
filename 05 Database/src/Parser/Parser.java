@@ -6,14 +6,36 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import ConditionTree.*;
 import ConditionTree.AndNode;
 import ConditionTree.Node;
 import ConditionTree.OperatorNode;
-import Interpreter.*;
-import Tokenizer.*;
+import ConditionTree.OrNode;
+import Interpreter.Add;
+import Interpreter.Alter;
+import Interpreter.And;
+import Interpreter.CreateDatabase;
+import Interpreter.CreateTable;
+import Interpreter.Delete;
+import Interpreter.Drop;
+import Interpreter.DropDatabase;
+import Interpreter.DropTable;
+import Interpreter.Expression;
+import Interpreter.From;
+import Interpreter.Insert;
+import Interpreter.Join;
+import Interpreter.On;
+import Interpreter.Select;
+import Interpreter.Set;
+import Interpreter.Update;
+import Interpreter.Use;
+import Interpreter.Where;
+import Tokenizer.Token;
+import Tokenizer.TokenType;
+import Tokenizer.Tokenizer;
 
-//https://www.clear.rice.edu/comp212/05-spring/lectures/36/
+// Would have like to try and implement the parse according to the reference below. 
+// Ultimately ran out of time though. The below makes for interesting reading though ;)
+// https://www.clear.rice.edu/comp212/05-spring/lectures/36/
 
 // The parser analyses the tokenized query to check that it conforms to the grammar. 
 // Based on this, it builds an expression which is returned as an Expression type. 
@@ -21,32 +43,28 @@ import Tokenizer.*;
 // simply builds the expression to be run
 
 public class Parser {
-    // TODO seperate out the tokenizer constructor call
     Tokenizer tokenizer = new Tokenizer();
 
     Token activeToken;
     LinkedList<Token> tokenQueue;
 
-    // TODO this should probably just throw an error
-    // TODO this functionality can probably be modified. One try catch block,
-    // handling multi-line queries etc.
-    // TODO still need to deal with too long queries
-    // TODO ERROR: can be concatenated ERROR: +?
-
     public Expression parseQuery(String query) throws RuntimeException {
         String input = query.trim();
-        System.out.println("QUERY: " + query);
+
+        System.out.println("\nQUERY: " + query);
 
         if (!input.endsWith(";")) {
-            throw new RuntimeException("ERROR: Semicolon missing from end of query");
+            throw new RuntimeException("Semicolon missing from end of query");
         }
         input = input.substring(0, input.length() - 1);
 
         tokenQueue = tokenizer.tokenize(input);
 
         Expression expression = parseCommand();
-        if (!tokenQueue.isEmpty()) {
-            throw new RuntimeException("ERROR: Unexpected tokens remaining");
+
+        getNextToken();
+        if (activeToken.getToken() != TokenType.END) {
+            throw new RuntimeException("Unexpected tokens remaining");
         }
 
         return expression;
@@ -92,7 +110,7 @@ public class Parser {
             case JOIN:
                 return parseJoin();
             default:
-                throw new RuntimeException("ERROR: Unexpected input. Invalid command '" + activeToken.getValue() + "'");
+                throw new RuntimeException("Unexpected input. Invalid command '" + activeToken.getValue() + "'");
         }
     }
 
@@ -109,7 +127,7 @@ public class Parser {
             case DATABASE:
                 return parseCreateDatabase();
             default:
-                throw new RuntimeException("ERROR: Must specify whether to CREATE database or table");
+                throw new RuntimeException("Must specify whether to CREATE database or table");
         }
     }
 
@@ -140,7 +158,7 @@ public class Parser {
             case DATABASE:
                 return new DropDatabase(parseName());
             default:
-                throw new RuntimeException("ERROR: Must specify what to DROP");
+                throw new RuntimeException("Must specify what to DROP");
         }
     }
 
@@ -159,7 +177,7 @@ public class Parser {
             case DROP:
                 return new Drop(parseName());
             default:
-                throw new RuntimeException("ERROR: Expected ADD or DROP");
+                throw new RuntimeException("Expected ADD or DROP");
         }
     }
 
@@ -168,7 +186,7 @@ public class Parser {
     private void consumeRequiredToken(TokenType type) throws RuntimeException {
         getNextToken();
         if (activeToken.getToken() != type) {
-            throw new RuntimeException("ERROR: Expected " + type);
+            throw new RuntimeException("Expected " + type);
         }
     }
 
@@ -179,7 +197,7 @@ public class Parser {
 
         getNextToken();
         if (activeToken.getToken() != TokenType.VALUES) {
-            throw new RuntimeException("ERROR: Expected VALUES token");
+            throw new RuntimeException("Expected VALUES token");
         }
 
         consumeRequiredToken(TokenType.OPENBRACKET);
@@ -202,7 +220,7 @@ public class Parser {
                 attributes = parseList(TokenType.NAME);
                 return new Select((ArrayList<String>) attributes, parseFrom());
             default:
-                throw new RuntimeException("ERROR: Expected * or attributes");
+                throw new RuntimeException("Expected * or attributes");
         }
 
     }
@@ -239,7 +257,7 @@ public class Parser {
             case AND:
                 break;
             default:
-                throw new RuntimeException("ERROR: Expected AND");
+                throw new RuntimeException("Expected AND");
         }
     }
 
@@ -249,7 +267,7 @@ public class Parser {
             case ON:
                 break;
             default:
-                throw new RuntimeException("ERROR: Expected ON");
+                throw new RuntimeException("Expected ON");
         }
 
     }
@@ -262,7 +280,7 @@ public class Parser {
                 HashMap<String, String> nameValuePairs = parseNameValueList();
                 return new Set(nameValuePairs, parseWhere());
             default:
-                throw new RuntimeException("ERROR: Expected SET token");
+                throw new RuntimeException("Expected SET token");
         }
     }
 
@@ -286,7 +304,7 @@ public class Parser {
             case PAIR:
                 break;
             default:
-                throw new RuntimeException("ERROR: Expect = operator");
+                throw new RuntimeException("Expect = operator");
         }
 
         String value = parseValue();
@@ -304,7 +322,7 @@ public class Parser {
                 name = parseName();
                 break;
             default:
-                throw new RuntimeException("ERROR: Expected FROM");
+                throw new RuntimeException("Expected FROM");
 
         }
         return new From(name, parseWhere());
@@ -318,7 +336,7 @@ public class Parser {
             case END:
                 return null;
             default:
-                throw new RuntimeException("ERROR: Unexpected token");
+                throw new RuntimeException("Unexpected token");
         }
     }
 
@@ -342,7 +360,7 @@ public class Parser {
                         condition = new OrNode(leftNode, parseCondition());
                         break;
                     default:
-                        throw new RuntimeException("ERROR: Expected AND or OR");
+                        throw new RuntimeException("Expected AND or OR");
 
                 }
                 parseCloseBracket();
@@ -352,7 +370,7 @@ public class Parser {
                 Predicate<String> operator = parseOperator();
                 return new OperatorNode(name, operator);
             default:
-                throw new RuntimeException("ERROR: In condition 1");
+                throw new RuntimeException("In condition 1");
         }
 
     }
@@ -393,14 +411,14 @@ public class Parser {
                 // comparison can be made
                 try {
                     Float.parseFloat(value);
-                    throw new RuntimeException("ERROR: Attribute cannot be converted to number");
+                    throw new RuntimeException("String expected");
                 } catch (NumberFormatException e) {
                     operator = i -> (i.contains(value));
                 }
 
                 break;
             default:
-                throw new RuntimeException("ERROR: Invalid comparison operator");
+                throw new RuntimeException("Invalid comparison operator");
         }
 
         return operator;
@@ -412,7 +430,7 @@ public class Parser {
             case LITERAL:
                 return activeToken.getValue();
             default:
-                throw new RuntimeException("ERROR: Expected literal value");
+                throw new RuntimeException("Expected literal value");
         }
     }
 
@@ -431,7 +449,7 @@ public class Parser {
             getNextToken(); // consume attirbute
         }
 
-        throw new RuntimeException("ERROR: Unexprected value in list");
+        throw new RuntimeException("Unexpected value in list");
 
     }
 
@@ -442,7 +460,7 @@ public class Parser {
             case NAME:
                 return activeToken.getValue();
             default:
-                throw new RuntimeException("ERROR: Must specify name");
+                throw new RuntimeException("Must specify name");
 
         }
     }
@@ -453,7 +471,7 @@ public class Parser {
             case OPENBRACKET:
                 return;
             default:
-                throw new RuntimeException("ERROR: Expected opening bracket");
+                throw new RuntimeException("Expected opening bracket");
         }
     }
 
@@ -463,7 +481,7 @@ public class Parser {
             case CLOSEBRACKET:
                 return;
             default:
-                throw new RuntimeException("ERROR: Expected closing bracket");
+                throw new RuntimeException("Expected closing bracket");
         }
     }
 
