@@ -62,12 +62,12 @@ public class Parser {
 
         Expression expression = parseCommand();
 
-        getNextToken();
-        if (activeToken.getToken() != TokenType.END) {
+        if (!tokenQueue.isEmpty()) {
             throw new RuntimeException("Unexpected tokens remaining");
         }
 
         return expression;
+
     }
 
     // Updates the activeToken with the next token in the queue. If the end of the

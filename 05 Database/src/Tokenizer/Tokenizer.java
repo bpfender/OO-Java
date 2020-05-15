@@ -107,27 +107,23 @@ public class Tokenizer {
             for (TokenInfo tokenInfo : tokenSelectors) {
                 Matcher m = tokenInfo.regex.matcher(query);
 
+                // If match is found for tokenSelector, breaks out of loop
                 if (m.find()) {
                     tokenMatch = true;
-
-                    // TODO slightly neater string sanitisation
                     String description = m.group().trim().replaceAll("'", "");
-
                     tokenQueue.add(new Token(tokenInfo.type, description));
-
                     query = m.replaceFirst("");
                     break;
                 }
-
             }
 
+            // Check if match has been found
             if (!tokenMatch) {
                 throw new RuntimeException("ERROR: Invalid input in region '" + query + "'");
             }
         }
 
         return tokenQueue;
-
     }
 
     // Compiles a case insensitive pattern matcher, which gets added to a new
