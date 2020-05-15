@@ -18,7 +18,6 @@ public class Tokenizer {
             this.regex = regex;
             this.type = type;
         }
-
     }
 
     // Stores the searchable list of tokenselectors, allowign the next part of the

@@ -48,10 +48,11 @@ public class Parser {
     Token activeToken;
     LinkedList<Token> tokenQueue;
 
+    // First check that string ends with ;. Trim last character and pass to
+    // tokenizer and then parser.
     public Expression parseQuery(String query) throws RuntimeException {
         String input = query.trim();
-
-        System.out.println("\nQUERY: " + query);
+        System.out.println("\nQUERY: " + input);
 
         if (!input.endsWith(";")) {
             throw new RuntimeException("Semicolon missing from end of query");
@@ -59,7 +60,6 @@ public class Parser {
         input = input.substring(0, input.length() - 1);
 
         tokenQueue = tokenizer.tokenize(input);
-
         Expression expression = parseCommand();
 
         if (!tokenQueue.isEmpty()) {
@@ -67,23 +67,8 @@ public class Parser {
         }
 
         return expression;
-
     }
 
-    // Updates the activeToken with the next token in the queue. If the end of the
-    // queue is reached, an END type is returned, which can be used to check that a
-    // query terminated correctly/too/early/too late
-    private void getNextToken() {
-        if (tokenQueue.isEmpty()) {
-            activeToken = new Token(TokenType.END, null);
-        } else {
-            activeToken = tokenQueue.pop();
-        }
-    }
-
-    // TODO can this be refactored into a design pattern (strategy/chain of
-    // responsibiltiy)?
-    // TODO return types of parseMethods
     // The main switch statement that determines which command is being parsed. All
     // parsing methods throw an exception on unexpected input, which will get passed
     // back all the way to here, allowing errors to be handled centrally
@@ -114,6 +99,8 @@ public class Parser {
         }
     }
 
+    /* ------ MAIN COMMAND TOKENS ------ */
+
     private Use parseUse() throws RuntimeException {
         return new Use(parseName());
     }
@@ -129,24 +116,6 @@ public class Parser {
             default:
                 throw new RuntimeException("Must specify whether to CREATE database or table");
         }
-    }
-
-    private CreateTable parseCreateTable() throws RuntimeException {
-        String name = parseName();
-        List<String> attributes = null;
-
-        if (!tokenQueue.isEmpty()) {
-            parseOpenBracket();
-            attributes = parseList(TokenType.NAME);
-            parseCloseBracket();
-        }
-
-        return new CreateTable(name, attributes);
-
-    }
-
-    private CreateDatabase parseCreateDatabase() throws RuntimeException {
-        return new CreateDatabase(parseName());
     }
 
     private Expression parseDrop() throws RuntimeException {
@@ -169,27 +138,6 @@ public class Parser {
         return new Alter(tableName, parseAlterationType());
     }
 
-    private Expression parseAlterationType() throws RuntimeException {
-        getNextToken();
-        switch (activeToken.getToken()) {
-            case ADD:
-                return new Add(parseName());
-            case DROP:
-                return new Drop(parseName());
-            default:
-                throw new RuntimeException("Expected ADD or DROP");
-        }
-    }
-
-    // Helper function to consume required tokens that are expected but don't
-    // actually do anything
-    private void consumeRequiredToken(TokenType type) throws RuntimeException {
-        getNextToken();
-        if (activeToken.getToken() != type) {
-            throw new RuntimeException("Expected " + type);
-        }
-    }
-
     private Insert parseInsert() throws RuntimeException {
         consumeRequiredToken(TokenType.INTO);
 
@@ -207,9 +155,7 @@ public class Parser {
         return new Insert(name, values);
     }
 
-    // TODO
     private Select parseSelect() throws RuntimeException {
-
         List<String> attributes = new ArrayList<>();
 
         switch (tokenQueue.peek().getToken()) {
@@ -222,7 +168,6 @@ public class Parser {
             default:
                 throw new RuntimeException("Expected * or attributes");
         }
-
     }
 
     private Update parseUpdate() throws RuntimeException {
@@ -238,38 +183,47 @@ public class Parser {
 
     private Join parseJoin() throws RuntimeException {
         String name1 = parseName();
-        parseAnd();
+        consumeRequiredToken(TokenType.AND);
         String name2 = parseName();
 
-        parseOn();
+        consumeRequiredToken(TokenType.ON);
 
         String attrib1 = parseName();
-        parseAnd();
+        consumeRequiredToken(TokenType.AND);
         String attrib2 = parseName();
 
         return new Join(new And(name1, name2), new On(attrib1, attrib2));
-
     }
 
-    private void parseAnd() throws RuntimeException {
-        getNextToken();
-        switch (activeToken.getToken()) {
-            case AND:
-                break;
-            default:
-                throw new RuntimeException("Expected AND");
+    /* ------- Other reserved string commands ------ */
+
+    private CreateTable parseCreateTable() throws RuntimeException {
+        String name = parseName();
+        List<String> attributes = null;
+
+        if (!tokenQueue.isEmpty()) {
+            consumeRequiredToken(TokenType.OPENBRACKET);
+            attributes = parseList(TokenType.NAME);
+            consumeRequiredToken(TokenType.CLOSEBRACKET);
         }
+
+        return new CreateTable(name, attributes);
     }
 
-    private void parseOn() throws RuntimeException {
+    private CreateDatabase parseCreateDatabase() throws RuntimeException {
+        return new CreateDatabase(parseName());
+    }
+
+    private Expression parseAlterationType() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
-            case ON:
-                break;
+            case ADD:
+                return new Add(parseName());
+            case DROP:
+                return new Drop(parseName());
             default:
-                throw new RuntimeException("Expected ON");
+                throw new RuntimeException("Expected ADD or DROP");
         }
-
     }
 
     private Set parseSet() throws RuntimeException {
@@ -282,6 +236,54 @@ public class Parser {
             default:
                 throw new RuntimeException("Expected SET token");
         }
+    }
+
+    // TODO NO validation on from where. sometimes it's needed sometimes it isnt
+    private From parseFrom() throws RuntimeException {
+        getNextToken();
+
+        String name;
+        switch (activeToken.getToken()) {
+            case FROM:
+                name = parseName();
+                break;
+            default:
+                throw new RuntimeException("Expected FROM");
+        }
+
+        return new From(name, parseWhere());
+    }
+
+    private Where parseWhere() throws RuntimeException {
+        getNextToken();
+        switch (activeToken.getToken()) {
+            case WHERE:
+                return new Where(parseCondition());
+            case END:
+                return null;
+            default:
+                throw new RuntimeException("Unexpected token");
+        }
+    }
+
+    /* ------- Parse lists ------ */
+
+    private List<String> parseList(TokenType type) throws RuntimeException {
+        List<String> attributes = new ArrayList<>();
+
+        getNextToken();
+
+        while (activeToken.getToken() == type) {
+            attributes.add(activeToken.getValue());
+
+            if (tokenQueue.peek().getToken() != TokenType.COMMA) {
+                return attributes;
+            }
+            getNextToken(); // consume comma
+            getNextToken(); // consume attirbute
+        }
+
+        throw new RuntimeException("Unexpected value in list");
     }
 
     private HashMap<String, String> parseNameValueList() throws RuntimeException {
@@ -312,33 +314,7 @@ public class Parser {
         nameValuePairs.put(name, value);
     }
 
-    // NO validation on from where. sometimes it's needed sometimes it isnt
-    private From parseFrom() throws RuntimeException {
-        getNextToken();
-
-        String name;
-        switch (activeToken.getToken()) {
-            case FROM:
-                name = parseName();
-                break;
-            default:
-                throw new RuntimeException("Expected FROM");
-
-        }
-        return new From(name, parseWhere());
-    }
-
-    private Where parseWhere() throws RuntimeException {
-        getNextToken();
-        switch (activeToken.getToken()) {
-            case WHERE:
-                return new Where(parseCondition());
-            case END:
-                return null;
-            default:
-                throw new RuntimeException("Unexpected token");
-        }
-    }
+    /* ----- Functions to build condition tree ------ */
 
     private Node parseCondition() throws RuntimeException {
         getNextToken();
@@ -347,23 +323,23 @@ public class Parser {
             case OPENBRACKET:
                 Node condition;
                 Node leftNode = parseCondition();
-                parseCloseBracket();
+                consumeRequiredToken(TokenType.CLOSEBRACKET);
 
                 getNextToken();
                 switch (activeToken.getToken()) {
                     case AND:
-                        parseOpenBracket();
+                        consumeRequiredToken(TokenType.OPENBRACKET);
                         condition = new AndNode(leftNode, parseCondition());
                         break;
                     case OR:
-                        parseOpenBracket();
+                        consumeRequiredToken(TokenType.OPENBRACKET);
                         condition = new OrNode(leftNode, parseCondition());
                         break;
                     default:
                         throw new RuntimeException("Expected AND or OR");
 
                 }
-                parseCloseBracket();
+                consumeRequiredToken(TokenType.CLOSEBRACKET);
                 return condition;
             case NAME:
                 String name = activeToken.getValue();
@@ -424,6 +400,8 @@ public class Parser {
         return operator;
     }
 
+    /* ------ Parse tokens where value matters and is returned ------ */
+
     private String parseValue() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
@@ -434,25 +412,6 @@ public class Parser {
         }
     }
 
-    private List<String> parseList(TokenType type) throws RuntimeException {
-        List<String> attributes = new ArrayList<>();
-
-        getNextToken();
-
-        while (activeToken.getToken() == type) {
-            attributes.add(activeToken.getValue());
-
-            if (tokenQueue.peek().getToken() != TokenType.COMMA) {
-                return attributes;
-            }
-            getNextToken(); // consume comma
-            getNextToken(); // consume attirbute
-        }
-
-        throw new RuntimeException("Unexpected value in list");
-
-    }
-
     private String parseName() throws RuntimeException {
         getNextToken();
 
@@ -461,27 +420,26 @@ public class Parser {
                 return activeToken.getValue();
             default:
                 throw new RuntimeException("Must specify name");
-
         }
     }
 
-    private void parseOpenBracket() throws RuntimeException {
+    // Helper function to consume required tokens that are expected but don't
+    // actually do anything
+    private void consumeRequiredToken(TokenType type) throws RuntimeException {
         getNextToken();
-        switch (activeToken.getToken()) {
-            case OPENBRACKET:
-                return;
-            default:
-                throw new RuntimeException("Expected opening bracket");
+        if (activeToken.getToken() != type) {
+            throw new RuntimeException("Expected " + type);
         }
     }
 
-    private void parseCloseBracket() throws RuntimeException {
-        getNextToken();
-        switch (activeToken.getToken()) {
-            case CLOSEBRACKET:
-                return;
-            default:
-                throw new RuntimeException("Expected closing bracket");
+    // Updates the activeToken with the next token in the queue. If the end of the
+    // queue is reached, an END type is returned, which can be used to check that a
+    // query terminated correctly/too/early/too late
+    private void getNextToken() {
+        if (tokenQueue.isEmpty()) {
+            activeToken = new Token(TokenType.END, null);
+        } else {
+            activeToken = tokenQueue.pop();
         }
     }
 
