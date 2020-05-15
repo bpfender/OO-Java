@@ -43,16 +43,20 @@ public class DatabaseHandler {
         if (dbHandlerFile.exists()) {
             System.out.println("Loading info.storage database file");
 
-            // Is it possible to avoid an unchecked cast warning no the below? Couldn't
-            // figure out how...
+            // Is it possible to avoid an unchecked cast warning below? Couldn't
+            // figure out how other than this
             try {
-                databases = (HashMap<String, File>) readSerializedObject(dbHandlerFile);
+                @SuppressWarnings("unchecked")
+                HashMap<String, File> tmp = (HashMap<String, File>) readSerializedObject(dbHandlerFile);
+                databases = tmp;
 
             } catch (ClassNotFoundException | IOException e) {
                 System.out.println(e.getMessage());
                 System.exit(1);
             }
-        } else {
+        } else
+
+        {
             try {
                 databases = new HashMap<>();
 
