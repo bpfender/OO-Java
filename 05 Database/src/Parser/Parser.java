@@ -12,6 +12,7 @@ import ConditionTree.OperatorNode;
 import ConditionTree.OrNode;
 import Interpreter.Add;
 import Interpreter.Alter;
+import Interpreter.AlterationType;
 import Interpreter.And;
 import Interpreter.CreateDatabase;
 import Interpreter.CreateTable;
@@ -142,11 +143,7 @@ public class Parser {
         consumeRequiredToken(TokenType.INTO);
 
         String name = parseName();
-
-        getNextToken();
-        if (activeToken.getToken() != TokenType.VALUES) {
-            throw new RuntimeException("Expected VALUES token");
-        }
+        consumeRequiredToken(TokenType.VALUES);
 
         consumeRequiredToken(TokenType.OPENBRACKET);
         List<String> values = parseList(TokenType.LITERAL);
@@ -158,6 +155,8 @@ public class Parser {
     private Select parseSelect() throws RuntimeException {
         List<String> attributes = new ArrayList<>();
 
+        // Must first peek to check if the token is wildcard or not. If it is, consume,
+        // otherwise process the list
         switch (tokenQueue.peek().getToken()) {
             case WILD:
                 getNextToken();
@@ -177,8 +176,6 @@ public class Parser {
 
     private Delete parseDelete() throws RuntimeException {
         return new Delete(parseFrom());
-        // TODO this doesn't handle variable where at the moment i.e. must have where-
-        // ensure!
     }
 
     private Join parseJoin() throws RuntimeException {
@@ -214,7 +211,7 @@ public class Parser {
         return new CreateDatabase(parseName());
     }
 
-    private Expression parseAlterationType() throws RuntimeException {
+    private AlterationType parseAlterationType() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
             case ADD:
@@ -238,7 +235,6 @@ public class Parser {
         }
     }
 
-    // TODO NO validation on from where. sometimes it's needed sometimes it isnt
     private From parseFrom() throws RuntimeException {
         getNextToken();
 
@@ -254,6 +250,9 @@ public class Parser {
         return new From(name, parseWhere());
     }
 
+    // Slightly fudged. Doesn't require WHERE for Delete. Non-specified WHERE will
+    // delete all records from table. Let's call it additional functionality. Could
+    // also just have added a flag in the attributes to require WHERE or not
     private Where parseWhere() throws RuntimeException {
         getNextToken();
         switch (activeToken.getToken()) {
@@ -268,6 +267,8 @@ public class Parser {
 
     /* ------- Parse lists ------ */
 
+    // Parses single element (rather than namevaluepair) lists based on type passed
+    // in
     private List<String> parseList(TokenType type) throws RuntimeException {
         List<String> attributes = new ArrayList<>();
 
@@ -316,6 +317,7 @@ public class Parser {
 
     /* ----- Functions to build condition tree ------ */
 
+    // Builds condition tree for where statement.
     private Node parseCondition() throws RuntimeException {
         getNextToken();
 
@@ -346,11 +348,12 @@ public class Parser {
                 Predicate<String> operator = parseOperator();
                 return new OperatorNode(name, operator);
             default:
-                throw new RuntimeException("In condition 1");
+                throw new RuntimeException("In condition attribute");
         }
 
     }
 
+    // Select relevant predicate based on comparison operator
     private Predicate<String> parseOperator() throws RuntimeException {
         getNextToken();
         Predicate<String> operator;

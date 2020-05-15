@@ -1,6 +1,6 @@
 package Interpreter;
 
-public class Drop implements Expression {
+public class Drop implements AlterationType {
     String attribute;
 
     public Drop(String attribute) {

@@ -109,6 +109,8 @@ public class Tokenizer {
                 // If match is found for tokenSelector, breaks out of loop
                 if (m.find()) {
                     tokenMatch = true;
+                    // This is somewhat brittle without explicit typing. It will break if a
+                    // String literal is input as number forms i.e. '10'
                     String description = m.group().trim().replaceAll("'", "");
                     tokenQueue.add(new Token(tokenInfo.type, description));
                     query = m.replaceFirst("");

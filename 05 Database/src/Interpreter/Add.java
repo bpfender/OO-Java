@@ -1,6 +1,6 @@
 package Interpreter;
 
-public class Add implements Expression {
+public class Add implements AlterationType {
     private String attribute;
 
     public Add(String attribute) {

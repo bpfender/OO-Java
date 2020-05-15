@@ -1,4 +1,3 @@
-import Database.DatabaseHandler;
 import Interpreter.Context;
 import Interpreter.Expression;
 import Parser.Parser;

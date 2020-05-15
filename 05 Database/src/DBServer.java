@@ -51,7 +51,9 @@ public class DBServer {
         out.write(output + "\n" + DBClient.EOT + "\n");
         out.flush();
 
-        // TODO would like some more intelligence with this.
+        // Write changes to file after every query. Could have a little more
+        // intelligence to only write when changes are made by moving to
+        // Context.excute() method
         DatabaseHandler.getInstance().writeChangesToFile();
     }
 

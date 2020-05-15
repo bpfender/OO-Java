@@ -6,13 +6,7 @@ public class Alter implements Expression {
     private String tableName;
     private Expression expression;
 
-    // TODO this needs to be fixed
-    public Alter(String tableName, Expression expression) {
-        this.tableName = tableName;
-        this.expression = expression;
-    }
-
-    public Alter(String tableName, Drop expression) {
+    public Alter(String tableName, AlterationType expression) {
         this.tableName = tableName;
         this.expression = expression;
     }
